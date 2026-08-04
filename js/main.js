@@ -18,42 +18,47 @@ function resizeCanvas(){
     document.getElementById("gameCanvas");
 
 
-    const ratio =
-    800 / 700;
+    const gameWidth = 800;
+    const gameHeight = 700;
 
 
-    let width =
+    const screenWidth =
     window.innerWidth;
 
 
-    let height =
+    const screenHeight =
     window.innerHeight;
 
 
 
-    if(width / height > ratio){
+    const scaleX =
+    screenWidth / gameWidth;
 
-        width = height * ratio;
 
-    }
-    else{
+    const scaleY =
+    screenHeight / gameHeight;
 
-        height = width / ratio;
 
-    }
+
+    // 小さい方を採用して比率維持
+
+    const scale =
+    Math.min(
+        scaleX,
+        scaleY
+    );
 
 
 
     canvas.style.width =
-    width + "px";
+    (gameWidth * scale) + "px";
 
 
     canvas.style.height =
-    height + "px";
+    (gameHeight * scale) + "px";
 
 
 }
-
 
 
 window.addEventListener(
