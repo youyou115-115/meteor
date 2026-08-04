@@ -31,7 +31,7 @@ reset(){
 
     if(Game.isMobile){
 
-    this.speed = 2.0;
+    this.speed = 1.0;
 
 }
 else{
@@ -78,7 +78,7 @@ update(){
 
 
 
-        this.destroyTimer--;
+        this.destroyTimer -= Game.deltaTime;
 
 
 
@@ -250,7 +250,8 @@ update(){
 
 
 
-    this.z -= this.speed;
+    this.z -=
+this.speed * Game.deltaTime;
 
 
 
