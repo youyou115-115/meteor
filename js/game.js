@@ -16,11 +16,17 @@ meteor:null,
 
 coin:null,
 
+isMobile:false,
+
 
 roulette:Roulette,
 
 
 danger:0,
+
+lastTime:0,
+
+deltaTime:1,
 
 
 // 残機コイン配列
@@ -39,6 +45,9 @@ power:1,
 
 
 init(){
+
+    this.isMobile =
+window.innerWidth < 700;
 
 
 

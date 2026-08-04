@@ -40,12 +40,13 @@ class Debris{
     update(){
 
 
-        this.x += this.vx;
+        this.x += this.vx * Game.deltaTime;
 
-        this.y += this.vy;
+this.y += this.vy * Game.deltaTime;
 
 
-        this.vy += 0.25;
+this.vy += 
+0.25 * Game.deltaTime;
 
 
         this.life--;
