@@ -31,7 +31,7 @@ reset(){
 
     if(Game.isMobile){
 
-    this.speed = 4;
+    this.speed = 2.8;
 
 }
 else{
