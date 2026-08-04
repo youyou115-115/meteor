@@ -193,11 +193,17 @@ for(let coin of Game.coins){
 
 }
 
+// =====================
+// TITLE SCREEN
+// =====================
+
 if(Game.state === "TITLE"){
 
 
-    ctx.fillStyle =
-    "#02020a";
+
+    // 背景
+
+    ctx.fillStyle="#02020a";
 
     ctx.fillRect(
         0,
@@ -207,10 +213,298 @@ if(Game.state === "TITLE"){
     );
 
 
-    ctx.fillStyle="white";
 
 
-    ctx.font="90px sans-serif";
+    // =====================
+    // 星
+    // =====================
+
+
+    for(let i=0;i<80;i++){
+
+
+        const x =
+        (i * 97) % 800;
+
+
+        const y =
+        (i * 53) % 700;
+
+
+
+        const size =
+        1 + (i%3);
+
+
+
+        ctx.fillStyle =
+        "rgba(255,255,255,0.5)";
+
+
+        ctx.fillRect(
+            x,
+            y,
+            size,
+            size
+        );
+
+
+    }
+
+
+
+
+
+
+    // =====================
+    // タイトル隕石
+    // =====================
+
+
+
+    const meteorX = 400;
+
+const meteorY = 120;
+
+
+    const fire =
+ctx.createRadialGradient(
+    meteorX,
+    meteorY,
+    20,
+    meteorX,
+    meteorY,
+    100
+);
+
+
+    fire.addColorStop(
+        0,
+        "rgba(255,180,50,0.9)"
+    );
+
+
+    fire.addColorStop(
+        0.5,
+        "rgba(255,50,0,0.5)"
+    );
+
+
+    fire.addColorStop(
+        1,
+        "rgba(255,0,0,0)"
+    );
+
+
+    ctx.fillStyle=fire;
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        meteorX,
+        meteorY,
+        100,
+        0,
+        Math.PI*2
+    );
+
+
+    ctx.fill();
+
+
+
+
+  // =====================
+// リアル隕石
+// =====================
+
+
+const r = 55;
+
+
+ctx.save();
+
+
+ctx.translate(
+    meteorX,
+    meteorY
+);
+
+
+
+// 不規則な岩形状
+
+ctx.beginPath();
+
+
+const points = 12;
+
+
+for(let i=0;i<points;i++){
+
+
+    const angle =
+    Math.PI*2*i/points;
+
+
+    const size =
+    r*(0.85 + Math.random()*0.15);
+
+
+    const x =
+    Math.cos(angle)*size;
+
+
+    const y =
+    Math.sin(angle)*size;
+
+
+
+    if(i===0){
+
+        ctx.moveTo(x,y);
+
+    }
+    else{
+
+        ctx.lineTo(x,y);
+
+    }
+
+
+}
+
+
+ctx.closePath();
+
+
+
+// 岩のグラデーション
+
+const rock =
+ctx.createRadialGradient(
+    -20,
+    -25,
+    5,
+    0,
+    0,
+    r
+);
+
+
+rock.addColorStop(
+    0,
+    "#999"
+);
+
+
+rock.addColorStop(
+    0.4,
+    "#555"
+);
+
+
+rock.addColorStop(
+    1,
+    "#111"
+);
+
+
+ctx.fillStyle=rock;
+
+ctx.fill();
+
+
+
+
+// クレーター
+
+ctx.fillStyle=
+"rgba(0,0,0,0.45)";
+
+
+ctx.beginPath();
+
+ctx.arc(
+    -20,
+    -15,
+    13,
+    0,
+    Math.PI*2
+);
+
+ctx.fill();
+
+
+
+ctx.beginPath();
+
+ctx.arc(
+    18,
+    5,
+    9,
+    0,
+    Math.PI*2
+);
+
+ctx.fill();
+
+
+
+ctx.beginPath();
+
+ctx.arc(
+    -5,
+    25,
+    7,
+    0,
+    Math.PI*2
+);
+
+ctx.fill();
+
+
+
+
+
+
+
+
+ctx.restore();
+
+
+
+
+
+    // =====================
+    // METEOR文字
+    // =====================
+
+
+
+    const glow =
+    Math.sin(
+        Date.now()/300
+    )*15+30;
+
+
+
+    ctx.shadowColor =
+    "orange";
+
+
+    ctx.shadowBlur =
+    glow;
+
+
+
+    ctx.fillStyle="#ffffff";
+
+
+    ctx.font=
+    "90px sans-serif";
 
 
     ctx.textAlign="center";
@@ -219,18 +513,90 @@ if(Game.state === "TITLE"){
     ctx.fillText(
         "METEOR",
         400,
-        280
+        300
     );
 
 
-    ctx.font="35px sans-serif";
+
+    ctx.shadowBlur=0;
+
+
+
+
+
+
+
+    // サブタイトル
+
+
+    ctx.fillStyle=
+    "#ff9900";
+
+
+    ctx.font=
+    "24px sans-serif";
+
+
+    ctx.fillText(
+        "DEFEND THE EARTH",
+        400,
+        350
+    );
+
+
+
+
+
+
+    // =====================
+    // START点滅
+    // =====================
+
+
+    const alpha =
+    (Math.sin(
+        Date.now()/300
+    )+1)/2;
+
+
+
+    ctx.fillStyle =
+    `rgba(255,255,255,${alpha})`;
+
+
+
+    ctx.font =
+    "40px sans-serif";
 
 
     ctx.fillText(
         "TAP TO START",
         400,
-        420
+        470
     );
+
+
+
+
+
+
+    // 操作説明
+
+
+    ctx.fillStyle=
+    "rgba(255,255,255,0.6)";
+
+
+    ctx.font=
+    "20px sans-serif";
+
+
+    ctx.fillText(
+        "SLOT → THROW COIN → DESTROY METEOR",
+        400,
+        540
+    );
+
 
 
 }

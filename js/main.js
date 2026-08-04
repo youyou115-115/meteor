@@ -81,15 +81,12 @@ function rouletteInput(){
 
     if(Game.state === "GAMEOVER"){
 
-    Game.state = "TITLE";
 
-    Game.meteor.reset();
+    Game.toTitle();
 
-    Game.impactFlash = 0;
-
-    Camera.shake = 0;
 
     return;
+
 
 }
 
