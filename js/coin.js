@@ -173,9 +173,16 @@ class Coin{
     ){
 
 
-        const damage =
+    let damage = 10;
 
-20 * this.power;
+
+if(Game.bonus){
+
+    damage = 20 * this.power;
+
+    Game.bonus = false;
+
+}
 
 
 
@@ -196,11 +203,15 @@ Game.meteor.damage(damage);
 
     if(this.y < -50){
 
-        this.reset();
+    this.reset();
 
-        Game.state="GAME";
+    Game.bonus = false;
 
-    }
+    Game.power = 1;
+
+    Game.state="GAME";
+
+}
 
 
 

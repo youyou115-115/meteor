@@ -12,6 +12,8 @@ const Roulette = {
 
     active:false,
 
+    
+
      mode:"IDLE",
 
 
@@ -57,6 +59,7 @@ reelSpeed:[
 
 
     highlightLines:[],
+    targetNumber:null,
 
 
 
@@ -134,9 +137,9 @@ for(let x=0;x<3;x++){
 
 
 this.reelSpeed=[
-    0.8,
-    0.8,
-    0.8
+    0.01,
+    0.01,
+    0.01
 ];
 
     this.phase=0;
@@ -282,37 +285,63 @@ for(let x=0;x<3;x++){
 
     if(this.phase===0){
 
+    this.stopColumn(0);
 
-        this.stopColumn(0);
-
-        this.stopped[0]=true;
-
-
-        this.phase=1;
+    this.stopped[0]=true;
 
 
-        return;
+    const pos =
+    Math.floor(
+        this.reelPos[0] *
+        this.reels[0].length
+    );
 
-    }
+
+    this.targetNumber =
+    this.reels[0][
+        pos
+    ];
 
 
+    this.phase=1;
 
-    // 真ん中
+    return;
+
+}
+
+
 
     if(this.phase===1){
 
+    this.stopColumn(1);
 
-        this.stopColumn(1);
-
-        this.stopped[1]=true;
-
-
-        this.phase=2;
+    this.stopped[1]=true;
 
 
-        return;
+    // 40%で左に合わせる
+
+    if(Math.random() < 0.4){
+
+
+        const pos =
+        Math.floor(
+            this.reelPos[1] *
+            this.reels[1].length
+        );
+
+
+        this.reels[1][pos] =
+        this.targetNumber;
+
 
     }
+
+
+    this.phase=2;
+
+    return;
+
+}
 
 
 
@@ -320,14 +349,31 @@ for(let x=0;x<3;x++){
 
     if(this.phase===2){
 
-
     this.stopColumn(2);
+
+
+    // 20%で揃える
+
+    if(Math.random() < 0.2){
+
+
+        const pos =
+        Math.floor(
+            this.reelPos[2] *
+            this.reels[2].length
+        );
+
+
+        this.reels[2][pos] =
+        this.targetNumber;
+
+
+    }
 
 
     this.phase=3;
 
     this.phaseTimer=20;
-
 
     return;
 
@@ -341,15 +387,73 @@ for(let x=0;x<3;x++){
 
 
 
-    stopColumn(column){
+   stopColumn(column){
 
 
     this.stopped[column]=true;
 
 
+
+    // =====================
+    // リール補正
+    // =====================
+
+    let rate = 0;
+
+
+    if(column === 0){
+
+        // 左リール 50%
+        rate = 0.5;
+
+    }
+    else if(column === 1){
+
+        // 中央リール 40%
+        rate = 0.4;
+
+    }
+    else if(column === 2){
+
+        // 右リール 30%
+        rate = 0.3;
+
+    }
+
+
+
+    if(Math.random() < rate){
+
+
+        const pos =
+        Math.floor(
+            this.reelPos[column] *
+            this.reels[column].length
+        );
+
+
+        // 表示されている数字
+        const value =
+        this.reels[column][
+            pos
+        ];
+
+
+
+        // 同じ数字を次の位置にも配置
+
+        this.reels[column][
+            (pos+1) %
+            this.reels[column].length
+        ] = value;
+
+
+
+    }
+
+
+
 },
-
-
 
 
 
@@ -493,6 +597,21 @@ Game.state="READY";
 
 // 結果表示時間
 this.resultTimer = 60;
+
+Game.power = this.result;
+
+
+// 2以上が揃った時だけ強化
+if(this.result > 1){
+
+    Game.bonus = true;
+
+}
+else{
+
+    Game.bonus = false;
+
+}
 
 
 

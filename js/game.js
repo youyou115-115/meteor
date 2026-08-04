@@ -27,6 +27,8 @@ danger:0,
 lastTime:0,
 
 deltaTime:1,
+power:1,
+bonus:false,
 
 
 
@@ -70,6 +72,8 @@ window.innerWidth < 700;
 
     this.ctx =
     this.canvas.getContext("2d");
+
+    let touchLock=false;
 
 
 
@@ -130,6 +134,13 @@ start(){
 
 
     this.impactFlash=0;
+
+    this.coin.active=false;
+    this.meteor.destroying=false;
+    Roulette.mode="IDLE";
+    Roulette.visible=false;
+    Roulette.resultTimer=0;
+    this.power=1;
 
 
 

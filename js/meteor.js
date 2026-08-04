@@ -31,12 +31,12 @@ reset(){
 
     if(Game.isMobile){
 
-    this.speed = 3.5;
+    this.speed = 5;
 
 }
 else{
 
-    this.speed = 3.5;
+    this.speed = 5;
 
 }
 
@@ -59,6 +59,12 @@ else{
 
 
     this.debris=[];
+
+    this.destroying = false;
+this.destroyPhase = 0;
+this.destroyTimer = 0;
+
+this.debris = [];
 
 
 }
@@ -164,13 +170,14 @@ Math.min(
 
             if(this.destroyTimer <= 0){
 
+    this.reset();
 
+    this.x = 400;
+    this.y = 150;
+    this.z = 1000;
+    this.hp = this.maxHp;
 
-
-                this.reset();
-
-
-            }
+}
 
 
         }
@@ -263,23 +270,17 @@ damage(value){
 
 
 
-    if(this.hp <= 0){
+    if(this.hp <= 0 && !this.destroying){
 
+    this.hp = 0;
 
+    this.destroying=true;
 
-        this.destroying=true;
+    this.destroyPhase=1;
 
+    this.destroyTimer=30;
 
-        // ヒビ開始
-
-        this.destroyPhase=1;
-
-
-        this.destroyTimer=30;
-
-
-
-    }
+}
 
 
 
@@ -559,27 +560,34 @@ draw(ctx){
 
     if(this.destroying){
 
-
+    if(this.destroyPhase === 1){
 
         ctx.fillStyle="white";
 
     }
+    else if(this.destroyPhase === 2){
 
-    else if(this.damageFlash>0){
-
-
-        ctx.fillStyle="white";
-
+        ctx.fillStyle =
+        "rgba(255,255,255,0.8)";
 
     }
-
     else{
-
 
         ctx.fillStyle=rock;
 
-
     }
+
+}
+else if(this.damageFlash>0){
+
+    ctx.fillStyle="white";
+
+}
+else{
+
+    ctx.fillStyle=rock;
+
+}
 
 
 

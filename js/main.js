@@ -132,7 +132,19 @@ function rouletteInput(){
 
 
 
-    
+    if(Game.meteor.destroying){
+
+    return;
+
+}
+
+
+// ルーレット結果表示中は入力禁止
+if(Roulette.resultTimer > 0){
+
+    return;
+
+}
 
 
 
