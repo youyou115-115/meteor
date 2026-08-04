@@ -166,52 +166,6 @@ Math.min(
 
 
 
-                // コイン回復
-
-                for(let i=0;i<2;i++){
-
-
-
-                    if(Game.coins.length < 3){
-
-
-
-                        const coin =
-                        new Coin();
-
-
-
-                        coin.x =
-                        50 +
-                        Game.coins.length*35;
-
-
-
-                        coin.y=650;
-
-
-                        coin.scale=0.6;
-
-
-                        coin.rotationSpeed=0;
-
-
-                        coin.displayOnly=true;
-
-
-
-                        Game.coins.push(
-                            coin
-                        );
-
-
-
-                    }
-
-
-                }
-
-
 
                 this.reset();
 

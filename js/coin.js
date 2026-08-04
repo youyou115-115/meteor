@@ -46,6 +46,9 @@ class Coin{
 
   throw(){
 
+      // ルーレット非表示
+    Roulette.visible=false;
+
 
     this.active = true;
 
@@ -181,7 +184,7 @@ Game.meteor.damage(damage);
 
         this.reset();
 
-        Game.state="READY";
+        Game.state="GAME";
 
 
     }
@@ -195,7 +198,7 @@ Game.meteor.damage(damage);
 
         this.reset();
 
-        Game.state="READY";
+        Game.state="GAME";
 
     }
 

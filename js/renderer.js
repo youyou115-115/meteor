@@ -67,60 +67,29 @@ draw(){
     }
 
 
+if(Game.state !== "TITLE"){
 
     // 隕石
 
     Game.meteor.draw(ctx);
 
 
-
     // コイン
 
     Game.coin.draw(ctx);
 
+
     // ルーレット
 
-Roulette.draw(ctx);
+    Roulette.draw(ctx);
+
+}
 
 
 
 
 
     ctx.restore();
-
-
-if(Roulette.stopTimer > 0){
-
-
-    ctx.fillStyle="white";
-
-
-    ctx.font="60px sans-serif";
-
-
-    ctx.textAlign="center";
-
-
-    ctx.fillText(
-
-        "POWER ×"+Roulette.result,
-
-        400,
-
-        120
-
-    );
-
-
-}
-
-// 残機コイン
-
-for(let coin of Game.coins){
-
-    coin.draw(ctx);
-
-}
 
 
 

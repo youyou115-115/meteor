@@ -32,8 +32,7 @@ deltaTime:1,
 
 
 
-// 残機コイン配列
-coins:[],
+
 
 
 // 状態管理
@@ -50,6 +49,8 @@ power:1,
 
 
 init(){
+
+    Roulette.init();
 
     this.isMobile =
 window.innerWidth < 700;
@@ -81,82 +82,16 @@ window.innerWidth < 700;
     this.meteor =
     new Meteor();
 
+ // 攻撃用コイン
 
-
-
-
-    // =====================
-    // 攻撃用コイン
-    // =====================
-
-    this.coin =
-    new Coin();
+this.coin =
+new Coin();
 
 
 
 
 
-    // =====================
-    // 残機コイン作成
-    // =====================
 
-    this.coins=[];
-
-
-
-    for(let i=0;i<3;i++){
-
-
-
-        const coin =
-        new Coin();
-
-
-
-
-        // 左下配置
-
-        coin.x =
-        50 + i * 35;
-
-
-        coin.y =
-        650;
-
-
-
-
-        // 小型表示
-
-        coin.scale =
-        0.6;
-
-
-
-
-        // 回転停止
-
-        coin.rotationSpeed =
-        0;
-
-
-
-
-        // 表示専用
-
-        coin.displayOnly =
-        true;
-
-
-
-
-        this.coins.push(
-            coin
-        );
-
-
-
-    }
 
     this.state = "TITLE";
 
@@ -196,34 +131,6 @@ start(){
 
     this.impactFlash=0;
 
-
-    this.coinCount=3;
-
-
-    this.coins=[];
-
-
-    for(let i=0;i<3;i++){
-
-
-        const coin = new Coin();
-
-
-        coin.x=50+i*35;
-
-        coin.y=650;
-
-        coin.scale=0.6;
-
-        coin.rotationSpeed=0;
-
-        coin.displayOnly=true;
-
-
-        this.coins.push(coin);
-
-
-    }
 
 
 },
@@ -326,40 +233,6 @@ toTitle(){
 
     Camera.shake=0;
 
-
-
-    this.coins=[];
-
-
-    for(let i=0;i<3;i++){
-
-
-        const coin =
-        new Coin();
-
-
-        coin.x =
-        50+i*35;
-
-
-        coin.y=650;
-
-
-        coin.scale=0.6;
-
-
-        coin.rotationSpeed=0;
-
-
-        coin.displayOnly=true;
-
-
-        this.coins.push(
-            coin
-        );
-
-
-    }
 
 
 }

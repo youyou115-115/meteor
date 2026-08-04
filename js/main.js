@@ -120,13 +120,6 @@ function rouletteInput(){
 
 
 
-    // 結果表示中
-
-    if(Roulette.stopTimer > 0){
-
-        return;
-
-    }
 
      // 隕石破壊演出中
 
@@ -138,13 +131,6 @@ function rouletteInput(){
 
 
 
-    // コインなし
-
-    if(Game.coinCount <= 0){
-
-        return;
-
-    }
 
     
 

@@ -1,5 +1,5 @@
 /*
-    Meteor Ver0.5
+    Meteor Ver1.1
     roulette.js
 */
 
@@ -7,43 +7,89 @@
 const Roulette = {
 
 
+    grid:[],
+
+
     active:false,
 
-
-    position:0,
-
-
-    speed:30,
-
-
-    result:1,
+     mode:"IDLE",
 
 
     stopTimer:0,
 
 
-
-    values:[
-
-        1,
-        2,
-        3,
-        5,
-        10
-
-    ],
+    result:1,
 
 
+    phase:0,
+
+    resultTimer:0,
+
+
+    phaseTimer:0,
+    scrollSpeed:20,
+
+offset:[0,0,0],
+
+stopped:[false,false,false],
+
+    visible:false,
+
+    reels:[
+    [],
+    [],
+    []
+],
+
+reelPos:[
+    0,
+    0,
+    0
+],
+
+reelSpeed:[
+    0,
+    0,
+    0
+],
+
+   
+
+
+    highlightLines:[],
 
 
 
-    start(){
+
+    init(){
 
 
-        this.active = true;
+        this.reels=[];
 
 
-        this.speed = 30;
+for(let x=0;x<3;x++){
+
+    this.reels[x]=[];
+
+
+    for(let i=0;i<30;i++){
+
+        this.reels[x].push(
+            this.randomNumber()
+        );
+
+    }
+
+}
+
+    },
+
+
+
+    randomNumber(){
+
+
+        return Math.floor(Math.random()*9)+1;
 
 
     },
@@ -52,40 +98,51 @@ const Roulette = {
 
 
 
-    update(){
+    start(){
 
-
-    // 停止後の表示時間カウント
-
-    if(this.stopTimer > 0){
-
-        this.stopTimer--;
-
-    }
-
-
-
-    // 停止中なら回転処理なし
-
-    if(!this.active){
-
+    if(this.active){
         return;
-
     }
 
 
+    this.mode="SPIN";
 
-    // スロット回転
+     this.visible=true;
 
-    this.position += this.speed;
+    this.active=true;
+
+        // ★追加
+    this.stopped=[
+        false,
+        false,
+        false
+    ];
 
 
+    // ★追加
+    this.offset=[
+        0,
+        0,
+        0
+    ];
 
-    if(this.position > 100000){
+    this.reelPos=[
+    0,
+    0,
+    0
+];
 
-        this.position = 0;
 
-    }
+this.reelSpeed=[
+    0.8,
+    0.8,
+    0.8
+];
+
+    this.phase=0;
+
+
+    this.highlightLines=[];
 
 
 
@@ -95,47 +152,34 @@ const Roulette = {
 
 
 
+    update(){
 
-    stop(){
+if(this.resultTimer > 0){
 
+    this.resultTimer--;
 
-        this.active = false;
+    if(this.resultTimer <= 0){
 
+        Game.coin.throw();
 
+        this.visible=false;
 
-        const index =
+        this.mode="IDLE";
 
-        Math.floor(
+    }
 
-            this.position / 60
+    return;
 
-        )
-        %
-        this.values.length;
+}
 
-
-
-        this.result =
-
-        this.values[index];
+        if(this.stopTimer>0){
 
 
+            this.stopTimer--;
 
-        this.stopTimer = 120;
-
-        Game.power = this.result;
-
-
-// 少し表示してから攻撃
-
-setTimeout(()=>{
-
-
-    // 残機チェック
-
-    if(Game.coins.length <= 0){
-
-        console.log("残機なし");
+        }
+        
+           if(this.mode !== "SPIN"){
 
         return;
 
@@ -143,81 +187,316 @@ setTimeout(()=>{
 
 
 
-    // 残機を消費
+        if(!this.active){
 
-    Game.coins.pop();
+            return;
 
-
-    Game.coinCount =
-    Game.coins.length;
+        }
 
 
 
-    Game.state="THROW";
+
+        // =====================
+// リール回転
+// =====================
+
+for(let x=0;x<3;x++){
 
 
-    Game.coin.throw();
+    if(this.stopped[x]){
+
+        continue;
+
+    }
+
+
+    this.reelPos[x] +=
+    this.reelSpeed[x] *
+    Game.deltaTime;
 
 
 
-},800);
+    if(this.reelPos[x] >= 1){
 
 
+        this.reelPos[x] -= 1;
 
-        console.log(
 
-            "POWER ×",
+        // リールを進める
 
-            this.result
-
+        this.reels[x].push(
+            this.randomNumber()
         );
 
 
-
-    },
-
+        this.reels[x].shift();
 
 
+    }
 
 
+}
 
 
-    getColor(value){
+        // 停止演出
 
 
-        if(value === 10){
-
-            return "#ffd700";
-
-        }
+        if(this.phaseTimer>0){
 
 
-        if(value === 5){
-
-            return "#ff3300";
-
-        }
+    this.phaseTimer -= Game.deltaTime;
 
 
-        if(value === 3){
+    if(this.phaseTimer<=0 && this.phase===3){
 
-            return "#00cc66";
+        this.finish();
 
-        }
-
-
-        if(value === 2){
-
-            return "#3399ff";
-
-        }
+    }
 
 
-        return "#aaaaaa";
+    return;
+
+}
 
 
     },
 
+
+
+
+
+
+
+   stop(){
+
+
+    if(!this.active){
+
+        return;
+
+    }
+
+
+
+    // 左
+
+    if(this.phase===0){
+
+
+        this.stopColumn(0);
+
+        this.stopped[0]=true;
+
+
+        this.phase=1;
+
+
+        return;
+
+    }
+
+
+
+    // 真ん中
+
+    if(this.phase===1){
+
+
+        this.stopColumn(1);
+
+        this.stopped[1]=true;
+
+
+        this.phase=2;
+
+
+        return;
+
+    }
+
+
+
+    // 右
+
+    if(this.phase===2){
+
+
+    this.stopColumn(2);
+
+
+    this.phase=3;
+
+    this.phaseTimer=20;
+
+
+    return;
+
+}
+
+
+},
+
+
+
+
+
+
+    stopColumn(column){
+
+
+    this.stopped[column]=true;
+
+
+},
+
+
+
+
+
+
+
+    finish(){
+
+        const resultGrid=[];
+
+
+for(let y=0;y<3;y++){
+
+    for(let x=0;x<3;x++){
+
+
+        const pos =
+Math.floor(this.reelPos[x] * this.reels[x].length);
+
+
+        let value =
+this.reels[x][
+(pos+y) % this.reels[x].length
+];
+
+
+if(value === undefined){
+
+    value = this.randomNumber();
+
+}
+
+
+resultGrid.push(value);
+
+
+    }
+
+}
+
+
+
+        this.result=1;
+
+
+        this.highlightLines=[];
+
+
+
+
+        const lines=[
+
+
+
+            [0,1,2],
+
+            [3,4,5],
+
+            [6,7,8],
+
+
+
+            [0,3,6],
+
+            [1,4,7],
+
+            [2,5,8],
+
+
+
+            [0,4,8],
+
+            [2,4,6]
+
+
+        ];
+
+
+
+
+
+        for(let line of lines){
+
+
+
+            const a=resultGrid[line[0]];
+
+const b=resultGrid[line[1]];
+
+const c=resultGrid[line[2]];
+
+
+
+            if(
+                a===b &&
+                b===c
+            ){
+
+
+
+                this.result =
+                Math.max(
+                    this.result,
+                    a
+                );
+
+
+
+                this.highlightLines.push(
+                    line
+                );
+
+
+            }
+
+
+        }
+
+
+
+        Game.power=this.result;
+
+
+
+       this.stopTimer=60;
+
+
+this.mode="RESULT";
+
+
+this.active=false;
+
+
+// ルーレット終了
+this.mode="RESULT";
+
+this.active=false;
+
+
+// コイン投げ待機
+Game.state="READY";
+
+// 結果表示時間
+this.resultTimer = 60;
+
+
+
+    },
 
 
 
@@ -227,257 +506,209 @@ setTimeout(()=>{
 
     draw(ctx){
 
+        if(!this.visible){
+
+        return;
+
+    }
 
 
-        if(
-            !this.active &&
-            this.stopTimer <=0
-        ){
 
-            return;
+        const startX=295;
+        const startY=220;
+        const size=70;
+
+
+
+
+        for(let y=0;y<3;y++){
+
+
+            for(let x=0;x<3;x++){
+
+
+
+                const index =
+                y*3+x;
+
+
+
+                let glow=false;
+
+
+
+
+                for(let line of this.highlightLines){
+
+
+                    if(
+                        line.includes(index)
+                    ){
+
+                        glow=true;
+
+                    }
+
+
+                }
+
+
+
+
+
+                if(glow){
+
+
+                    ctx.fillStyle=
+                    "orange";
+
+
+                }
+                else{
+
+
+                    ctx.fillStyle=
+                    "rgba(0,0,0,0.7)";
+
+
+                }
+
+
+
+
+                ctx.fillRect(
+
+                    startX+x*size,
+
+                    startY+y*size,
+
+                    size-5,
+
+                    size-5
+
+                );
+
+
+
+
+
+                ctx.strokeStyle="white";
+
+
+                ctx.strokeRect(
+
+                    startX+x*size,
+
+                    startY+y*size,
+
+                    size-5,
+
+                    size-5
+
+                );
+
+
+
+
+
+                ctx.fillStyle="white";
+
+
+                ctx.font="45px sans-serif";
+
+
+                ctx.textAlign="center";
+
+
+                ctx.textBaseline="middle";
+
+
+
+                ctx.save();
+
+
+ctx.beginPath();
+
+ctx.rect(
+    startX+x*size,
+    startY+y*size,
+    size-5,
+    size-5
+);
+
+ctx.clip();
+
+
+
+const pos =
+Math.floor(
+    this.reelPos[x] *
+    this.reels[x].length
+);
+
+
+let value =
+this.reels[x][
+(pos+y) % this.reels[x].length
+];
+
+
+if(value === undefined){
+
+    value = this.randomNumber();
+
+}
+
+
+
+ctx.fillText(
+
+    value,
+
+    startX+x*size+32,
+
+    startY+y*size+32
+
+);
+
+
+ctx.restore();
+
+
+
+            }
+
 
         }
 
 
 
 
+        if(this.stopTimer>0){
 
-        const x = 400;
 
-        const y = 470;
 
+            ctx.fillStyle="yellow";
 
 
+            ctx.font="55px sans-serif";
 
 
-
-        ctx.save();
-
-
-
-
-
-
-        // =====================
-        // 筐体
-        // =====================
-
-
-
-        ctx.fillStyle="#080808";
-
-
-        ctx.fillRect(
-
-            x-120,
-
-            y-150,
-
-            240,
-
-            300
-
-        );
-
-
-
-
-
-        // 外枠
-
-        ctx.strokeStyle="#777";
-
-
-        ctx.lineWidth=8;
-
-
-        ctx.strokeRect(
-
-            x-120,
-
-            y-150,
-
-            240,
-
-            300
-
-        );
-
-
-
-
-
-
-
-        // ランプ風
-
-        ctx.fillStyle="red";
-
-
-        ctx.beginPath();
-
-
-        ctx.arc(
-
-            x,
-
-            y-120,
-
-            10,
-
-            0,
-
-            Math.PI*2
-
-        );
-
-
-        ctx.fill();
-
-
-
-
-
-
-
-        // =====================
-        // リール部分
-        // =====================
-
-
-        ctx.fillStyle="#222";
-
-
-        ctx.fillRect(
-
-            x-80,
-
-            y-90,
-
-            160,
-
-            180
-
-        );
-
-
-
-
-
-
-        // 真ん中判定枠
-
-        ctx.strokeStyle="orange";
-
-
-        ctx.lineWidth=5;
-
-
-        ctx.strokeRect(
-
-            x-80,
-
-            y-30,
-
-            160,
-
-            60
-
-        );
-
-
-
-
-
-
-
-
-        ctx.textAlign="center";
-
-        ctx.textBaseline="middle";
-
-        ctx.font="40px sans-serif";
-
-
-
-
-
-
-
-        for(let i=-1;i<=1;i++){
-
-
-
-            let index =
-
-            Math.floor(
-
-                this.position / 60
-
-            )
-            + i;
-
-
-
-
-
-            index =
-
-            ((index %
-
-            this.values.length)
-
-            +
-
-            this.values.length)
-
-            %
-
-            this.values.length;
-
-
-
-
-
-            const value =
-
-            this.values[index];
-
-
-
-
-
-            ctx.fillStyle =
-
-            this.getColor(value);
-
-
-
+            ctx.textAlign="center";
 
 
             ctx.fillText(
 
-                "×"+value,
+                "POWER ×"+this.result,
 
-                x,
+                400,
 
-                y+i*60
+                120
 
             );
 
 
-
         }
-
-
-
-
-
-
-
-
-        ctx.restore();
-
 
 
 
