@@ -1,0 +1,196 @@
+/*
+    Meteor Ver0.3
+    game.js
+*/
+
+
+const Game={
+
+
+canvas:null,
+
+ctx:null,
+
+
+meteor:null,
+
+coin:null,
+
+
+roulette:Roulette,
+
+
+danger:0,
+
+
+// 残機コイン配列
+coins:[],
+
+
+// 状態管理
+state:"READY",
+
+
+// 現在倍率
+power:1,
+
+
+
+
+
+init(){
+
+
+
+    this.canvas =
+    document.getElementById("gameCanvas");
+
+
+
+    this.canvas.width = 800;
+
+    this.canvas.height = 700;
+
+
+
+    this.ctx =
+    this.canvas.getContext("2d");
+
+
+
+
+
+    // =====================
+    // 隕石生成
+    // =====================
+
+    this.meteor =
+    new Meteor();
+
+
+
+
+
+    // =====================
+    // 攻撃用コイン
+    // =====================
+
+    this.coin =
+    new Coin();
+
+
+
+
+
+    // =====================
+    // 残機コイン作成
+    // =====================
+
+    this.coins=[];
+
+
+
+    for(let i=0;i<3;i++){
+
+
+
+        const coin =
+        new Coin();
+
+
+
+
+        // 左下配置
+
+        coin.x =
+        50 + i * 35;
+
+
+        coin.y =
+        650;
+
+
+
+
+        // 小型表示
+
+        coin.scale =
+        0.6;
+
+
+
+
+        // 回転停止
+
+        coin.rotationSpeed =
+        0;
+
+
+
+
+        // 表示専用
+
+        coin.displayOnly =
+        true;
+
+
+
+
+        this.coins.push(
+            coin
+        );
+
+
+
+    }
+
+
+
+},
+
+
+
+
+
+
+
+update(){
+
+
+    // ゲームオーバーなら停止
+
+    if(this.state === "GAMEOVER"){
+
+        return;
+
+    }
+
+
+
+    if(!Roulette.active){
+
+        this.meteor.update();
+
+    }
+
+
+
+    this.coin.update();
+
+
+
+    Roulette.update();
+
+
+
+    Camera.update();
+
+
+
+}
+
+
+
+
+
+};
