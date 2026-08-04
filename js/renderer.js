@@ -193,6 +193,48 @@ for(let coin of Game.coins){
 
 }
 
+if(Game.state === "TITLE"){
+
+
+    ctx.fillStyle =
+    "#02020a";
+
+    ctx.fillRect(
+        0,
+        0,
+        800,
+        700
+    );
+
+
+    ctx.fillStyle="white";
+
+
+    ctx.font="90px sans-serif";
+
+
+    ctx.textAlign="center";
+
+
+    ctx.fillText(
+        "METEOR",
+        400,
+        280
+    );
+
+
+    ctx.font="35px sans-serif";
+
+
+    ctx.fillText(
+        "TAP TO START",
+        400,
+        420
+    );
+
+
+}
+
 
 }
 

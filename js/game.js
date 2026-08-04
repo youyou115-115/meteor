@@ -35,7 +35,7 @@ coins:[],
 
 
 // 状態管理
-state:"READY",
+state:"TITLE",
 
 impactFlash:0,
 
@@ -156,6 +156,72 @@ window.innerWidth < 700;
 
     }
 
+    this.state = "TITLE";
+
+    if(Game.state === "GAMEOVER"){
+
+
+    Game.state="TITLE";
+
+
+    return;
+
+}
+
+
+
+},
+
+start(){
+
+
+    this.state="READY";
+
+
+    this.meteor.reset();
+
+
+    this.coin.reset();
+
+
+    Roulette.active=false;
+
+    Roulette.stopTimer=0;
+
+
+    Camera.shake=0;
+
+
+    this.impactFlash=0;
+
+
+    this.coinCount=3;
+
+
+    this.coins=[];
+
+
+    for(let i=0;i<3;i++){
+
+
+        const coin = new Coin();
+
+
+        coin.x=50+i*35;
+
+        coin.y=650;
+
+        coin.scale=0.6;
+
+        coin.rotationSpeed=0;
+
+        coin.displayOnly=true;
+
+
+        this.coins.push(coin);
+
+
+    }
 
 
 },
@@ -176,7 +242,10 @@ update(){
     }
 
 
-    if(this.state === "GAMEOVER"){
+    if(
+        this.state === "TITLE" ||
+        this.state === "GAMEOVER"
+    ){
 
         return;
 

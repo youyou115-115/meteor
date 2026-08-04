@@ -75,6 +75,37 @@ resizeCanvas();
 
 function rouletteInput(){
 
+       // =====================
+    // GAMEOVER → TITLE
+    // =====================
+
+    if(Game.state === "GAMEOVER"){
+
+    Game.state = "TITLE";
+
+    Game.meteor.reset();
+
+    Game.impactFlash = 0;
+
+    Camera.shake = 0;
+
+    return;
+
+}
+
+
+    // =====================
+    // TITLE → START
+    // =====================
+
+    if(Game.state === "TITLE"){
+
+        Game.start();
+
+        return;
+
+    }
+
 
 
     // =====================
