@@ -12,15 +12,19 @@ const Camera = {
 
     update(){
 
+    if(this.shake > 0){
 
-        if(this.shake > 0){
+        this.shake -= 1;
 
-            this.shake *= 0.9;
+        if(this.shake < 0){
+
+            this.shake = 0;
 
         }
 
+    }
 
-    },
+},
 
 
 

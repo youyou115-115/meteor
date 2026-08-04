@@ -29,12 +29,15 @@ lastTime:0,
 deltaTime:1,
 
 
+
 // 残機コイン配列
 coins:[],
 
 
 // 状態管理
 state:"READY",
+
+impactFlash:0,
 
 
 // 現在倍率
@@ -166,7 +169,12 @@ window.innerWidth < 700;
 update(){
 
 
-    // ゲームオーバーなら停止
+    if(this.impactFlash > 0){
+
+        this.impactFlash--;
+
+    }
+
 
     if(this.state === "GAMEOVER"){
 
@@ -175,21 +183,13 @@ update(){
     }
 
 
-
     this.meteor.update();
-
-
 
     this.coin.update();
 
-
-
     Roulette.update();
 
-
-
     Camera.update();
-
 
 
 }

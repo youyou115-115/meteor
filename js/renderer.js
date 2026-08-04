@@ -126,6 +126,25 @@ for(let coin of Game.coins){
 
     if(Game.state === "GAMEOVER"){
 
+        if(Game.impactFlash > 0){
+
+
+    ctx.fillStyle =
+    "rgba(255,255,255,"+
+    (Game.impactFlash / 30)+
+    ")";
+
+
+    ctx.fillRect(
+        0,
+        0,
+        800,
+        700
+    );
+
+
+}
+
 
     // 暗転
 

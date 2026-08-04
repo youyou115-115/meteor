@@ -274,13 +274,18 @@ Math.min(
 
 
 
-    if(this.z < 50){
+    if(
+    this.z < 50 &&
+    Game.state !== "GAMEOVER"
+){
 
+    Game.state="GAMEOVER";
 
-        Game.state="GAMEOVER";
+    Game.impactFlash = 30;
 
+    Camera.hitShake(30);
 
-    }
+}
 
 
 
