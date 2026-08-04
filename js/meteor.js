@@ -29,7 +29,16 @@ reset(){
     this.radius = 20;
 
 
+    if(Game.isMobile){
+
+    this.speed = 2.0;
+
+}
+else{
+
     this.speed = 1.0;
+
+}
 
 
     this.hp = 100;
