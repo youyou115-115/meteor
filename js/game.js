@@ -176,11 +176,7 @@ update(){
 
 
 
-    if(!Roulette.active){
-
-        this.meteor.update();
-
-    }
+    this.meteor.update();
 
 
 

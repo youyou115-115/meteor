@@ -31,12 +31,12 @@ reset(){
 
     if(Game.isMobile){
 
-    this.speed = 1.0;
+    this.speed = 4;
 
 }
 else{
 
-    this.speed = 1.0;
+    this.speed = 4;
 
 }
 
@@ -113,7 +113,11 @@ update(){
 
 
 
-            this.radius *= 1.08;
+            this.radius =
+Math.min(
+    this.radius * 1.02,
+    250
+);
 
 
 
@@ -250,14 +254,21 @@ update(){
 
 
 
-    this.z -=
-this.speed * Game.deltaTime;
+    this.z -= this.speed * Game.deltaTime;
 
 
+if(this.z < 10){
+
+    this.z = 10;
+
+}
 
 
-    this.radius =
-    20000 / this.z;
+this.radius =
+Math.min(
+    20000 / this.z,
+    250
+);
 
 
 
@@ -359,7 +370,24 @@ createDebris(){
 
 draw(ctx){
 
+       if(
+        !Number.isFinite(this.radius) ||
+        this.radius <= 0
+    ){
 
+        console.log(
+            "radius error",
+            this.radius,
+            "z:",
+            this.z
+        );
+
+
+        this.reset();
+
+        return;
+
+    }
 
 
 
