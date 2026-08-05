@@ -44,7 +44,7 @@ else{
     this.time = Math.random()*10;
 
 
-    this.cooldown = 60;
+    this.cooldown = 0.25;
 
 
     this.active = true;
@@ -154,7 +154,7 @@ if(this.cooldown <= 0){
 
     this.shoot();
 
-    this.cooldown = 60;
+    this.cooldown = 0.25;
 
 }
 
