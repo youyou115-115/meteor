@@ -614,7 +614,7 @@ this.active=false;
 Game.state="READY";
 
 // 結果表示時間
-this.resultTimer = 60;
+this.resultTimer = 40;
 
 Game.power = this.result;
 

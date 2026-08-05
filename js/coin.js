@@ -108,7 +108,7 @@ class Coin{
     // 回転
 
     this.rotationSpeed =
-    0.25 + Math.random()*0.2;
+0.35 + Math.random()*0.25;
 
 
 
@@ -282,19 +282,19 @@ ctx.scale(
 
 
     gold.addColorStop(
-        0,
-        "#fff4a0"
-    );
+    0,
+    "#e8c878"
+);
 
-    gold.addColorStop(
-        0.4,
-        "#ffd700"
-    );
+gold.addColorStop(
+    0.45,
+    "#b88632"
+);
 
-    gold.addColorStop(
-        1,
-        "#b88600"
-    );
+gold.addColorStop(
+    1,
+    "#5c3a12"
+);
 
 
     ctx.fillStyle=gold;
@@ -322,25 +322,52 @@ ctx.scale(
 
     ctx.stroke();
 
+    // 貨幣の縁
+
+ctx.strokeStyle="#e6c46a";
+ctx.lineWidth=3;
+
+ctx.beginPath();
+
+ctx.arc(
+    0,
+    0,
+    this.radius*0.85,
+    0,
+    Math.PI*2
+);
+
+ctx.stroke();
 
 
-    // 中央模様
 
-    ctx.fillStyle=
-    "rgba(180,120,0,0.8)";
+// 中央刻印
+
+ctx.fillStyle="#6b4518";
+
+ctx.beginPath();
+
+ctx.arc(
+    0,
+    0,
+    this.radius*0.3,
+    0,
+    Math.PI*2
+);
+
+ctx.fill();
 
 
-    ctx.beginPath();
+ctx.strokeStyle="#f1d27a";
+ctx.lineWidth=2;
 
-    ctx.arc(
-        0,
-        0,
-        this.radius*0.35,
-        0,
-        Math.PI*2
-    );
+ctx.beginPath();
 
-    ctx.fill();
+ctx.moveTo(-5,0);
+ctx.lineTo(0,-7);
+ctx.lineTo(5,0);
+
+ctx.stroke();
 
 
 
