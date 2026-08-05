@@ -143,22 +143,19 @@ update(){
 
 
 
+
     // 攻撃間隔
 
-    this.cooldown--;
+this.cooldown -= Game.deltaTime;
 
 
+if(this.cooldown <=0){
 
-    if(this.cooldown <=0){
+    this.shoot();
 
+    this.cooldown = 60;
 
-        this.shoot();
-
-
-        this.cooldown = 60;
-
-
-    }
+}
 
 
 }
