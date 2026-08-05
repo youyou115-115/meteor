@@ -340,6 +340,12 @@ Math.min(
 
     Game.state="GAMEOVER";
 
+    // ボーナス初期化
+    WaveBonus.init();
+
+    WaveBonusUI.active=false;
+
+
     Game.bullets=[];
 
 
