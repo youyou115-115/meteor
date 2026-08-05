@@ -251,9 +251,13 @@ update(){
     this.coin.update();
 
     // 飛行機
-for(let p of this.planes){
+if(!Roulette.active){
 
-    p.update();
+    for(let p of Game.planes){
+
+        p.update();
+
+    }
 
 }
 
