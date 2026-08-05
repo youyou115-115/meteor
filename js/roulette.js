@@ -12,6 +12,8 @@ const Roulette = {
 
     active:false,
 
+    reachWait:false,
+
     
 
      mode:"IDLE",
@@ -27,6 +29,12 @@ const Roulette = {
 
     resultTimer:0,
 
+    reachEffectTimer:0,
+
+    reachLine:null,
+
+    
+
 
     phaseTimer:0,
     scrollSpeed:20,
@@ -35,6 +43,12 @@ const Roulette = {
     false,
     false,
     false
+],
+
+stopOffset:[
+    0,
+    0,
+    0
 ],
 
 offset:[0,0,0],
@@ -67,6 +81,10 @@ reelSpeed:[
     highlightLines:[],
     targetNumber:null,
 
+    reach:false,
+
+reachTimer:0,
+
 
 
 
@@ -76,38 +94,46 @@ reelSpeed:[
         this.reels=[];
 
 
-for(let x=0;x<3;x++){
+this.reels=[
 
-    this.reels[x]=[];
+    // 左リール
+    [
+1,5,3,7,2,"☄",9,4,1,8,6,
+7,3,"★",5,2,1,9
+],
 
 
-    for(let i=0;i<30;i++){
+    // 中央リール
+    [
+4,7,2,8,1,"☄",5,9,3,7,6,
+2,8,"★",5,1
+],
 
-        this.reels[x].push(
-            this.randomNumber()
-        );
 
-    }
+    // 右リール
+    [
+2,6,7,3,9,1,"☄",5,8,4,7,
+6,"★",2
+]
+];
 
-}
 
     },
 
 
 
-    randomNumber(){
-
-
-        return Math.floor(Math.random()*9)+1;
-
-
-    },
 
 
 
 
 
     start(){
+
+        this.stopOffset=[
+    0,
+    0,
+    0
+];
 
     if(this.active){
         return;
@@ -149,15 +175,22 @@ this.stopLight=[
 
 
 this.reelSpeed=[
-    0.01,
-    0.01,
-    0.01
+    0.012,
+    0.015,
+    0.018
 ];
 
     this.phase=0;
 
 
     this.highlightLines=[];
+
+    this.reach=false;
+
+this.reachTimer=0;
+
+this.reachWait=false;
+this.reachLine=null;
 
 
 
@@ -168,6 +201,12 @@ this.reelSpeed=[
 
 
     update(){
+
+        if(this.reachEffectTimer > 0){
+
+    this.reachEffectTimer -= Game.deltaTime;
+
+}
 
 if(this.resultTimer > 0){
 
@@ -234,20 +273,12 @@ for(let x=0;x<3;x++){
     if(this.reelPos[x] >= 1){
 
 
-        this.reelPos[x] -= 1;
+    this.reelPos[x] -= 1;
 
 
-        // リールを進める
+    // リールを循環
 
-        this.reels[x].push(
-            this.randomNumber()
-        );
-
-
-        this.reels[x].shift();
-
-
-    }
+}
 
 
 }
@@ -293,11 +324,9 @@ for(let x=0;x<3;x++){
 
 
 
-    // 左
+   // 左
 
-    if(this.phase===0){
-
-    this.stopColumn(0);
+if(this.phase===0){
 
     this.stopped[0]=true;
 
@@ -311,11 +340,16 @@ for(let x=0;x<3;x++){
     );
 
 
-    this.targetNumber =
-    this.reels[0][
-        pos
-    ];
+    const leftIndex =
+(
+pos + 1 + this.reels[0].length
+)
+%
+this.reels[0].length;
 
+
+this.targetNumber =
+this.reels[0][leftIndex];
 
     this.phase=1;
 
@@ -327,29 +361,123 @@ for(let x=0;x<3;x++){
 
     if(this.phase===1){
 
-    this.stopColumn(1);
-
     this.stopped[1]=true;
+
     this.stopLight[1]=true;
 
 
-    // 40%で左に合わせる
 
-    if(Math.random() < 0.4){
+    // 40%で左と同じ数字を狙う
+
+    if(Math.random()<0.6){
+
+    const current =
+    Math.floor(
+        this.reelPos[1] *
+        this.reels[1].length
+    );
 
 
-        const pos =
+    for(let i=0;i<this.reels[1].length;i++){
+
+        if(this.reels[1][i]===this.targetNumber){
+
+            this.stopOffset[1] =
+            i - current - 1;
+
+            break;
+
+        }
+
+    }
+
+}
+
+//=====================
+// 左・中央 表示位置でリーチ判定
+//=====================
+
+const leftGrid=[];
+const centerGrid=[];
+
+
+for(let y=0;y<3;y++){
+
+    leftGrid[y] =
+    this.reels[0][
+        (
+        Math.floor(
+            this.reelPos[0] *
+            this.reels[0].length
+        )
+        +
+        this.stopOffset[0]
+        +
+        y
+        +
+        this.reels[0].length
+        )
+        %
+        this.reels[0].length
+    ];
+
+
+    centerGrid[y] =
+    this.reels[1][
+        (
         Math.floor(
             this.reelPos[1] *
             this.reels[1].length
-        );
+        )
+        +
+        this.stopOffset[1]
+        +
+        y
+        +
+        this.reels[1].length
+        )
+        %
+        this.reels[1].length
+    ];
+
+}
 
 
-        this.reels[1][pos] =
-        this.targetNumber;
+
+if(leftGrid[1] === centerGrid[1]){
+
+    this.reachLine="middle";
+
+}
+else if(leftGrid[0] === centerGrid[0]){
+
+    this.reachLine="top";
+
+}
+else if(leftGrid[2] === centerGrid[2]){
+
+    this.reachLine="bottom";
+
+}
 
 
-    }
+
+if(this.reachLine){
+
+    this.reach=true;
+
+    this.reachWait=true;
+
+    this.reachTimer=60;
+
+    this.reachEffectTimer=120;
+
+}
+
+
+
+
+
 
 
     this.phase=2;
@@ -360,31 +488,90 @@ for(let x=0;x<3;x++){
 
 
 
-    // 右
+// 右
 
-    if(this.phase===2){
+if(this.phase===2){
 
-    this.stopColumn(2);
+
+    // リーチ演出待ち
+
+if(this.reachWait){
+
+    this.reachTimer -= Game.deltaTime;
+
+
+    if(this.reachTimer <= 0){
+
+        this.reachWait=false;
+
+    }
+
+}
+
+
+
+    this.stopped[2]=true;
+
     this.stopLight[2]=true;
 
 
-    // 20%で揃える
 
-    if(Math.random() < 0.2){
+// リーチ時補正
 
+if(this.reach){
 
-        const pos =
-        Math.floor(
-            this.reelPos[2] *
-            this.reels[2].length
-        );
+    let chance = 0.6;
 
 
-        this.reels[2][pos] =
-        this.targetNumber;
+    // レア役リーチ補正
+    if(this.targetNumber==="☄"){
 
+        chance = 0.25;
 
     }
+    else if(this.targetNumber==="★"){
+
+        chance = 0.8;
+
+    }
+
+
+    if(Math.random() < chance){
+
+        const target = this.targetNumber;
+
+
+        for(let i=0;i<this.reels[2].length;i++){
+
+            if(this.reels[2][i] === target){
+
+                const current =
+                Math.floor(
+                    this.reelPos[2] *
+                    this.reels[2].length
+                );
+
+
+                this.stopOffset[2] =
+                i - current - 1;
+
+
+                break;
+
+            }
+
+        }
+
+    }
+    else{
+
+        // ハズレ時は補正なし
+        this.stopOffset[2]=0;
+
+    }
+
+}
+
 
 
     this.phase=3;
@@ -405,69 +592,7 @@ for(let x=0;x<3;x++){
 
    stopColumn(column){
 
-
     this.stopped[column]=true;
-
-
-
-    // =====================
-    // リール補正
-    // =====================
-
-    let rate = 0;
-
-
-    if(column === 0){
-
-        // 左リール 50%
-        rate = 0.5;
-
-    }
-    else if(column === 1){
-
-        // 中央リール 40%
-        rate = 0.4;
-
-    }
-    else if(column === 2){
-
-        // 右リール 30%
-        rate = 0.3;
-
-    }
-
-
-
-    if(Math.random() < rate){
-
-
-        const pos =
-        Math.floor(
-            this.reelPos[column] *
-            this.reels[column].length
-        );
-
-
-        // 表示されている数字
-        const value =
-        this.reels[column][
-            pos
-        ];
-
-
-
-        // 同じ数字を次の位置にも配置
-
-        this.reels[column][
-            (pos+1) %
-            this.reels[column].length
-        ] = value;
-
-
-
-    }
-
-
 
 },
 
@@ -486,7 +611,17 @@ for(let y=0;y<3;y++){
 
 
         const pos =
-Math.floor(this.reelPos[x] * this.reels[x].length);
+(
+Math.floor(
+ this.reelPos[x] * this.reels[x].length
+)
++
+this.stopOffset[x]
++
+this.reels[x].length
+)
+%
+this.reels[x].length
 
 
         let value =
@@ -494,12 +629,6 @@ this.reels[x][
 (pos+y) % this.reels[x].length
 ];
 
-
-if(value === undefined){
-
-    value = this.randomNumber();
-
-}
 
 
 resultGrid.push(value);
@@ -571,11 +700,26 @@ const c=resultGrid[line[2]];
 
 
 
-                this.result =
-                Math.max(
-                    this.result,
-                    a
-                );
+                if(a==="☄"){
+
+    this.result = 99;
+
+}
+else if(a==="★"){
+
+    this.result = 8;
+
+}
+else{
+
+    this.result =
+    Math.max(
+        this.result,
+        a
+    );
+
+}
+
 
 
 
@@ -658,6 +802,43 @@ else{
         //====================
 // スロット筐体
 //====================
+
+// リーチ演出
+//====================
+// リーチ演出
+//====================
+
+let reachGlow = false;
+
+if(this.reachEffectTimer > 0){
+
+    reachGlow = true;
+
+}
+
+
+if(reachGlow){
+
+    if(this.targetNumber==="☄"){
+
+        ctx.shadowColor="#ff5500";
+        ctx.shadowBlur=60;
+
+    }
+    else if(this.targetNumber==="★"){
+
+        ctx.shadowColor="#ffff00";
+        ctx.shadowBlur=40;
+
+    }
+    else{
+
+        ctx.shadowColor="#00ffff";
+        ctx.shadowBlur=30;
+
+    }
+
+}
 
 // 外枠
 ctx.fillStyle = "#2b2f3a";
@@ -860,9 +1041,7 @@ ctx.fillStyle=panel;
                 ctx.shadowColor="#66ffff";
                 ctx.shadowBlur=15;
 
-               ctx.fillStyle="#ffffff";
-
-               ctx.font="45px sans-serif";
+               
 
 
                 ctx.textAlign="center";
@@ -889,10 +1068,17 @@ ctx.clip();
 
 
 const pos =
+(
 Math.floor(
-    this.reelPos[x] *
-    this.reels[x].length
-);
+ this.reelPos[x] * this.reels[x].length
+)
++
+this.stopOffset[x]
++
+this.reels[x].length
+)
+%
+this.reels[x].length
 
 
 let value =
@@ -901,9 +1087,24 @@ this.reels[x][
 ];
 
 
-if(value === undefined){
+if(value==="☄"){
 
-    value = this.randomNumber();
+    ctx.fillStyle="#ff6600";
+    ctx.shadowColor="#ff0000";
+    ctx.shadowBlur=20;
+
+}
+else if(value==="★"){
+
+    ctx.fillStyle="#ffff00";
+    ctx.shadowColor="#ffffff";
+    ctx.shadowBlur=20;
+
+}
+else{
+
+    ctx.fillStyle="#ffffff";
+    ctx.shadowBlur=15;
 
 }
 
@@ -930,6 +1131,8 @@ ctx.restore();
 
 
         }
+
+      ctx.shadowBlur=0;
 
         //====================
 // STOPボタン
@@ -1050,6 +1253,8 @@ else{
 
 
             ctx.textAlign="center";
+
+            
 
 
             ctx.fillText(
