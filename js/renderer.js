@@ -109,6 +109,8 @@ if(Game.state !== "TITLE"){
 
     // 隕石
 
+    
+
     Game.meteor.draw(ctx);
 
 

@@ -222,7 +222,7 @@ this.reachNumber=null;
 
 if(this.resultTimer > 0){
 
-    this.resultTimer--;
+    this.resultTimer -= Game.deltaTime;
 
     if(this.resultTimer <= 0){
 
@@ -240,10 +240,9 @@ if(this.resultTimer > 0){
 
         if(this.stopTimer>0){
 
+    this.stopTimer -= Game.deltaTime;
 
-            this.stopTimer--;
-
-        }
+}
         
            if(this.mode !== "SPIN"){
 
@@ -840,7 +839,7 @@ this.resultEffectTimer=60;
 
 
 
-       this.stopTimer=60;
+       this.stopTimer=40;
 
 
 this.mode="RESULT";
@@ -859,7 +858,7 @@ this.active=false;
 Game.state="READY";
 
 // 結果表示時間
-this.resultTimer = 80;
+this.resultTimer = 25;
 
 if(this.resultEffect==="meteor"){
 

@@ -32,7 +32,7 @@ this.randomMeteor = false;
 case 1:
 
     this.maxHp = 100;
-    this.speed = 2;
+    this.speed = 5;
     this.type = 0;
 
     break;
@@ -42,7 +42,7 @@ case 1:
 case 2:
 
     this.maxHp = 200;
-    this.speed = 3;
+    this.speed = 5.3;
     this.type = 1;
 
     break;
@@ -65,7 +65,7 @@ default:
 
 
     this.speed =
-    1 +
+    5.5 +
     Game.wave*0.15;
 
 
@@ -225,7 +225,7 @@ Math.min(
 Game.waveMessage =
 "WAVE " + Game.wave;
 
-Game.waveTimer = 1500;
+Game.waveTimer = 90;
 
 this.reset();
 
@@ -592,7 +592,7 @@ for(let i=0;i<points;i++){
 
 
         const angle =
-        Math.PI*2*i/10;
+Math.PI*2*i/points;
 
 
 
