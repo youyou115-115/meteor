@@ -227,13 +227,18 @@ Math.min(
 Game.waveMessage =
 "WAVE " + Game.wave;
 
-if(Game.wave === 3){
+if(
+    Game.wave===3 &&
+    !Game.bonusHelpShown
+){
 
-     WaveBonus.generate();
-      Game.showBonusHelp = true;
-     WaveBonusUI.start();
+    WaveBonus.generate();
 
+    Game.showBonusHelp = true;
 
+    WaveBonusUI.start();
+
+    Game.bonusHelpShown=true;
 
 }
 else if(Game.wave > 3){

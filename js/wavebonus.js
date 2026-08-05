@@ -10,6 +10,8 @@ const WaveBonus = {
     green:null,
     blue:null,
     yellow:null,
+
+        helpShown:false,
    
 
     
@@ -35,6 +37,7 @@ const WaveBonus = {
 
         this.current=null;
         this.timer=0;
+        this.helpShown=false;
 
     },
 
@@ -114,11 +117,28 @@ SPECIAL BONUS
     draw(ctx){
 
 
-        if(this.timer<=0){
+    if(this.timer<=0){
 
-            return;
+        return;
 
-        }
+    }
+
+
+    if(!this.current){
+
+        return;
+
+    }
+
+
+    if(this.helpShown){
+
+        return;
+
+    }
+
+
+    this.helpShown=true;
 
 
 

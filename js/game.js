@@ -20,6 +20,7 @@ isMobile:false,
 showBonusHelp:false,
 bonusHelpWait:false,
 bonusHelpReady:false,
+bonusHelpShown:false,
 
 planes:[],
 bullets:[],
@@ -180,6 +181,10 @@ start(){
 this.bonusHelpWait=false;
 this.bonusHelpReady=false;
 
+WaveBonus.timer=0;
+WaveBonusUI.timer=0;
+WaveBonusUI.active=false;
+
 
 
 },
@@ -338,6 +343,8 @@ toTitle(){
 
 
     this.impactFlash=0;
+
+    this.bonusHelpShown=false;
 
 
     Camera.shake=0;

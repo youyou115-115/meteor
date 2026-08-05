@@ -80,16 +80,18 @@ function rouletteInput(event){
     // WAVE BONUS説明解除
     // =====================
 
-    if(Game.showBonusHelp){
+   if(Game.showBonusHelp){
 
-        Game.showBonusHelp=false;
-        WaveBonusUI.active=false;
-        WaveBonusUI.timer=0;
+    Game.showBonusHelp=false;
 
-        return;
+    WaveBonusUI.active=false;
+    WaveBonusUI.timer=0;
 
-    }
+    WaveBonus.timer=0;
 
+    return;
+
+}
 
     // 以下そのまま
 
