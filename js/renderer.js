@@ -66,6 +66,27 @@ draw(){
 
     }
 
+//=====================
+// WAVE表示
+//=====================
+
+if(
+    Game.state === "GAME" &&
+    Game.waveTimer <= 0
+){
+
+    ctx.fillStyle = "white";
+    ctx.font = "30px sans-serif";
+    ctx.textAlign = "left";
+
+    ctx.fillText(
+        "WAVE " + Game.wave,
+        20,
+        40
+    );
+
+}
+
 
 if(Game.state !== "TITLE"){
 
@@ -567,6 +588,41 @@ ctx.restore();
     );
 
 
+
+}
+
+if(Game.waveTimer > 0){
+
+    const alpha =
+    Math.min(
+        1,
+        Game.waveTimer / 20
+    );
+
+    ctx.save();
+
+    ctx.globalAlpha = alpha;
+
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "orange";
+    ctx.lineWidth = 4;
+
+    ctx.font = "80px sans-serif";
+    ctx.textAlign = "center";
+
+    ctx.strokeText(
+        Game.waveMessage,
+        400,
+        350
+    );
+
+    ctx.fillText(
+        Game.waveMessage,
+        400,
+        350
+    );
+
+    ctx.restore();
 
 }
 

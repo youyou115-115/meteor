@@ -17,56 +17,41 @@ constructor(){
 
 reset(){
 
-
     this.x = 400;
-
     this.y = 150;
-
-
     this.z = 1000;
 
+    switch(Game.wave){
+
+        case 1:
+            this.maxHp = 100;
+            this.speed = 5;
+            this.type = 0;
+            break;
+
+        case 2:
+            this.maxHp = 200;
+            this.speed = 5.3;
+            this.type = 1;
+            break;
+
+        default:
+            this.maxHp = 100 + (Game.wave-1)*120;
+            this.speed = 5 + Game.wave*0.2;
+            this.type = 1;
+            break;
+    }
+
+    this.hp = this.maxHp;
 
     this.radius = 20;
-
-
-    if(Game.isMobile){
-
-    this.speed = 2.8;
-
-}
-else{
-
-    this.speed = 4;
-
-}
-
-
-    this.hp = 100;
-
-
     this.damageFlash = 0;
-    this.maxHp = 100;
-
-
-
-    // 破壊関連
 
     this.destroying = false;
-
     this.destroyPhase = 0;
-
     this.destroyTimer = 0;
 
-
-    this.debris=[];
-
-    this.destroying = false;
-this.destroyPhase = 0;
-this.destroyTimer = 0;
-
-this.debris = [];
-
-
+    this.debris = [];
 }
 
 
@@ -170,7 +155,15 @@ Math.min(
 
             if(this.destroyTimer <= 0){
 
-    this.reset();
+
+    Game.wave++;
+
+Game.waveMessage =
+"WAVE " + Game.wave;
+
+Game.waveTimer = 90;
+
+this.reset();
 
     this.x = 400;
     this.y = 150;
@@ -538,22 +531,20 @@ draw(ctx){
 
 
 
-    rock.addColorStop(
-        0,
-        "#777"
-    );
+   if(this.type===0){
 
+    rock.addColorStop(0,"#777");
+    rock.addColorStop(0.5,"#333");
+    rock.addColorStop(1,"#080808");
 
-    rock.addColorStop(
-        0.5,
-        "#333"
-    );
+}
+else{
 
+    rock.addColorStop(0,"#ff8888");
+    rock.addColorStop(0.5,"#aa2222");
+    rock.addColorStop(1,"#330000");
 
-    rock.addColorStop(
-        1,
-        "#080808"
-    );
+}
 
 
 

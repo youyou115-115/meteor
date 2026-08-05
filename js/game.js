@@ -17,6 +17,8 @@ meteor:null,
 coin:null,
 
 isMobile:false,
+wave:1,
+
 
 
 roulette:Roulette,
@@ -37,6 +39,7 @@ bonus:false,
 
 
 
+
 // 状態管理
 state:"TITLE",
 
@@ -45,6 +48,9 @@ impactFlash:0,
 
 // 現在倍率
 power:1,
+
+waveMessage:"",
+waveTimer:0,
 
 
 
@@ -141,6 +147,7 @@ start(){
     Roulette.visible=false;
     Roulette.resultTimer=0;
     this.power=1;
+    this.wave = 1;
 
 
 
@@ -213,6 +220,12 @@ update(){
 
     Camera.update();
 
+    if(this.waveTimer > 0){
+
+    this.waveTimer--;
+
+}
+
 
 
 },
@@ -243,6 +256,7 @@ toTitle(){
 
 
     Camera.shake=0;
+    this.wave = 1;
 
 
 
