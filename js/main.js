@@ -84,6 +84,7 @@ function rouletteInput(event){
 
         Game.showBonusHelp=false;
         WaveBonusUI.active=false;
+        WaveBonusUI.timer=0;
 
         return;
 
