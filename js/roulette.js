@@ -31,6 +31,12 @@ const Roulette = {
     phaseTimer:0,
     scrollSpeed:20,
 
+    stopLight:[
+    false,
+    false,
+    false
+],
+
 offset:[0,0,0],
 
 stopped:[false,false,false],
@@ -133,6 +139,12 @@ for(let x=0;x<3;x++){
     0,
     0,
     0
+];
+
+this.stopLight=[
+    false,
+    false,
+    false
 ];
 
 
@@ -289,6 +301,8 @@ for(let x=0;x<3;x++){
 
     this.stopped[0]=true;
 
+    this.stopLight[0]=true;
+
 
     const pos =
     Math.floor(
@@ -316,6 +330,7 @@ for(let x=0;x<3;x++){
     this.stopColumn(1);
 
     this.stopped[1]=true;
+    this.stopLight[1]=true;
 
 
     // 40%で左に合わせる
@@ -350,6 +365,7 @@ for(let x=0;x<3;x++){
     if(this.phase===2){
 
     this.stopColumn(2);
+    this.stopLight[2]=true;
 
 
     // 20%で揃える
@@ -495,6 +511,8 @@ resultGrid.push(value);
 
 
 
+
+
         this.result=1;
 
 
@@ -637,6 +655,101 @@ else{
         const startY=220;
         const size=70;
 
+        //====================
+// スロット筐体
+//====================
+
+// 外枠
+ctx.fillStyle = "#2b2f3a";
+
+ctx.beginPath();
+ctx.roundRect(
+    startX - 35,
+    startY - 60,
+    size * 3 + 65,
+    size * 3 + 120,
+    18
+);
+ctx.fill();
+
+
+// 内枠
+const frame =
+ctx.createLinearGradient(
+    startX,
+    startY - 40,
+    startX,
+    startY + size * 3 + 40
+);
+
+frame.addColorStop(0, "#3e5cff");
+frame.addColorStop(0.5, "#101830");
+frame.addColorStop(1, "#5fb7ff");
+
+ctx.fillStyle = frame;
+
+ctx.beginPath();
+ctx.roundRect(
+    startX - 20,
+    startY - 45,
+    size * 3 + 30,
+    size * 3 + 90,
+    14
+);
+ctx.fill();
+
+ctx.fillStyle = "#ffffff";
+
+ctx.font = "bold 28px sans-serif";
+
+ctx.textAlign = "center";
+
+ctx.shadowColor = "#55aaff";
+ctx.shadowBlur = 18;
+
+ctx.fillText(
+    "☄ METEOR SLOT ☄",
+    400,
+    startY - 35
+);
+
+ctx.shadowBlur = 0;
+
+        //====================
+// スロット背景
+//====================
+
+ctx.fillStyle="#0b1024";
+
+ctx.fillRect(
+    startX-20,
+    startY-20,
+    250,
+    250
+);
+
+ctx.strokeStyle="#55ddff";
+ctx.lineWidth=4;
+
+ctx.strokeRect(
+    startX-20,
+    startY-20,
+    250,
+    250
+);
+
+ctx.shadowColor="#33ccff";
+ctx.shadowBlur=20;
+
+ctx.strokeRect(
+    startX-20,
+    startY-20,
+    250,
+    250
+);
+
+ctx.shadowBlur=0;
+
 
 
 
@@ -678,16 +791,28 @@ else{
                 if(glow){
 
 
-                    ctx.fillStyle=
-                    "orange";
+                    ctx.shadowColor="#00ffff";
+                    ctx.shadowBlur=25;
+
+                    ctx.fillStyle="#00ffff";
 
 
                 }
                 else{
 
 
-                    ctx.fillStyle=
-                    "rgba(0,0,0,0.7)";
+                    const panel =
+                    ctx.createLinearGradient(
+                        0,
+                    startY+y*size,
+                     0,
+                     startY+y*size+size
+                    );
+
+panel.addColorStop(0,"#1b2b55");
+panel.addColorStop(1,"#081020");
+
+ctx.fillStyle=panel;
 
 
                 }
@@ -706,6 +831,8 @@ else{
                     size-5
 
                 );
+
+               ctx.shadowBlur=0;
 
 
 
@@ -730,10 +857,12 @@ else{
 
 
 
-                ctx.fillStyle="white";
+                ctx.shadowColor="#66ffff";
+                ctx.shadowBlur=15;
 
+               ctx.fillStyle="#ffffff";
 
-                ctx.font="45px sans-serif";
+               ctx.font="45px sans-serif";
 
 
                 ctx.textAlign="center";
@@ -790,6 +919,8 @@ ctx.fillText(
 
 );
 
+ctx.shadowBlur=0;
+
 
 ctx.restore();
 
@@ -800,6 +931,108 @@ ctx.restore();
 
         }
 
+        //====================
+// STOPボタン
+//====================
+
+const buttonY =
+startY + size*3 + 25;
+
+
+for(let i=0;i<3;i++){
+
+    const buttonX =
+    startX + i*70;
+
+
+    // ボタン本体
+
+    const grad =
+    ctx.createLinearGradient(
+        buttonX,
+        buttonY,
+        buttonX,
+        buttonY+35
+    );
+
+
+    if(this.stopLight[i]){
+
+
+    grad.addColorStop(
+        0,
+        "#55ff55"
+    );
+
+    grad.addColorStop(
+        1,
+        "#008000"
+    );
+
+
+}
+else{
+
+
+    grad.addColorStop(
+        0,
+        "#ff5555"
+    );
+
+    grad.addColorStop(
+        1,
+        "#800000"
+    );
+
+
+}
+
+
+    ctx.fillStyle=grad;
+
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        buttonX,
+        buttonY,
+        60,
+        35,
+        8
+    );
+
+    ctx.fill();
+
+
+
+    // 枠
+
+    ctx.strokeStyle="#ffffff";
+
+    ctx.stroke();
+
+
+
+    // 文字
+
+    ctx.fillStyle="white";
+
+    ctx.font="18px sans-serif";
+
+    ctx.textAlign="center";
+
+    ctx.textBaseline="middle";
+
+
+    ctx.fillText(
+        "STOP",
+        buttonX+30,
+        buttonY+18
+    );
+
+
+}
+
 
 
 
@@ -807,7 +1040,10 @@ ctx.restore();
 
 
 
-            ctx.fillStyle="yellow";
+            ctx.shadowColor="#00ffff";
+            ctx.shadowBlur=25;
+
+            ctx.fillStyle="#ffffff";
 
 
             ctx.font="55px sans-serif";
@@ -825,6 +1061,8 @@ ctx.restore();
                 120
 
             );
+
+            ctx.shadowBlur=0;
 
 
         }

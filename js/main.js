@@ -73,7 +73,7 @@ resizeCanvas();
 
 
 
-function rouletteInput(){
+function rouletteInput(event){
 
        // =====================
     // GAMEOVER → TITLE
@@ -155,15 +155,13 @@ if(Roulette.resultTimer > 0){
 
 
 
-    if(Roulette.active){
+   if(Roulette.active){
 
+    Roulette.stop();
 
-        Roulette.stop();
+    return;
 
-
-        return;
-
-    }
+}
 
 
 
@@ -179,17 +177,12 @@ if(Roulette.resultTimer > 0){
 
 
 canvas.addEventListener(
-
 "click",
+(e)=>{
 
-()=>{
-
-
-    rouletteInput();
-
+    rouletteInput(e);
 
 }
-
 );
 
 
@@ -198,25 +191,17 @@ canvas.addEventListener(
 
 
 canvas.addEventListener(
-
 "touchstart",
-
 (e)=>{
-
 
     e.preventDefault();
 
-
-    rouletteInput();
-
+    rouletteInput(e);
 
 },
-
 {
     passive:false
-}
-
-);
+});
 
 
 
