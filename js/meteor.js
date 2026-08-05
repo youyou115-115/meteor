@@ -225,7 +225,7 @@ Math.min(
 Game.waveMessage =
 "WAVE " + Game.wave;
 
-Game.waveTimer = 90;
+Game.waveTimer = 1500;
 
 this.reset();
 
