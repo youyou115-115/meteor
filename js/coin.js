@@ -91,7 +91,7 @@ class Coin{
 
     // 飛行速度
 
-    const speed = 18;
+    const speed = 72;
 
 
 
@@ -108,7 +108,7 @@ class Coin{
     // 回転
 
     this.rotationSpeed =
-0.35 + Math.random()*0.25;
+(0.35 + Math.random()*0.25) * 4;
 
 
 
@@ -128,13 +128,11 @@ class Coin{
 
 
     update(){
-        if(this.displayOnly){
 
-        return;
+    const dt = Game.deltaTime;
 
-    }
 
-        this.rotation += this.rotationSpeed;
+    this.rotation += this.rotationSpeed * dt;
 
 
     if(!this.active){
@@ -142,16 +140,12 @@ class Coin{
     }
 
 
-    this.x += this.vx;
-
-    this.y += this.vy;
-
-
-    this.vy += 0.2;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
 
 
+    this.vy += 0.8 * dt;
 
-    // 隕石との距離
 
     const dx =
     this.x - Game.meteor.x;
@@ -165,7 +159,6 @@ class Coin{
     Math.sqrt(
         dx*dx + dy*dy
     );
-
 
 
     if(
