@@ -32,7 +32,7 @@ this.randomMeteor = false;
 case 1:
 
     this.maxHp = 100;
-    this.speed = 5;
+    this.speed = 4;
     this.type = 0;
 
     break;
@@ -42,7 +42,7 @@ case 1:
 case 2:
 
     this.maxHp = 200;
-    this.speed = 5.3;
+    this.speed = 5;
     this.type = 1;
 
     break;
