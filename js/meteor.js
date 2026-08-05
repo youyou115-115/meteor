@@ -65,7 +65,7 @@ default:
 
 
     this.speed =
-    3 +
+    5.5 +
     Game.wave*0.15;
 
 
