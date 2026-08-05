@@ -384,7 +384,17 @@ this.reels[0][leftIndex];
 
     // 40%で左と同じ数字を狙う
 
-    let reachChance = 0.7;
+    let reachChance =
+0.7 +
+(Game.wave - 1) * 0.03;
+
+
+// 最大90%
+reachChance =
+Math.min(
+    reachChance,
+    0.9
+);
 
 
 // レア役は少し低くする
@@ -548,20 +558,51 @@ Sound.stop(3);
 
 if(this.reach){
 
-    let chance = 0.6;
+    let chance =
+0.6 +
+(Game.wave - 1) * 0.04;
+
+
+chance =
+Math.min(
+    chance,
+    0.9
+);
 
 
     // レア役リーチ補正
-   if(this.reachNumber==="☄"){
+if(this.reachNumber==="☄"){
 
-        chance = 0.25;
 
-    }
-    else if(this.reachNumber==="★"){
+    chance =
+    0.25 +
+    (Game.wave-1)*0.03;
 
-        chance = 0.8;
 
-    }
+    chance =
+    Math.min(
+        chance,
+        0.45
+    );
+
+
+}
+else if(this.reachNumber==="★"){
+
+
+    chance =
+    0.8 +
+    (Game.wave-1)*0.02;
+
+
+    chance =
+    Math.min(
+        chance,
+        0.95
+    );
+
+
+}
 
 
     if(Math.random() < chance){
