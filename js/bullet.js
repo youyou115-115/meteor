@@ -32,10 +32,11 @@ constructor(x,y,angle){
 
 update(){
 
+    this.x += 
+    this.vx * Game.deltaTime;
 
-    this.x += this.vx;
-
-    this.y += this.vy;
+    this.y += 
+    this.vy * Game.deltaTime;
 
 
 
@@ -64,7 +65,6 @@ update(){
         this.active=false;
 
     }
-
 
 }
 
