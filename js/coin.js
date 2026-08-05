@@ -188,6 +188,9 @@ if(Game.bonus){
 
 Game.meteor.damage(damage);
 
+      
+
+        Sound.coinHit();
 
         this.reset();
 

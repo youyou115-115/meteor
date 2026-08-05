@@ -18,6 +18,11 @@ coin:null,
 
 isMobile:false,
 
+planes:[],
+bullets:[],
+screenCrack:0,
+cracks:[],
+
 
 wave:1,
 
@@ -63,6 +68,9 @@ init(){
     Roulette.init();
 
     Sound.init();
+
+    this.planes=[];
+this.bullets=[];
 
     this.isMobile =
 window.innerWidth < 700;
@@ -130,9 +138,13 @@ start(){
 
     this.state="GAME";
 
-    Sound.stopBGM();
+     Sound.stopBGM();
 
-this.titleBGMStarted=false;
+      Sound.startBattleBGM();
+
+      this.planes=[];
+    this.bullets=[];
+
 
      
 
@@ -202,15 +214,28 @@ update(){
     // ゲームオーバー
     // =====================
 
-    if(this.state === "GAMEOVER"){
+   if(this.state === "GAMEOVER"){
 
 
-        Camera.update();
+    for(let p of this.planes){
 
-        return;
+        p.update();
 
     }
 
+
+    for(let b of this.bullets){
+
+        b.update();
+
+    }
+
+
+    Camera.update();
+
+    return;
+
+}
 
 
 
@@ -224,6 +249,28 @@ update(){
 
 
     this.coin.update();
+
+    // 飛行機
+for(let p of this.planes){
+
+    p.update();
+
+}
+
+
+// 弾
+for(let b of this.bullets){
+
+    b.update();
+
+}
+
+
+this.bullets =
+this.bullets.filter(
+b=>b.active
+);
+
 
 
     Roulette.update();

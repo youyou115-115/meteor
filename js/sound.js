@@ -7,6 +7,203 @@ master:null,
 
 bgmTimer:null,
 
+battleTimer:null,
+battleStep:0,
+battleTimer:null,
+battleStep:0,
+battleBeat:0,
+
+battleKick(){
+
+    if(!this.ctx)return;
+
+
+    const now=this.ctx.currentTime;
+
+
+    const osc =
+    this.ctx.createOscillator();
+
+
+    const gain =
+    this.ctx.createGain();
+
+
+    osc.type="sine";
+
+
+    osc.frequency.setValueAtTime(
+        90,
+        now
+    );
+
+
+    osc.frequency.exponentialRampToValueAtTime(
+        35,
+        now+0.15
+    );
+
+
+    gain.gain.setValueAtTime(
+        0.8,
+        now
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.15
+    );
+
+
+    osc.connect(gain);
+    gain.connect(this.master);
+
+
+    osc.start(now);
+
+    osc.stop(now+0.15);
+
+},
+
+battleAlarm(){
+
+    if(!this.ctx)return;
+
+
+    this.beep(
+    bassNotes[step],
+    0.45,
+    "triangle"
+);
+
+
+    setTimeout(()=>{
+
+        this.beep(
+            120,
+            0.3,
+            "sawtooth"
+        );
+
+    },250);
+
+},
+
+startBattleBGM(){
+
+    if(!this.ctx){
+        return;
+    }
+
+
+    if(this.battleTimer){
+        return;
+    }
+
+
+    if(this.ctx.state==="suspended"){
+
+        this.ctx.resume();
+
+    }
+
+
+
+    const bassNotes=[
+        55,55,65,55,
+        55,73,65,55
+    ];
+
+
+
+    const melody=[
+        220,
+        0,
+        261,
+        0,
+        196,
+        0,
+        174,
+        0
+    ];
+
+
+
+    this.battleStep=0;
+
+
+
+    this.battleTimer=setInterval(()=>{
+
+
+        const step=this.battleStep%8;
+
+
+
+        //====================
+        // ドラム
+        //====================
+
+     this.battleKick();
+
+
+
+        //====================
+        // ベース
+        //====================
+
+        this.beep(
+            bassNotes[step],
+            0.25,
+            "sawtooth"
+        );
+
+
+
+        //====================
+        // SFシンセ
+        //====================
+
+        this.beep(
+    melody[step],
+    0.35,
+    "sine"
+);
+
+
+
+        this.battleStep++;
+
+
+    },200);
+
+    this.battleBeat++;
+
+
+if(this.battleBeat % 16 === 0){
+
+    this.battleAlarm();
+
+}
+
+
+},
+
+stopBattleBGM(){
+
+    if(this.battleTimer){
+
+        clearInterval(
+            this.battleTimer
+        );
+
+        this.battleTimer=null;
+
+    }
+
+},
+
 star(){
 
     this.beep(
@@ -24,6 +221,348 @@ star(){
         );
 
     },100);
+
+},
+
+meteorCharge(){
+
+    if(!this.ctx){
+        return;
+    }
+
+
+    const now =
+    this.ctx.currentTime;
+
+
+    const osc =
+    this.ctx.createOscillator();
+
+
+    const gain =
+    this.ctx.createGain();
+
+
+    osc.type = "sawtooth";
+
+
+    // 低い唸りから上昇
+    osc.frequency.setValueAtTime(
+        80,
+        now
+    );
+
+
+    osc.frequency.exponentialRampToValueAtTime(
+        180,
+        now + 1.5
+    );
+
+
+    gain.gain.setValueAtTime(
+        0.05,
+        now
+    );
+
+
+    gain.gain.linearRampToValueAtTime(
+        0.35,
+        now + 1.2
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now + 2
+    );
+
+
+    osc.connect(gain);
+
+    gain.connect(this.master);
+
+
+    osc.start(now);
+
+    osc.stop(
+        now + 2
+    );
+
+},
+
+meteorBreak(){
+
+    if(!this.ctx)return;
+
+    const now=this.ctx.currentTime;
+
+
+    //====================
+    // 爆発瞬間（衝撃）
+    //====================
+
+    const bufferSize =
+    this.ctx.sampleRate * 0.2;
+
+
+    const buffer =
+    this.ctx.createBuffer(
+        1,
+        bufferSize,
+        this.ctx.sampleRate
+    );
+
+
+    const data =
+    buffer.getChannelData(0);
+
+
+    for(let i=0;i<bufferSize;i++){
+
+        const decay =
+        1 - i / bufferSize;
+
+
+        data[i] =
+        (Math.random()*2-1)
+        *
+        decay
+        *
+        decay;
+
+    }
+
+
+    const noise =
+    this.ctx.createBufferSource();
+
+
+    const noiseGain =
+    this.ctx.createGain();
+
+
+    noise.buffer=buffer;
+
+
+    noiseGain.gain.setValueAtTime(
+        1.0,
+        now
+    );
+
+
+    noiseGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.2
+    );
+
+
+    noise.connect(noiseGain);
+    noiseGain.connect(this.master);
+
+
+    noise.start(now);
+
+
+
+    //====================
+    // ドカーン低音
+    //====================
+
+    const boom =
+    this.ctx.createOscillator();
+
+
+    const boomGain =
+    this.ctx.createGain();
+
+
+    boom.type="sine";
+
+
+    boom.frequency.setValueAtTime(
+        70,
+        now
+    );
+
+
+    boom.frequency.exponentialRampToValueAtTime(
+        20,
+        now+0.8
+    );
+
+
+    boomGain.gain.setValueAtTime(
+        1.2,
+        now
+    );
+
+
+    boomGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.8
+    );
+
+
+    boom.connect(boomGain);
+    boomGain.connect(this.master);
+
+
+    boom.start(now);
+
+    boom.stop(now+0.8);
+
+
+
+    //====================
+    // 低い余韻
+    //====================
+
+    const tail =
+    this.ctx.createOscillator();
+
+
+    const tailGain =
+    this.ctx.createGain();
+
+
+    tail.type="triangle";
+
+
+    tail.frequency.setValueAtTime(
+        90,
+        now
+    );
+
+
+    tail.frequency.exponentialRampToValueAtTime(
+        35,
+        now+1.5
+    );
+
+
+    tailGain.gain.setValueAtTime(
+        0.5,
+        now
+    );
+
+
+    tailGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+1.5
+    );
+
+
+    tail.connect(tailGain);
+    tailGain.connect(this.master);
+
+
+    tail.start(now);
+
+    tail.stop(now+1.5);
+
+},
+coinHit(){
+
+    if(!this.ctx){
+        return;
+    }
+
+
+    const now=this.ctx.currentTime;
+
+
+    // =====================
+    // 重い衝撃音
+    // =====================
+
+    const osc =
+    this.ctx.createOscillator();
+
+    const gain =
+    this.ctx.createGain();
+
+
+    osc.type="square";
+
+
+    osc.frequency.setValueAtTime(
+        160,
+        now
+    );
+
+
+    osc.frequency.exponentialRampToValueAtTime(
+        50,
+        now+0.18
+    );
+
+
+    gain.gain.setValueAtTime(
+        0.7,
+        now
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.18
+    );
+
+
+    osc.connect(gain);
+    gain.connect(this.master);
+
+
+    osc.start(now);
+    osc.stop(now+0.18);
+
+
+
+    // =====================
+    // 金属の響き
+    // =====================
+
+    const osc2 =
+    this.ctx.createOscillator();
+
+
+    const gain2 =
+    this.ctx.createGain();
+
+
+    osc2.type="triangle";
+
+
+    osc2.frequency.setValueAtTime(
+        320,
+        now
+    );
+
+
+    osc2.frequency.exponentialRampToValueAtTime(
+        120,
+        now+0.25
+    );
+
+
+    gain2.gain.setValueAtTime(
+        0.35,
+        now
+    );
+
+
+    gain2.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.25
+    );
+
+
+    osc2.connect(gain2);
+    gain2.connect(this.master);
+
+
+    osc2.start(now);
+    osc2.stop(now+0.25);
 
 },
 meteor(){
@@ -455,9 +994,9 @@ beep(freq,time,type="square"){
 
 
     gain.gain.exponentialRampToValueAtTime(
-        0.3,
-        this.ctx.currentTime+0.02
-    );
+    0.15,
+    this.ctx.currentTime+0.05
+);
 
 
     gain.gain.exponentialRampToValueAtTime(
@@ -477,7 +1016,259 @@ beep(freq,time,type="square"){
         this.ctx.currentTime+time
     );
 
-}
+},
+
+planeShot(){
+
+    if(!this.ctx){
+        return;
+    }
+
+
+    const now =
+    this.ctx.currentTime;
+
+
+    const osc =
+    this.ctx.createOscillator();
+
+
+    const gain =
+    this.ctx.createGain();
+
+
+    osc.type="square";
+
+
+    osc.frequency.setValueAtTime(
+        900,
+        now
+    );
+
+
+    osc.frequency.exponentialRampToValueAtTime(
+        300,
+        now+0.08
+    );
+
+
+    gain.gain.setValueAtTime(
+        0.15,
+        now
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.08
+    );
+
+
+    osc.connect(gain);
+
+    gain.connect(this.master);
+
+
+    osc.start(now);
+
+    osc.stop(now+0.1);
+
+},
+gameOver(){
+
+    if(!this.ctx){
+        return;
+    }
+
+
+    const now =
+    this.ctx.currentTime;
+
+
+
+    // =====================
+    // 衝突直前の低周波
+    // =====================
+
+    const rumble =
+    this.ctx.createOscillator();
+
+
+    const rumbleGain =
+    this.ctx.createGain();
+
+
+    rumble.type="sawtooth";
+
+
+    rumble.frequency.setValueAtTime(
+        80,
+        now
+    );
+
+
+    rumble.frequency.exponentialRampToValueAtTime(
+        25,
+        now+1.5
+    );
+
+
+    rumbleGain.gain.setValueAtTime(
+        0.6,
+        now
+    );
+
+
+    rumbleGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+1.5
+    );
+
+
+    rumble.connect(rumbleGain);
+    rumbleGain.connect(this.master);
+
+
+    rumble.start(now);
+    rumble.stop(now+1.5);
+
+
+
+
+    // =====================
+    // 爆発インパクト
+    // =====================
+
+    const bufferSize =
+    this.ctx.sampleRate*0.5;
+
+
+    const buffer =
+    this.ctx.createBuffer(
+        1,
+        bufferSize,
+        this.ctx.sampleRate
+    );
+
+
+    const data =
+    buffer.getChannelData(0);
+
+
+
+    for(let i=0;i<bufferSize;i++){
+
+        const decay =
+        1-i/bufferSize;
+
+
+        data[i] =
+        (
+        Math.random()*2-1
+        )
+        *
+        decay;
+
+    }
+
+
+
+    const noise =
+    this.ctx.createBufferSource();
+
+
+    const noiseGain =
+    this.ctx.createGain();
+
+
+    noise.buffer=buffer;
+
+
+    noiseGain.gain.setValueAtTime(
+        1,
+        now+0.15
+    );
+
+
+    noiseGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.8
+    );
+
+
+    noise.connect(noiseGain);
+    noiseGain.connect(this.master);
+
+
+    noise.start(now+0.15);
+
+
+
+
+    // =====================
+    // ドォン低音
+    // =====================
+
+    const boom =
+    this.ctx.createOscillator();
+
+
+    const boomGain =
+    this.ctx.createGain();
+
+
+    boom.type="sine";
+
+
+    boom.frequency.setValueAtTime(
+        90,
+        now+0.15
+    );
+
+
+    boom.frequency.exponentialRampToValueAtTime(
+        25,
+        now+1
+    );
+
+
+    boomGain.gain.setValueAtTime(
+        1,
+        now+0.15
+    );
+
+
+    boomGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+1
+    );
+
+
+    boom.connect(boomGain);
+    boomGain.connect(this.master);
+
+
+    boom.start(now+0.15);
+    boom.stop(now+1);
+
+
+
+    // =====================
+    // 警報っぽい金属音
+    // =====================
+
+    setTimeout(()=>{
+
+        this.beep(
+            220,
+            0.4,
+            "square"
+        );
+
+    },600);
+
+
+},
 
 
 };

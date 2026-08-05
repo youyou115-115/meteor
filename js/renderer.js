@@ -90,6 +90,23 @@ if(
 
 if(Game.state !== "TITLE"){
 
+        // 飛行機
+
+    for(let p of Game.planes){
+
+        p.draw(ctx);
+
+    }
+
+
+    // 弾
+
+    for(let b of Game.bullets){
+
+        b.draw(ctx);
+
+    }
+
     // 隕石
 
     Game.meteor.draw(ctx);
@@ -114,7 +131,103 @@ if(Game.state !== "TITLE"){
 
 
 
-    if(Game.state === "GAMEOVER"){
+ if(Game.state === "GAMEOVER"){
+
+
+
+// =====================
+// 画面ひび割れ
+// =====================
+
+if(Game.screenCrack > 0){
+
+
+ctx.save();
+
+
+ctx.strokeStyle =
+"rgba(255,255,255,0.9)";
+
+
+ctx.lineWidth = 2;
+
+
+
+ctx.beginPath();
+
+
+
+for(let c of Game.cracks){
+
+
+    let x=400;
+    let y=350;
+
+
+    const ex =
+    x + Math.cos(c.angle)*c.length;
+
+
+    const ey =
+    y + Math.sin(c.angle)*c.length;
+
+
+
+    ctx.moveTo(x,y);
+
+
+    ctx.lineTo(
+        ex,
+        ey
+    );
+
+
+
+    // 枝
+
+    if(c.branch > 0.4){
+
+
+        const bx =
+        x + Math.cos(c.angle+0.5)
+        * c.length*0.6;
+
+
+        const by =
+        y + Math.sin(c.angle+0.5)
+        * c.length*0.6;
+
+
+        ctx.moveTo(
+            ex*0.7+x*0.3,
+            ey*0.7+y*0.3
+        );
+
+
+        ctx.lineTo(
+            bx,
+            by
+        );
+
+    }
+
+
+
+}
+
+
+
+ctx.stroke();
+
+
+
+ctx.restore();
+
+
+}
+
+
+
 
         if(Game.impactFlash > 0){
 
@@ -303,6 +416,7 @@ ctx.createRadialGradient(
 
     ctx.fill();
 
+    
 
 
 

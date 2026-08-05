@@ -17,41 +17,94 @@ constructor(){
 
 reset(){
 
+    this.chargeSoundPlayed=false;
+this.breakSoundPlayed=false;
+
+this.randomMeteor = false;
+
     this.x = 400;
     this.y = 150;
     this.z = 1000;
 
     switch(Game.wave){
 
-        case 1:
-            this.maxHp = 100;
-            this.speed = 5;
-            this.type = 0;
-            break;
 
-        case 2:
-            this.maxHp = 200;
-            this.speed = 5.3;
-            this.type = 1;
-            break;
+case 1:
 
-        default:
-            this.maxHp = 100 + (Game.wave-1)*120;
-            this.speed = 5 + Game.wave*0.2;
-            this.type = 1;
-            break;
-    }
+    this.maxHp = 100;
+    this.speed = 5;
+    this.type = 0;
 
-    this.hp = this.maxHp;
+    break;
 
-    this.radius = 20;
-    this.damageFlash = 0;
 
-    this.destroying = false;
-    this.destroyPhase = 0;
-    this.destroyTimer = 0;
 
-    this.debris = [];
+case 2:
+
+    this.maxHp = 200;
+    this.speed = 5.3;
+    this.type = 1;
+
+    break;
+
+
+
+default:
+
+
+    // WAVE3以降
+
+    this.maxHp =
+    300 +
+    Math.floor(
+        Math.random()*100
+    )
+    +
+    (Game.wave-3)*80;
+
+
+
+    this.speed =
+    5.5 +
+    Game.wave*0.15;
+
+
+
+    this.type =
+    2 +
+    Math.floor(
+        Math.random()*4
+    );
+
+
+    this.randomMeteor=true;
+
+
+    break;
+
+
+}
+
+this.hp = this.maxHp;
+
+this.radius = 20;
+
+if(Game.wave >= 3){
+
+    this.radius =
+    25 + Math.random()*20;
+
+}
+
+this.damageFlash = 0;
+
+this.destroying = false;
+
+this.destroyPhase = 0;
+
+this.destroyTimer = 0;
+
+this.debris = [];
 }
 
 
@@ -87,6 +140,8 @@ update(){
                 this.destroyPhase = 2;
 
                 this.destroyTimer = 15;
+
+                   Sound.meteorBreak();
 
 
             }
@@ -158,6 +213,15 @@ Math.min(
 
     Game.wave++;
 
+    if(Game.wave===3){
+
+    Game.planes.push(
+        new Plane("left"),
+        new Plane("right")
+    );
+
+}
+
 Game.waveMessage =
 "WAVE " + Game.wave;
 
@@ -217,6 +281,12 @@ if(this.z < 10){
 
 }
 
+if(this.z < 300 && !this.warning){
+
+    this.warning=true;
+
+}
+
 
 this.radius =
 Math.min(
@@ -235,12 +305,53 @@ Math.min(
 
     Game.state="GAMEOVER";
 
-    Game.impactFlash = 30;
+    Game.bullets=[];
 
-    Camera.hitShake(30);
+
+    for(let p of Game.planes){
+
+    p.destroy();
 
 }
 
+     Sound.stopBattleBGM();
+
+    Game.impactFlash = 30;
+
+    Sound.gameOver();
+
+
+    Camera.hitShake(30);
+
+      // 画面破壊開始
+    Game.screenCrack=1;
+    Game.cracks=[];
+
+
+for(let i=0;i<25;i++){
+
+    const angle =
+    Math.random()*Math.PI*2;
+
+
+    const length =
+    100 + Math.random()*350;
+
+
+    Game.cracks.push({
+
+        angle:angle,
+
+        length:length,
+
+        branch:Math.random()
+
+    });
+
+}
+
+
+}
 
 
 }
@@ -272,6 +383,8 @@ damage(value){
     this.destroyPhase=1;
 
     this.destroyTimer=30;
+
+     Sound.meteorCharge();
 
 }
 
@@ -467,7 +580,14 @@ draw(ctx){
     const r=this.radius;
 
 
-    for(let i=0;i<10;i++){
+    const points =
+this.randomMeteor ?
+8 + Math.floor(Math.random()*8)
+:
+10;
+
+
+for(let i=0;i<points;i++){
 
 
 
@@ -538,11 +658,39 @@ draw(ctx){
     rock.addColorStop(1,"#080808");
 
 }
-else{
+else if(this.type===1){
 
     rock.addColorStop(0,"#ff8888");
     rock.addColorStop(0.5,"#aa2222");
     rock.addColorStop(1,"#330000");
+
+}
+else if(this.type===2){
+
+    rock.addColorStop(0,"#8888ff");
+    rock.addColorStop(0.5,"#3333aa");
+    rock.addColorStop(1,"#111144");
+
+}
+else if(this.type===3){
+
+    rock.addColorStop(0,"#88ff88");
+    rock.addColorStop(0.5,"#229922");
+    rock.addColorStop(1,"#113311");
+
+}
+else if(this.type===4){
+
+    rock.addColorStop(0,"#ffff88");
+    rock.addColorStop(0.5,"#aa6622");
+    rock.addColorStop(1,"#442200");
+
+}
+else{
+
+    rock.addColorStop(0,"#ff88ff");
+    rock.addColorStop(0.5,"#882288");
+    rock.addColorStop(1,"#220022");
 
 }
 
@@ -553,10 +701,14 @@ else{
 
     if(this.destroyPhase === 1){
 
+
         ctx.fillStyle="white";
 
     }
+
+    
     else if(this.destroyPhase === 2){
+
 
         ctx.fillStyle =
         "rgba(255,255,255,0.8)";
