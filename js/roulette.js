@@ -9,10 +9,15 @@ const Roulette = {
 
     grid:[],
 
+    resultEffect:"normal",
+resultEffectTimer:0,
+
 
     active:false,
 
     reachWait:false,
+
+    reachNumber:null,
 
     
 
@@ -146,6 +151,12 @@ this.reels=[
 
     this.active=true;
 
+        this.reach=false;
+    this.reachWait=false;
+    this.reachTimer=0;
+    this.reachEffectTimer=0;
+    this.reachLine=null;
+
         // ★追加
     this.stopped=[
         false,
@@ -191,6 +202,7 @@ this.reachTimer=0;
 
 this.reachWait=false;
 this.reachLine=null;
+this.reachNumber=null;
 
 
 
@@ -328,6 +340,8 @@ for(let x=0;x<3;x++){
 
 if(this.phase===0){
 
+    Sound.stop(1);
+
     this.stopped[0]=true;
 
     this.stopLight[0]=true;
@@ -360,6 +374,7 @@ this.reels[0][leftIndex];
 
 
     if(this.phase===1){
+        Sound.stop(2);
 
     this.stopped[1]=true;
 
@@ -369,7 +384,21 @@ this.reels[0][leftIndex];
 
     // 40%で左と同じ数字を狙う
 
-    if(Math.random()<0.6){
+    let reachChance = 0.7;
+
+
+// レア役は少し低くする
+if(
+    this.targetNumber==="☄" ||
+    this.targetNumber==="★"
+){
+
+    reachChance=0.4;
+
+}
+
+
+if(Math.random()<reachChance){
 
     const current =
     Math.floor(
@@ -444,19 +473,18 @@ for(let y=0;y<3;y++){
 
 
 
-if(leftGrid[1] === centerGrid[1]){
+const leftValue = leftGrid[1];
+
+
+// 真ん中ラインだけリーチ判定
+if(
+    leftValue === centerGrid[1]
+){
 
     this.reachLine="middle";
 
-}
-else if(leftGrid[0] === centerGrid[0]){
-
-    this.reachLine="top";
-
-}
-else if(leftGrid[2] === centerGrid[2]){
-
-    this.reachLine="bottom";
+    // ★実際のリーチ数字
+    this.reachNumber = leftValue;
 
 }
 
@@ -508,7 +536,7 @@ if(this.reachWait){
 
 }
 
-
+Sound.stop(3);
 
     this.stopped[2]=true;
 
@@ -524,12 +552,12 @@ if(this.reach){
 
 
     // レア役リーチ補正
-    if(this.targetNumber==="☄"){
+   if(this.reachNumber==="☄"){
 
         chance = 0.25;
 
     }
-    else if(this.targetNumber==="★"){
+    else if(this.reachNumber==="★"){
 
         chance = 0.8;
 
@@ -738,6 +766,38 @@ else{
         Game.power=this.result;
 
 
+//=====================
+// リザルト演出設定
+//=====================
+
+this.resultEffect="normal";
+
+
+if(this.result === 7){
+
+    this.resultEffect="seven";
+
+}
+else if(this.result === 8){
+
+    this.resultEffect="star";
+
+}
+else if(this.result === 9){
+
+    this.resultEffect="nine";
+
+}
+else if(this.result === 99){
+
+    this.resultEffect="meteor";
+
+}
+
+
+this.resultEffectTimer=60;
+
+
 
        this.stopTimer=60;
 
@@ -758,10 +818,46 @@ this.active=false;
 Game.state="READY";
 
 // 結果表示時間
-this.resultTimer = 40;
+this.resultTimer = 80;
+
+if(this.resultEffect==="meteor"){
+
+     Camera.hitShake(60);
+
+       Sound.meteor();
+
+}
+else if(this.resultEffect==="star"){
+
+    Sound.star();
+
+}
+
+
+
 
 Game.power = this.result;
 
+if(this.result === 1){
+
+    Sound.miss();
+
+}
+else if(this.result < 7){
+
+    Sound.success(this.result);
+
+}
+else if(this.result === 7){
+
+    Sound.seven();
+}
+
+else if(this.result===9){
+
+    Sound.nine();
+
+}
 
 // 2以上が揃った時だけ強化
 if(this.result > 1){
@@ -774,6 +870,11 @@ else{
     Game.bonus = false;
 
 }
+
+    this.reach=false;
+    this.reachWait=false;
+    this.reachEffectTimer=0;
+    this.reachLine=null;
 
 
 
@@ -798,6 +899,21 @@ else{
         const startX=295;
         const startY=220;
         const size=70;
+
+
+        if(this.resultEffect==="meteor"
+&& this.resultEffectTimer>0){
+
+    ctx.fillStyle="rgba(255,80,0,0.25)";
+
+    ctx.fillRect(
+        0,
+        0,
+        800,
+        700
+    );
+
+}
 
         //====================
 // スロット筐体
@@ -1257,17 +1373,79 @@ else{
             
 
 
-            ctx.fillText(
+            let text="POWER ×"+this.result;
 
-                "POWER ×"+this.result,
+let color="#ffffff";
+let size=55;
 
-                400,
 
-                120
+// 7揃い
+if(this.resultEffect==="seven"){
 
-            );
+    text="★ POWER ×7 ★";
 
-            ctx.shadowBlur=0;
+    color="#ffff00";
+
+    size=70;
+
+}
+
+else if(this.resultEffect==="nine"){
+
+    text="POWER ×9";
+
+    color="#ff00ff";
+
+    size=75;
+
+}
+
+
+// ★
+else if(this.resultEffect==="star"){
+
+    text="★SPECIAL POWER★";
+
+    color="#00ffff";
+
+    size=65;
+
+}
+
+
+// 隕石
+else if(this.resultEffect==="meteor"){
+
+    text="☄METEOR IMPACT☄";
+
+    color="#ff5500";
+
+    size=80;
+
+}
+
+
+
+ctx.shadowColor=color;
+
+ctx.shadowBlur=35;
+
+ctx.fillStyle=color;
+
+ctx.font=
+"bold "+size+"px sans-serif";
+
+
+ctx.fillText(
+    text,
+    400,
+    120
+);
+
+
+ctx.shadowBlur=0;
+
+            
 
 
         }

@@ -17,6 +17,8 @@ meteor:null,
 coin:null,
 
 isMobile:false,
+
+
 wave:1,
 
 
@@ -59,6 +61,8 @@ waveTimer:0,
 init(){
 
     Roulette.init();
+
+    Sound.init();
 
     this.isMobile =
 window.innerWidth < 700;
@@ -107,6 +111,8 @@ new Coin();
 
     if(Game.state === "GAMEOVER"){
 
+       
+
 
     Game.state="TITLE";
 
@@ -123,6 +129,12 @@ start(){
 
 
     this.state="GAME";
+
+    Sound.stopBGM();
+
+this.titleBGMStarted=false;
+
+     
 
 
     this.meteor.reset();
@@ -176,12 +188,11 @@ update(){
 
     if(this.state === "TITLE"){
 
+    Camera.update();
 
-        Camera.update();
+    return;
 
-        return;
-
-    }
+}
 
 
 
@@ -233,6 +244,8 @@ toTitle(){
 
 
     this.state="TITLE";
+
+    this.titleBGMStarted=false;
 
 
     this.meteor.reset();
