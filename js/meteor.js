@@ -32,7 +32,7 @@ this.randomMeteor = false;
 case 1:
 
     this.maxHp = 100;
-    this.speed = 2;
+    this.speed = 4;
     this.type = 0;
 
     break;
@@ -42,7 +42,7 @@ case 1:
 case 2:
 
     this.maxHp = 200;
-    this.speed = 3;
+    this.speed = 5;
     this.type = 1;
 
     break;
@@ -289,8 +289,6 @@ this.reset();
 
 
 
-
-    this.z -= this.speed * Game.deltaTime;
 
     let speed = this.speed;
 
