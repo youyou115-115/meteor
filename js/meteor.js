@@ -32,7 +32,7 @@ this.randomMeteor = false;
 case 1:
 
     this.maxHp = 100;
-    this.speed = 4;
+    this.speed = 2;
     this.type = 0;
 
     break;
@@ -42,7 +42,7 @@ case 1:
 case 2:
 
     this.maxHp = 200;
-    this.speed = 5;
+    this.speed = 3;
     this.type = 1;
 
     break;
@@ -65,7 +65,7 @@ default:
 
 
     this.speed =
-    5.5 +
+    3 +
     Game.wave*0.15;
 
 
@@ -212,6 +212,8 @@ Math.min(
 
 
     Game.wave++;
+     // 前WAVEのボーナス効果を解除
+    WaveBonus.current = null;
 
     if(Game.wave===3){
 
@@ -224,6 +226,21 @@ Math.min(
 
 Game.waveMessage =
 "WAVE " + Game.wave;
+
+if(Game.wave === 3){
+
+     WaveBonus.generate();
+      Game.showBonusHelp = true;
+     WaveBonusUI.start();
+
+
+
+}
+else if(Game.wave > 3){
+
+    WaveBonus.generate();
+
+}
 
 Game.waveTimer = 90;
 
@@ -263,6 +280,7 @@ this.reset();
 
 
 
+
     if(this.damageFlash > 0){
 
         this.damageFlash--;
@@ -273,6 +291,23 @@ this.reset();
 
 
     this.z -= this.speed * Game.deltaTime;
+
+    let speed = this.speed;
+
+
+// GREEN BONUS
+// 隕石を押し返す
+
+if(
+    WaveBonus.current === "green"
+){
+
+    this.z += 2 * Game.deltaTime;
+
+}
+
+
+this.z -= speed * Game.deltaTime;
 
 
 if(this.z < 10){
@@ -850,6 +885,8 @@ this.hp / this.maxHp;
 
 
 }
+
+
 
 
 

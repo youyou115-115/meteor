@@ -44,7 +44,16 @@ else{
     this.time = Math.random()*10;
 
 
-    this.cooldown = 15;
+    if(WaveBonus.current==="yellow"){
+
+    this.cooldown=10;
+
+}
+else{
+
+    this.cooldown=15;
+
+}
 
 
     this.active = true;
@@ -154,7 +163,18 @@ if(this.cooldown <= 0){
 
     this.shoot();
 
+    if(
+    WaveBonus.current==="yellow"
+){
+
+    this.cooldown = 10;
+
+}
+else{
+
     this.cooldown = 15;
+
+}
 
 }
 
@@ -181,13 +201,26 @@ shoot(){
     );
 
 
-    Game.bullets.push(
-        new Bullet(
-            this.x,
-            this.y,
-            angle
-        )
-    );
+    let bulletSpeed=1;
+
+
+if(
+    WaveBonus.current==="yellow"
+){
+
+    bulletSpeed=1.5;
+
+}
+
+
+Game.bullets.push(
+    new Bullet(
+        this.x,
+        this.y,
+        angle,
+        bulletSpeed
+    )
+);
 
 }
 

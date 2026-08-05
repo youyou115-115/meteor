@@ -742,8 +742,14 @@ if(Game.waveTimer > 0){
 
 }
 
+if(Game.showBonusHelp){
+
+    WaveBonusUI.draw(ctx);
 
 }
+
+
+},
 
 
 };

@@ -75,6 +75,23 @@ resizeCanvas();
 
 function rouletteInput(event){
 
+
+    // =====================
+    // WAVE BONUS説明解除
+    // =====================
+
+    if(Game.showBonusHelp){
+
+        Game.showBonusHelp=false;
+        WaveBonusUI.active=false;
+
+        return;
+
+    }
+
+
+    // 以下そのまま
+
        // =====================
     // GAMEOVER → TITLE
     // =====================

@@ -12,6 +12,9 @@ const Roulette = {
     resultEffect:"normal",
 resultEffectTimer:0,
 
+effectMessage:"",
+effectMessageTimer:0,
+
 
     active:false,
 
@@ -185,10 +188,22 @@ this.stopLight=[
 ];
 
 
+let slow = 1;
+
+
+if(
+    WaveBonus.current === "blue"
+){
+
+    slow=0.6;
+
+}
+
+
 this.reelSpeed=[
-    0.012,
-    0.015,
-    0.018
+    0.012*slow,
+    0.015*slow,
+    0.018*slow
 ];
 
     this.phase=0;
@@ -910,6 +925,75 @@ else{
     Game.bonus = false;
 
 }
+//=====================
+// SPECIAL BONUS発動
+//=====================
+
+if(WaveBonus.active){
+
+
+    if(this.result === WaveBonus.green){
+
+        WaveBonus.current="green";
+
+    }
+    else if(this.result === WaveBonus.blue){
+
+        WaveBonus.current="blue";
+
+    }
+    else if(this.result === WaveBonus.yellow){
+
+        WaveBonus.current="yellow";
+
+    }
+  WaveBonus.active=false;
+
+}
+
+//=====================
+// 特殊数字説明
+//=====================
+
+this.effectMessage="";
+
+
+if(
+    Game.wave >= 3 &&
+    WaveBonus
+){
+
+    if(this.result === WaveBonus.green){
+
+        this.effectMessage =
+        "GREEN BONUS\n隕石を押し返す力UP";
+
+    }
+
+
+    else if(this.result === WaveBonus.blue){
+
+        this.effectMessage =
+        "BLUE BONUS\nスロット速度DOWN";
+
+    }
+
+
+    else if(this.result === WaveBonus.yellow){
+
+        this.effectMessage =
+        "YELLOW BONUS\n援軍の弾速UP";
+
+    }
+
+
+    if(this.effectMessage){
+
+        this.effectMessageTimer=180;
+
+    }
+
+}
 
     this.reach=false;
     this.reachWait=false;
@@ -1245,25 +1329,66 @@ this.reels[x][
 
 if(value==="☄"){
 
+
     ctx.fillStyle="#ff6600";
     ctx.shadowColor="#ff0000";
     ctx.shadowBlur=20;
 
+
 }
 else if(value==="★"){
+
 
     ctx.fillStyle="#ffff00";
     ctx.shadowColor="#ffffff";
     ctx.shadowBlur=20;
 
+
+}
+else if(
+    WaveBonus &&
+    Number(WaveBonus.green) === Number(value)
+){
+
+    // 緑特殊
+    ctx.fillStyle="#66ff99";
+    ctx.shadowColor="#66ff99";
+    ctx.shadowBlur=35;
+
+
+}
+else if(
+    WaveBonus &&
+    Number(WaveBonus.blue) === Number(value)
+){
+
+    // 青特殊
+    ctx.fillStyle="#55aaff";
+    ctx.shadowColor="#55aaff";
+    ctx.shadowBlur=35;
+
+
+}
+else if(
+    WaveBonus &&
+    Number(WaveBonus.yellow) === Number(value)
+){
+
+    // 黄特殊
+    ctx.fillStyle="#ffff66";
+    ctx.shadowColor="#ffff00";
+    ctx.shadowBlur=35;
+
+
 }
 else{
 
+    // 通常数字
     ctx.fillStyle="#ffffff";
+    ctx.shadowColor="#66ffff";
     ctx.shadowBlur=15;
 
 }
-
 
 
 ctx.fillText(
@@ -1483,13 +1608,53 @@ ctx.fillText(
 );
 
 
+
+
 ctx.shadowBlur=0;
 
             
 
 
         }
+//=====================
+// 効果説明
+//=====================
+if(this.effectMessageTimer > 0){
 
+    this.effectMessageTimer -= Game.deltaTime;
+
+    ctx.save();
+
+    ctx.fillStyle="rgba(0,0,0,0.65)";
+    ctx.beginPath();
+    ctx.roundRect(
+        180,
+        520,
+        440,
+        90,
+        15
+    );
+    ctx.fill();
+
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+
+    ctx.shadowColor="#66ff99";
+    ctx.shadowBlur=20;
+
+    ctx.fillStyle="#ffffff";
+    ctx.font="bold 28px sans-serif";
+
+    const lines=this.effectMessage.split("\n");
+
+    ctx.fillText(lines[0],400,550);
+
+    ctx.font="bold 22px sans-serif";
+
+    ctx.fillText(lines[1],400,585);
+
+    ctx.restore();
+}
 
 
     }

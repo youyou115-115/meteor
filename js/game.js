@@ -17,6 +17,9 @@ meteor:null,
 coin:null,
 
 isMobile:false,
+showBonusHelp:false,
+bonusHelpWait:false,
+bonusHelpReady:false,
 
 planes:[],
 bullets:[],
@@ -173,6 +176,10 @@ start(){
     this.power=1;
     this.wave = 1;
 
+    this.showBonusHelp=false;
+this.bonusHelpWait=false;
+this.bonusHelpReady=false;
+
 
 
 },
@@ -184,6 +191,20 @@ start(){
 
 
 update(){
+
+    // ボーナス説明中は停止
+
+if(this.showBonusHelp){
+
+    Camera.update();
+
+    return;
+
+}
+
+
+    WaveBonus.update();
+    WaveBonusUI.update();
 
 
     if(this.impactFlash > 0){
