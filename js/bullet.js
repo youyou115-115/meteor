@@ -12,7 +12,7 @@ constructor(
     y,
     angle,
     speed=1,
-    powerBullet=false
+    powerBullet=false,
 ){
 
     this.x=x;
@@ -21,6 +21,8 @@ constructor(
     this.angle=angle;
 
     this.speed = 15 * speed;
+
+    this.explosionDamage=false;
 
     this.vx =
     Math.cos(angle)*this.speed;
@@ -49,8 +51,15 @@ update(){
 
     this.explosionTimer -= Game.deltaTime;
 
+
     // 爆発開始時だけダメージ
-    if(this.explosionTimer > 19){
+    if(
+        this.explosionTimer > 19 &&
+        !this.explosionDamage
+    ){
+
+        this.explosionDamage = true;
+
 
         Game.meteor.damage(60);
 
@@ -59,6 +68,7 @@ update(){
         Camera.hitShake(8);
 
     }
+
 
     if(this.explosionTimer <= 0){
 
