@@ -133,7 +133,7 @@ const WaveBonusUI = {
 
         ctx.fillText(
             "YELLOW  "+WaveBonus.yellow+
-            " : 援軍強化UP",
+            " : 援軍ミサイル",
             400,
             570
         );
