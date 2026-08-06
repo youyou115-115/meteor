@@ -16,6 +16,7 @@ this.destroyTimer=0;
 this.vy=0;
 
 
+
     this.side = side;
 
 
@@ -266,6 +267,60 @@ else{
 
 
 shoot(){
+
+
+    // =====================
+    // YELLOW ミサイル
+    // =====================
+
+    if(
+        WaveBonus.yellowActive &&
+        WaveBonus.yellowShots < 2 &&
+        (this.side==="left" || this.side==="right")
+    ){
+
+
+        const dx =
+        Game.meteor.x - this.x;
+
+        const dy =
+        Game.meteor.y - this.y;
+
+
+        const angle =
+        Math.atan2(dy,dx);
+
+
+
+        Game.bullets.push(
+            new Bullet(
+                this.x,
+                this.y,
+                angle,
+                2,
+                true
+            )
+        );
+
+
+        Sound.missile();
+
+
+        WaveBonus.yellowShots++;
+
+
+        if(WaveBonus.yellowShots>=2){
+
+            WaveBonus.yellowActive=false;
+
+        }
+
+
+        return;
+    }
+
+
+    // ↓ここから通常弾処理
 
     const dx =
     Game.meteor.x - this.x;
