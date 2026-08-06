@@ -624,6 +624,59 @@ meteor(){
 
 
 },
+planeCrash(){
+
+    if(!this.ctx)return;
+
+
+    const now=this.ctx.currentTime;
+
+
+    const osc =
+    this.ctx.createOscillator();
+
+
+    const gain =
+    this.ctx.createGain();
+
+
+    osc.type="sawtooth";
+
+
+    osc.frequency.setValueAtTime(
+        300,
+        now
+    );
+
+
+    osc.frequency.exponentialRampToValueAtTime(
+        60,
+        now+0.4
+    );
+
+
+    gain.gain.setValueAtTime(
+        0.5,
+        now
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.4
+    );
+
+
+    osc.connect(gain);
+
+    gain.connect(this.master);
+
+
+    osc.start(now);
+
+    osc.stop(now+0.4);
+
+},
 
 miss(){
 
@@ -1076,16 +1129,358 @@ planeShot(){
 },
 missile(){
 
-    this.missileFireSound.currentTime=0;
-    this.missileFireSound.play();
+    if(!this.ctx){
+        return;
+    }
+
+
+    const now =
+    this.ctx.currentTime;
+
+
+    // 発射音（上昇するSFレーザー系）
+
+    const osc =
+    this.ctx.createOscillator();
+
+
+    const gain =
+    this.ctx.createGain();
+
+
+    osc.type="sawtooth";
+
+
+    osc.frequency.setValueAtTime(
+        180,
+        now
+    );
+
+
+    osc.frequency.exponentialRampToValueAtTime(
+        900,
+        now+0.15
+    );
+
+
+    gain.gain.setValueAtTime(
+        0.35,
+        now
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.2
+    );
+
+
+    osc.connect(gain);
+    gain.connect(this.master);
+
+
+    osc.start(now);
+
+    osc.stop(now+0.2);
 
 
 },
 
 explosion(){
 
-      this.missileExplosionSound.currentTime=0;
-    this.missileExplosionSound.play();
+    if(!this.ctx){
+        return;
+    }
+
+
+    const now =
+    this.ctx.currentTime;
+
+
+    // 爆発ノイズ
+
+    const bufferSize =
+    this.ctx.sampleRate * 0.3;
+
+
+    const buffer =
+    this.ctx.createBuffer(
+        1,
+        bufferSize,
+        this.ctx.sampleRate
+    );
+
+
+    const data =
+    buffer.getChannelData(0);
+
+
+    for(let i=0;i<bufferSize;i++){
+
+        const decay =
+        1-i/bufferSize;
+
+
+        data[i] =
+        (Math.random()*2-1)
+        *
+        decay;
+
+    }
+
+
+    const noise =
+    this.ctx.createBufferSource();
+
+
+    const gain =
+    this.ctx.createGain();
+
+
+    noise.buffer=buffer;
+
+
+    gain.gain.setValueAtTime(
+        1,
+        now
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.3
+    );
+
+
+    noise.connect(gain);
+    gain.connect(this.master);
+
+
+    noise.start(now);
+
+
+
+    // 重低音
+
+    const boom =
+    this.ctx.createOscillator();
+
+
+    const boomGain =
+    this.ctx.createGain();
+
+
+    boom.type="sine";
+
+
+    boom.frequency.setValueAtTime(
+        90,
+        now
+    );
+
+
+    boom.frequency.exponentialRampToValueAtTime(
+        25,
+        now+0.5
+    );
+
+
+    boomGain.gain.setValueAtTime(
+        0.8,
+        now
+    );
+
+
+    boomGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.5
+    );
+
+
+    boom.connect(boomGain);
+    boomGain.connect(this.master);
+
+
+    boom.start(now);
+    boom.stop(now+0.5);
+
+},
+meteorHit(){
+
+    if(!this.ctx){
+        return;
+    }
+
+
+    const now =
+    this.ctx.currentTime;
+
+
+
+    // =====================
+    // 衝撃ノイズ
+    // =====================
+
+    const bufferSize =
+    this.ctx.sampleRate * 0.25;
+
+
+    const buffer =
+    this.ctx.createBuffer(
+        1,
+        bufferSize,
+        this.ctx.sampleRate
+    );
+
+
+    const data =
+    buffer.getChannelData(0);
+
+
+    for(let i=0;i<bufferSize;i++){
+
+        const decay =
+        1 - i/bufferSize;
+
+
+        data[i] =
+        (Math.random()*2-1)
+        *
+        decay;
+
+    }
+
+
+    const noise =
+    this.ctx.createBufferSource();
+
+
+    const noiseGain =
+    this.ctx.createGain();
+
+
+    noise.buffer=buffer;
+
+
+    noiseGain.gain.setValueAtTime(
+        1.2,
+        now
+    );
+
+
+    noiseGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.25
+    );
+
+
+    noise.connect(noiseGain);
+
+    noiseGain.connect(this.master);
+
+
+    noise.start(now);
+
+
+
+    // =====================
+    // 重低音インパクト
+    // =====================
+
+    const boom =
+    this.ctx.createOscillator();
+
+
+    const boomGain =
+    this.ctx.createGain();
+
+
+    boom.type="sine";
+
+
+    boom.frequency.setValueAtTime(
+        55,
+        now
+    );
+
+
+    boom.frequency.exponentialRampToValueAtTime(
+        18,
+        now+0.6
+    );
+
+
+    boomGain.gain.setValueAtTime(
+        1.5,
+        now
+    );
+
+
+    boomGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.8
+    );
+
+
+    boom.connect(boomGain);
+
+    boomGain.connect(this.master);
+
+
+    boom.start(now);
+
+    boom.stop(now+0.8);
+
+
+
+    // =====================
+    // 金属衝撃音
+    // =====================
+
+    const metal =
+    this.ctx.createOscillator();
+
+
+    const metalGain =
+    this.ctx.createGain();
+
+
+    metal.type="triangle";
+
+
+    metal.frequency.setValueAtTime(
+        400,
+        now
+    );
+
+
+    metal.frequency.exponentialRampToValueAtTime(
+        80,
+        now+0.3
+    );
+
+
+    metalGain.gain.setValueAtTime(
+        0.5,
+        now
+    );
+
+
+    metalGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now+0.3
+    );
+
+
+    metal.connect(metalGain);
+
+    metalGain.connect(this.master);
+
+
+    metal.start(now);
+
+    metal.stop(now+0.35);
+
 
 },
 gameOver(){

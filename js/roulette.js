@@ -970,15 +970,12 @@ if(
     // 緑
     if(bonusHit==="green"){
 
-    // 緑：隕石を大きく後退
-    Game.meteor.greenPushTimer = 60;
+    const plane =
+    new Plane("green");
 
-    Game.meteor.greenPushPower = 15;
+    Game.planes.push(plane);
 
-
-    // 衝撃波
-    Game.meteor.greenShockTimer = 20;
-    Game.meteor.greenShockRadius = Game.meteor.radius;
+    plane.greenAttack = true;
 
 }
 

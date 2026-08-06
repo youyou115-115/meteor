@@ -9,6 +9,8 @@ class Plane{
 
 constructor(side){
 
+    this.greenAttack=false;
+
     this.destroying=false;
 this.destroyTimer=0;
 this.vy=0;
@@ -25,13 +27,18 @@ this.vy=0;
     this.y = 580;
 
 }
-else{
+else if(side==="right"){
 
     this.x = 700;
     this.y = 580;
 
 }
+else if(side==="green"){
 
+    this.x = 400;
+    this.y = 650;
+
+}
   // 追加
     this.destroying=false;
     this.destroyTimer=0;
@@ -101,10 +108,13 @@ destroy(){
 
     this.destroyTimer=60;
 
-    this.vy=-2;
+    this.vx = Math.random()*6-3;
+this.vy = -5;
 
 
     this.active=false;
+
+     Sound.planeCrash();
 
 
 }
@@ -113,6 +123,71 @@ destroy(){
 
 
 update(){
+
+    // GREEN BONUS 突撃
+
+if(this.greenAttack){
+
+    this.angle =
+    Math.atan2(
+        Game.meteor.y-this.y,
+        Game.meteor.x-this.x
+    );
+
+
+    const dx =
+    Game.meteor.x - this.x;
+
+
+    const dy =
+    Game.meteor.y - this.y;
+
+
+    const dist =
+    Math.sqrt(
+        dx*dx+dy*dy
+    );
+
+
+    this.greenAttackSpeed =
+(this.greenAttackSpeed || 0) + 0.2;
+
+const speed =
+Math.min(
+    this.greenAttackSpeed,
+    10
+);
+
+
+    this.x +=
+    dx/dist *
+    speed *
+    Game.deltaTime;
+
+
+    this.y +=
+    dy/dist *
+    speed *
+    Game.deltaTime;
+
+
+    if(
+    dist <
+    Game.meteor.radius + 20
+    ){
+
+        this.greenAttack=false;
+
+        this.destroy();
+
+        Game.meteor.greenHit=true;
+
+    }
+
+
+    return;
+
+}
 
     if(this.destroying){
 
@@ -133,6 +208,8 @@ update(){
 
 
 }
+
+
 
 
     if(!this.active){
@@ -253,6 +330,13 @@ draw(ctx){
     );
 
     ctx.rotate(this.angle);
+
+    if(this.side==="green"){
+
+    ctx.shadowColor="#66ff66";
+    ctx.shadowBlur=30;
+
+}
 
 
 
