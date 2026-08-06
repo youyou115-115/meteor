@@ -8,38 +8,59 @@ const WaveBonus = {
 
 
     green:null,
-    blue:null,
-    yellow:null,
-
-        helpShown:false,
-   
-
-    
+blue:null,
+yellow:null,
 
 
-    active:false,
-     current:null,
-     waitInput:false,
+current:null,
+
+active:false,
 
 
-    message:"",
-    timer:0,
+yellowUsed:false,
+
+yellowActive:false,
+yellowShots:0,
+
+blueSpin:false,
 
 
 
-    init(){
+blueActive:false,
 
-        this.green=null;
-        this.blue=null;
-        this.yellow=null;
 
-        this.active=false;
+message:"",
+timer:0,
 
-        this.current=null;
-        this.timer=0;
-        this.helpShown=false;
 
-    },
+
+   init(){
+
+    this.green=null;
+    this.blue=null;
+    this.yellow=null;
+
+    this.current=null;
+
+    this.active=false;
+
+    this.yellowUsed=false;
+
+    this.yellowActive=false;
+
+    this.yellowShots=0;
+
+
+    this.greenActive=false;
+
+    this.greenPower=0;
+
+
+    this.timer=0;
+
+    this.helpShown=false;
+
+},
 
 
 
@@ -74,6 +95,10 @@ const WaveBonus = {
         this.blue = numbers[1];
 
         this.yellow = numbers[2];
+
+
+        this.yellowUsed = false;
+        this.blueSpin = false;
 
 
 

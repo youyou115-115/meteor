@@ -9,18 +9,29 @@ class Meteor{
 
 constructor(){
 
+    
+
+
     this.reset();
 
 }
 
 
-
 reset(){
+
+    this.startX=400;
+    this.startY=150;
 
     this.chargeSoundPlayed=false;
 this.breakSoundPlayed=false;
 
 this.randomMeteor = false;
+
+this.greenPushTimer = 0;
+this.greenPushPower = 0;
+
+this.greenShockTimer = 0;
+this.greenShockRadius = 0;
 
     this.x = 400;
     this.y = 150;
@@ -98,6 +109,17 @@ if(Game.wave >= 3){
 
 this.damageFlash = 0;
 
+// GREEN 衝撃波更新
+
+if(this.greenShockTimer > 0){
+
+    this.greenShockTimer -= Game.deltaTime;
+
+    this.greenShockRadius += 
+    8 * Game.deltaTime;
+
+}
+
 this.destroying = false;
 
 this.destroyPhase = 0;
@@ -110,6 +132,22 @@ this.debris = [];
 
 
 update(){
+
+    if(this.pushTimer>0){
+
+
+    this.pushTimer--;
+
+
+    this.x +=
+    (this.startX-this.x)*0.08;
+
+
+    this.y +=
+    (this.startY-this.y)*0.08;
+
+
+}
 
 
 
@@ -293,24 +331,52 @@ this.reset();
     }
 
 
+// GREEN BONUS
+// 隕石押し戻し
+
+if(this.greenPushTimer > 0){
+
+
+    this.greenPushTimer -= Game.deltaTime;
+
+
+    // 中心位置へ戻す
+    this.x +=
+    (this.startX - this.x) * 0.12;
+
+
+    this.y +=
+    (this.startY - this.y) * 0.12;
+
+
+
+    // 距離を戻す
+    this.z +=
+    this.greenPushPower * Game.deltaTime;
+
+
+    // 初期距離以上には戻さない
+    if(this.z > 1000){
+
+        this.z = 1000;
+
+    }
+
+
+}
 
 
     let speed = this.speed;
+    this.z -= speed * Game.deltaTime;
 
 
 // GREEN BONUS
 // 隕石を押し返す
 
-if(
-    WaveBonus.current === "green"
-){
-
-    this.z += 2 * Game.deltaTime;
-
-}
 
 
-this.z -= speed * Game.deltaTime;
+
+
 
 
 if(this.z < 10){
@@ -532,7 +598,36 @@ draw(ctx){
     }
 
 
+// GREEN 衝撃波
 
+if(this.greenShockTimer > 0){
+
+    const alpha =
+    this.greenShockTimer / 20;
+
+
+    ctx.strokeStyle =
+    "rgba(100,255,150,"+
+    alpha+
+    ")";
+
+
+    ctx.lineWidth=6;
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        this.x,
+        this.y,
+        this.greenShockRadius,
+        0,
+        Math.PI*2
+    );
+
+    ctx.stroke();
+
+}
 
 
 

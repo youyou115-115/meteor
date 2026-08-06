@@ -7,14 +7,20 @@
 class Bullet{
 
 
-constructor(x,y,angle){
+constructor(
+    x,
+    y,
+    angle,
+    speed=1,
+    powerBullet=false
+){
 
     this.x=x;
     this.y=y;
 
     this.angle=angle;
 
-    this.speed=15;
+    this.speed = 15 * speed;
 
     this.vx =
     Math.cos(angle)*this.speed;
@@ -25,12 +31,44 @@ constructor(x,y,angle){
 
 
     this.active=true;
+    this.powerBullet = powerBullet;
+
+    this.exploding = false;
+this.explosionTimer = 0;
+this.explosionRadius = 0;
 
 }
 
 
 
 update(){
+
+    if(this.exploding){
+
+    this.explosionRadius += 6 * Game.deltaTime;
+
+    this.explosionTimer -= Game.deltaTime;
+
+    // 爆発開始時だけダメージ
+    if(this.explosionTimer > 19){
+
+        Game.meteor.damage(60);
+
+        Sound.explosion();
+
+        Camera.hitShake(8);
+
+    }
+
+    if(this.explosionTimer <= 0){
+
+        this.active = false;
+
+    }
+
+    return;
+
+}
 
     this.x += 
     this.vx * Game.deltaTime;
@@ -55,16 +93,28 @@ update(){
     );
 
 
-    if(d<Game.meteor.radius){
+    if(d < Game.meteor.radius){
 
+    if(this.powerBullet){
 
-        Game.meteor.damage(5);
+        this.exploding = true;
+        this.explosionTimer = 20;
+        this.explosionRadius = 0;
 
-        Sound.planeShot();
-
-        this.active=false;
+        // ミサイルはその場で停止
+        this.vx = 0;
+        this.vy = 0;
 
     }
+    else{
+
+        Game.meteor.damage(5);
+        Sound.planeShot();
+        this.active = false;
+
+    }
+
+}
 
 }
 
@@ -73,8 +123,84 @@ update(){
 draw(ctx){
 
 
-    ctx.fillStyle="#ffff66";
+    if(this.exploding){
 
+    // 外側
+    ctx.fillStyle="rgba(255,80,0,0.3)";
+    ctx.beginPath();
+    ctx.arc(
+        this.x,
+        this.y,
+        this.explosionRadius,
+        0,
+        Math.PI*2
+    );
+    ctx.fill();
+
+    // 中
+    ctx.fillStyle="rgba(255,180,0,0.6)";
+    ctx.beginPath();
+    ctx.arc(
+        this.x,
+        this.y,
+        this.explosionRadius*0.7,
+        0,
+        Math.PI*2
+    );
+    ctx.fill();
+
+    // 中心
+    ctx.fillStyle="white";
+    ctx.beginPath();
+    ctx.arc(
+        this.x,
+        this.y,
+        this.explosionRadius*0.3,
+        0,
+        Math.PI*2
+    );
+    ctx.fill();
+
+    return;
+
+}
+
+if(this.powerBullet){
+
+    // ミサイル本体
+    ctx.save();
+
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+
+    // 炎
+    ctx.fillStyle="orange";
+    ctx.beginPath();
+    ctx.moveTo(-14,0);
+    ctx.lineTo(-24,-4);
+    ctx.lineTo(-24,4);
+    ctx.closePath();
+    ctx.fill();
+
+    // 本体
+    ctx.fillStyle="#dddddd";
+    ctx.fillRect(-12,-3,18,6);
+
+    // 先端
+    ctx.fillStyle="red";
+    ctx.beginPath();
+    ctx.moveTo(8,0);
+    ctx.lineTo(2,-4);
+    ctx.lineTo(2,4);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+
+}
+else{
+
+    ctx.fillStyle="#ffff66";
 
     ctx.fillRect(
         this.x,
@@ -83,6 +209,7 @@ draw(ctx){
         4
     );
 
+}
 
 }
 

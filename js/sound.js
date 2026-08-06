@@ -1074,6 +1074,20 @@ planeShot(){
     osc.stop(now+0.1);
 
 },
+missile(){
+
+    this.missileFireSound.currentTime=0;
+    this.missileFireSound.play();
+
+
+},
+
+explosion(){
+
+      this.missileExplosionSound.currentTime=0;
+    this.missileExplosionSound.play();
+
+},
 gameOver(){
 
     if(!this.ctx){

@@ -188,14 +188,16 @@ this.stopLight=[
 ];
 
 
-let slow = 1;
+let slow=1;
 
 
-if(
-    WaveBonus.current === "blue"
-){
+// 青ボーナスは次の1回転だけ
+if(WaveBonus.blueSpin){
 
     slow=0.6;
+
+    // 使用済み
+    WaveBonus.blueSpin=false;
 
 }
 
@@ -727,6 +729,8 @@ resultGrid.push(value);
 
         this.result=1;
 
+        let bonusHit = null;
+
 
         this.highlightLines=[];
 
@@ -790,7 +794,7 @@ const c=resultGrid[line[2]];
 }
 else if(a==="★"){
 
-    this.result = 8;
+    this.result = 10;
 
 }
 else{
@@ -800,6 +804,34 @@ else{
         this.result,
         a
     );
+
+
+    // SPECIAL BONUS成立判定
+   if(
+    WaveBonus.active &&
+    Number(a) === Number(WaveBonus.green)
+){
+
+    bonusHit="green";
+
+}
+else if(
+    WaveBonus.active &&
+    Number(a) === Number(WaveBonus.blue)
+){
+
+    bonusHit="blue";
+
+}
+else if(
+    WaveBonus.active &&
+    Number(a) === Number(WaveBonus.yellow)
+){
+
+    bonusHit="yellow";
+
+}
+
 
 }
 
@@ -929,28 +961,58 @@ else{
 // SPECIAL BONUS発動
 //=====================
 
-if(WaveBonus.active){
+if(
+    WaveBonus.active &&
+    bonusHit
+){
 
 
-    if(this.result === WaveBonus.green){
+    // 緑
+    if(bonusHit==="green"){
 
-        WaveBonus.current="green";
+    // 緑：隕石を大きく後退
+    Game.meteor.greenPushTimer = 60;
 
-    }
-    else if(this.result === WaveBonus.blue){
+    Game.meteor.greenPushPower = 15;
 
-        WaveBonus.current="blue";
 
-    }
-    else if(this.result === WaveBonus.yellow){
-
-        WaveBonus.current="yellow";
-
-    }
-  WaveBonus.active=false;
+    // 衝撃波
+    Game.meteor.greenShockTimer = 20;
+    Game.meteor.greenShockRadius = Game.meteor.radius;
 
 }
 
+
+
+    // 青
+    else if(bonusHit==="blue"){
+
+    // 次の1回転だけ減速
+    WaveBonus.blueSpin=true;
+
+}
+
+
+
+    // 黄色
+    else if(
+    bonusHit==="yellow" &&
+    !WaveBonus.yellowUsed
+){
+
+
+        WaveBonus.yellowActive=true;
+
+        WaveBonus.yellowUsed=true;
+
+        WaveBonus.yellowShots=0;
+
+
+    }
+
+
+
+}
 //=====================
 // 特殊数字説明
 //=====================
@@ -963,7 +1025,10 @@ if(
     WaveBonus
 ){
 
-    if(this.result === WaveBonus.green){
+   if(
+    WaveBonus.active &&
+    bonusHit==="green"
+){
 
         this.effectMessage =
         "GREEN BONUS\n隕石を押し返す力UP";
@@ -971,7 +1036,8 @@ if(
     }
 
 
-    else if(this.result === WaveBonus.blue){
+    else if(WaveBonus.active &&
+        bonusHit==="blue"){
 
         this.effectMessage =
         "BLUE BONUS\nスロット速度DOWN";
@@ -979,10 +1045,11 @@ if(
     }
 
 
-    else if(this.result === WaveBonus.yellow){
+    else if(WaveBonus.active &&
+       bonusHit==="yellow"){
 
         this.effectMessage =
-        "YELLOW BONUS\n援軍の弾速UP";
+        "YELLOW BONUS\n強化ミサイル2発発射";
 
     }
 
@@ -999,6 +1066,8 @@ if(
     this.reachWait=false;
     this.reachEffectTimer=0;
     this.reachLine=null;
+
+ 
 
 
 

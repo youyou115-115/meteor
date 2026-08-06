@@ -163,12 +163,15 @@ if(this.cooldown <= 0){
 
     this.shoot();
 
-    if(
-    WaveBonus.current==="yellow"
+   if(
+    WaveBonus.current==="yellow" &&
+    !WaveBonus.yellowUsed
 ){
 
     this.cooldown = 10;
 
+    WaveBonus.yellowUsed=true;
+    WaveBonus.current=null;
 }
 else{
 
@@ -202,13 +205,23 @@ shoot(){
 
 
     let bulletSpeed=1;
-
+let powerBullet=false;
 
 if(
-    WaveBonus.current==="yellow"
+    WaveBonus.yellowActive &&
+    WaveBonus.yellowShots < 2
 ){
 
-    bulletSpeed=1.5;
+    bulletSpeed=2;
+    powerBullet=true;
+    Sound.missile();
+    WaveBonus.yellowShots++;
+
+    if(WaveBonus.yellowShots>=2){
+
+    WaveBonus.yellowActive=false;
+
+}
 
 }
 
@@ -218,7 +231,8 @@ Game.bullets.push(
         this.x,
         this.y,
         angle,
-        bulletSpeed
+        bulletSpeed,
+        powerBullet
     )
 );
 
