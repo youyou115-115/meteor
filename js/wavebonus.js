@@ -234,7 +234,7 @@ SPECIAL BONUS
 
         ctx.fillText(
             "🟡 YELLOW : "+this.yellow+
-            "  援軍強化",
+            "  援軍ミサイル",
             400,
             400
         );
