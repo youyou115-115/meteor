@@ -56,7 +56,7 @@ update(){
    if(this.explosionTimer > 19){
 
     const damage =
-    Math.floor(Game.meteor.maxHp * 0.5);
+    Math.floor(Game.meteor.Hp * 0.5);
 
     Game.meteor.damage(damage);
 
