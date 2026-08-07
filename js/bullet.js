@@ -59,7 +59,7 @@ update(){
 ){
 
     const damage =
-    Math.floor(Game.meteor.hp * 0.5);
+    Math.floor(Game.meteor.hp * 0.25);
 
     Game.meteor.damage(damage);
 
@@ -107,11 +107,12 @@ update(){
 
     if(d < Game.meteor.radius){
 
-    if(this.powerBullet){
+   if(this.powerBullet){
 
-        this.exploding = true;
-        this.explosionTimer = 20;
-        this.explosionRadius = 0;
+    this.exploding = true;
+    this.explosionTimer = 20;
+    this.explosionRadius = 0;
+    this.explosionDamage=false;
 
         // ミサイルはその場で停止
         this.vx = 0;
