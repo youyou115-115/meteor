@@ -175,10 +175,10 @@ this.reels=[
         0
     ];
 
-    this.reelPos=[
-    0,
-    0,
-    0
+    this.reelPos = [
+    Math.random(),
+    Math.random(),
+    Math.random()
 ];
 
 this.stopLight=[
@@ -865,7 +865,7 @@ if(this.result === 7){
     this.resultEffect="seven";
 
 }
-else if(this.result === 8){
+else if(this.result === 10){
 
     this.resultEffect="star";
 
