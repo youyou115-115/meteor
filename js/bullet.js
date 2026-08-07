@@ -53,16 +53,21 @@ update(){
 
 
     // 爆発開始時だけダメージ
-   if(this.explosionTimer > 19){
+   if(
+    this.explosionTimer > 19 &&
+    !this.explosionDamage
+){
 
     const damage =
-    Math.floor(Game.meteor.Hp * 0.5);
+    Math.floor(Game.meteor.hp * 0.5);
 
     Game.meteor.damage(damage);
 
     Sound.explosion();
 
     Camera.hitShake(12);
+
+    this.explosionDamage=true;
 
 }
 
