@@ -73,42 +73,36 @@ resizeCanvas();
 
 
 
-function rouletteInput(event){
 
+function rouletteInput(event){
 
     // =====================
     // WAVE BONUS説明解除
     // =====================
 
-   if(Game.showBonusHelp){
+    if(Game.showBonusHelp){
 
-    Game.showBonusHelp=false;
+        Game.showBonusHelp = false;
 
-    WaveBonusUI.active=false;
-    WaveBonusUI.timer=0;
+        WaveBonusUI.active = false;
+        WaveBonusUI.timer = 0;
 
-    WaveBonus.timer=0;
+        WaveBonus.timer = 0;
 
-    return;
+        return;
+    }
 
-}
 
-    // 以下そのまま
-
-       // =====================
+    // =====================
     // GAMEOVER → TITLE
     // =====================
 
     if(Game.state === "GAMEOVER"){
 
+        Game.toTitle();
 
-    Game.toTitle();
-
-
-    return;
-
-
-}
+        return;
+    }
 
 
     // =====================
@@ -120,109 +114,80 @@ function rouletteInput(event){
         Game.start();
 
         return;
-
     }
 
 
-
     // =====================
-    // 操作禁止状態
+    // ここからゲーム中
     // =====================
-
 
     // コイン飛行中
-
     if(Game.coin.active){
 
         return;
-
     }
 
 
+    // =====================
+    // 隕石破壊演出中
+    // =====================
 
+    if(
+        !Game.bossWave &&
+        Game.meteor.destroying
+    ){
 
-     /// =====================
-// 隕石破壊演出中
-// =====================
-
-if(
-    !Game.bossWave &&
-    Game.meteor.destroying
-){
-
-    return;
-
-}
-
-
-
-
-// ルーレット結果表示中は入力禁止
-if(Roulette.resultTimer > 0){
-
-    return;
-
-}
-
-
+        return;
+    }
 
 
     // =====================
-    // スロット操作
+    // ルーレット結果表示中
     // =====================
 
+    if(Roulette.resultTimer > 0){
 
-// =====================
-// BOSS WARNING中
-// =====================
-// WARNING中は完全に操作禁止
-
-if(
-    Game.bossWave &&
-    Game.bossPhase === "WARNING"
-){
-
-    return;
-
-}
+        return;
+    }
 
 
-// =====================
-// ルーレット操作中
-// =====================
+    // =====================
+    // BOSS WARNING中
+    // =====================
 
-if(Roulette.active){
+    if(
+        Game.bossWave &&
+        Game.bossPhase === "WARNING"
+    ){
 
-    Roulette.stop();
-
-    return;
-
-}
+        return;
+    }
 
 
-// =====================
-// BOSS BATTLE
-// =====================
+    // =====================
+    // スロット停止
+    // =====================
 
-if(
-    Game.bossWave &&
-    Game.bossPhase === "BATTLE"
-){
+    // ★開始は自然チャージのみ
+    // ★回っているときだけクリックで停止
 
-    Roulette.start();
+    if(Roulette.active){
+
+        Roulette.stop();
+
+        return;
+    }
+
+
+    // =====================
+    // それ以外のゲーム中クリック
+    // =====================
 
     return;
 
 }
 
 
-// =====================
-// 通常WAVE
-// =====================
-
-Roulette.start();
-
-}
 
 
 

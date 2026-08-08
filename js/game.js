@@ -7,10 +7,24 @@
 const Game={
 
 
+
+
 canvas:null,
 
 ctx:null,
 bossWaves:[6],
+
+// =====================
+// スロットチャージ
+// =====================
+
+slotCharge: 0,
+
+slotChargeMax: 60,
+
+slotCharging: true,
+
+slotAutoStart: true,
 
 
 meteor:null,
@@ -164,6 +178,58 @@ new Coin();
 
 },
 
+// =====================
+// WAVE開始時のスロット
+// =====================
+
+startWaveSlot(){
+
+    // 既にスロット中なら何もしない
+    if(Roulette.active){
+
+        return;
+
+    }
+
+    // 状態がGAME以外なら開始しない
+    if(this.state !== "GAME"){
+
+        return;
+
+    }
+
+    // 隕石破壊演出中は開始しない
+    if(
+        !this.bossWave &&
+        this.meteor &&
+        this.meteor.destroying
+    ){
+
+        return;
+
+    }
+
+    // =====================
+    // チャージリセット
+    // =====================
+
+    this.slotCharge = 0;
+    this.slotCharging = false;
+
+    // =====================
+    // スロット開始
+    // =====================
+
+    Roulette.active = false;
+    Roulette.visible = false;
+    Roulette.mode = "IDLE";
+    Roulette.stopTimer = 0;
+    Roulette.resultTimer = 0;
+
+    Roulette.start();
+
+},
+
 start(){
 
 
@@ -235,6 +301,15 @@ if(this.isBossWave()){
     this.startBossWave();
 
 }
+else{
+
+    // =====================
+    // WAVE1開始
+    // =====================
+
+    this.startWaveSlot();
+
+}
 
     this.showBonusHelp=false;
 this.bonusHelpWait=false;
@@ -243,6 +318,16 @@ this.bonusHelpReady=false;
 WaveBonus.timer=0;
 WaveBonusUI.timer=0;
 WaveBonusUI.active=false;
+
+// =====================
+// スロットチャージ初期化
+// =====================
+
+this.slotCharge = 0;
+
+this.slotCharging = false;
+
+this.slotAutoStart = true;
 
 
 
@@ -361,7 +446,7 @@ Roulette.update();
 
 
 // =====================
-// スロット中はゲーム停止
+// スロット中
 // =====================
 
 if(Roulette.active){
@@ -373,6 +458,62 @@ if(Roulette.active){
 }
 
 
+// =====================
+// スロットチャージ
+// =====================
+
+if(
+    this.state === "GAME" &&
+    this.bossPhase !== "WARNING" &&
+    this.meteor &&
+    !this.meteor.destroying
+){
+
+    this.slotCharging = true;
+
+
+    this.slotCharge +=
+        Game.deltaTime;
+
+
+    // =====================
+    // MAX
+    // =====================
+
+    if(
+        this.slotCharge >=
+        this.slotChargeMax
+    ){
+
+        this.slotCharge =
+            this.slotChargeMax;
+
+        this.slotCharging = false;
+
+
+        // =====================
+        // 自動スロット開始
+        // =====================
+
+        Roulette.start();
+
+        this.slotCharge = 0;
+
+    }
+
+}
+else if(
+    this.meteor &&
+    this.meteor.destroying
+){
+
+    // =====================
+    // 隕石破壊演出中のみ停止
+    // =====================
+
+    this.slotCharging = false;
+
+}
 
 // =====================
 // BOSS WAVE
@@ -422,8 +563,6 @@ b=>b.active
 );
 
 
-
-    Roulette.update();
 
 
     Camera.update();
@@ -551,6 +690,27 @@ if(this.bossPhase === "WARNING"){
 
         // 最初の隕石召喚
         this.boss.summonMeteors();
+
+           // =====================
+    // スロットチャージリセット
+    // =====================
+
+    this.slotCharge = 0;
+    this.slotCharging = false;
+    this.slotAutoStart = true;
+
+
+    // =====================
+    // 最初のスロット自動開始
+    // =====================
+
+    Roulette.active = false;
+    Roulette.visible = false;
+    Roulette.mode = "IDLE";
+
+    Roulette.start();
+
+
 
 
 

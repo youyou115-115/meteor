@@ -61,7 +61,7 @@ reset(){
     // 通常隕石と同じ速度
     // =====================
 
-    this.speed = 6;
+    this.speed = 4;
 
     // =====================
     // サイズ
@@ -138,7 +138,7 @@ update(){
     // 右・左から中央へ移動
     // =================================================
 
-    if(this.movingToCenter){
+   if(this.moveState === "CENTER"){
 
         const dx =
             400 - this.x;
@@ -164,7 +164,7 @@ update(){
 
         this.x = 400;
 
-        this.movingToCenter = false;
+        this.moveState = "FALL";
 
         return;
 
@@ -251,7 +251,28 @@ damage(value){
 
         this.hp = 0;
 
+
+        // =====================
+        // 破壊
+        // =====================
+
         this.active = false;
+
+
+        // =====================
+        // スロット強制解除
+        // =====================
+
+        Roulette.active = false;
+
+        Roulette.visible = false;
+
+        Roulette.mode = "IDLE";
+
+        Roulette.stopTimer = 0;
+
+        Roulette.resultTimer = 0;
+        Game.slotCharging = false;
 
 
         Camera.hitShake(5);

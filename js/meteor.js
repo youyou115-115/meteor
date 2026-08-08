@@ -47,7 +47,7 @@ this.greenHit=false;
 case 1:
 
     this.maxHp = 100;
-    this.speed = 4;
+    this.speed = 3;
     this.type = 0;
 
     break;
@@ -57,7 +57,7 @@ case 1:
 case 2:
 
     this.maxHp = 200;
-    this.speed = 4;
+    this.speed = 3;
     this.type = 1;
 
     break;
@@ -80,7 +80,7 @@ default:
 
 
     this.speed =
-    3.2 +
+    3 +
     Game.wave*0.15;
 
 
@@ -265,10 +265,28 @@ Math.min(
 
     Game.wave++;
 
+    // =====================
+// 次WAVE開始
+// スロットチャージリセット
+// =====================
+
+Game.slotCharge = 0;
+Game.slotCharging = false;
+Game.slotAutoStart = true;
+
+
     if(Game.isBossWave()){
 
     Game.waveMessage =
         "WAVE " + Game.wave;
+
+
+        // =====================
+// 次WAVE開始
+// 自動スロット
+// =====================
+
+
 
     Game.waveTimer = 90;
 
@@ -316,6 +334,12 @@ else if(Game.wave > 3){
 Game.waveTimer = 90;
 
 this.reset();
+
+// =====================
+// 新しいWAVE開始
+// =====================
+
+Game.startWaveSlot();
 
     this.x = 400;
     this.y = 150;
@@ -483,6 +507,38 @@ damage(value){
     this.destroyPhase=1;
 
     this.destroyTimer=30;
+
+       // =====================
+        // スロット強制終了
+        // =====================
+
+        Roulette.active = false;
+
+        Roulette.visible = false;
+
+        Roulette.mode = "IDLE";
+
+        Roulette.stopTimer = 0;
+
+        Roulette.resultTimer = 0;
+
+
+        // =====================
+        // チャージをリセット
+        // =====================
+
+        Game.slotCharge = 0;
+
+        Game.slotCharging = true;
+
+         // =====================
+    // 隕石破壊後は
+    // 次WAVEまでスロットチャージ停止
+    // =====================
+
+    Game.slotCharging = false;
+
+    Game.slotCharge = 0;
 
      Sound.meteorCharge();
 

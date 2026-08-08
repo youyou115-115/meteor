@@ -394,7 +394,7 @@ if(
         Game.bossMeteors.includes(target)
     ){
 
-        target.damage(20);
+        target.damage(40);
 
     }
 
@@ -408,7 +408,7 @@ if(
         target === Game.boss
     ){
 
-        target.damage(20);
+        target.damage(50);
 
     }
 

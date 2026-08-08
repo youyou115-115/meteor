@@ -584,6 +584,62 @@ if(
             this.y
         );
 
+        // =====================
+// スロットチャージゲージ
+// =====================
+
+if(
+    Game.state === "GAME" &&
+    Game.bossPhase !== "WARNING"
+){
+
+    const barWidth = 70;
+    const barHeight = 7;
+
+    const rate =
+        Game.slotCharge /
+        Game.slotChargeMax;
+
+
+    // 背景
+    ctx.fillStyle =
+        "rgba(0,0,0,0.75)";
+
+    ctx.fillRect(
+        -barWidth / 2,
+        -this.radius - 18,
+        barWidth,
+        barHeight
+    );
+
+
+    // チャージ
+    ctx.fillStyle =
+        "#ffd83d";
+
+    ctx.fillRect(
+        -barWidth / 2,
+        -this.radius - 18,
+        barWidth * rate,
+        barHeight
+    );
+
+
+    // 枠
+    ctx.strokeStyle =
+        "#ffffff";
+
+    ctx.lineWidth = 1;
+
+    ctx.strokeRect(
+        -barWidth / 2,
+        -this.radius - 18,
+        barWidth,
+        barHeight
+    );
+
+}
+
 
         // =====================
         // 横回転

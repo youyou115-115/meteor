@@ -62,8 +62,6 @@ this.attackState = "METEOR";
 
 this.attackChanceTimer = 0;
 
-this.laughTimer = 180;
-
 this.laughing = false;
 
 this.laughDuration = 0;
@@ -132,7 +130,7 @@ this.explosionParticles = [];
 
 this.z = 1000;
 
-this.secondPhaseSpeed = 3.3;
+this.secondPhaseSpeed = 3;
 
 
     // =====================
