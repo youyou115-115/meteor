@@ -34,15 +34,22 @@ draw(){
 
 
     // =====================
-    // カメラ
-    // =====================
+// カメラ
+// =====================
 
-    ctx.save();
+ctx.save();
+
+if(
+    Game.state === "GAME" ||
+    Game.state === "GAMEOVER"
+){
 
     ctx.translate(
         Camera.getX(),
         Camera.getY()
     );
+
+}
 
 
     // =====================
