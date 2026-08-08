@@ -271,28 +271,18 @@ destroyMeteor(){
         Game.bossMeteors.length > 0
     ){
 
-        for(
-            const meteor of Game.bossMeteors
-        ){
+        for(const meteor of Game.bossMeteors){
 
-            if(
-                meteor &&
-                meteor.active
-            ){
+            if(meteor && meteor.active){
 
-                // ★ 現在HPを全部削る
-                meteor.damage(meteor.hp);
+                meteor.hp = 99;
+                meteor.active = false;
 
             }
 
         }
 
-        Game.bossMeteors =
-            Game.bossMeteors.filter(
-                meteor =>
-                    meteor &&
-                    meteor.active
-            );
+        Game.bossMeteors = [];
 
         Camera.hitShake(25);
 
@@ -314,10 +304,7 @@ destroyMeteor(){
         Game.meteor.active
     ){
 
-        // ★ 現在HPを全部削る
-        Game.meteor.damage(
-            Game.meteor.hp
-        );
+        Game.meteor.hp = 99;
 
         Camera.hitShake(25);
 
@@ -894,8 +881,8 @@ const c=resultGrid[line[2]];
 
                 if(a==="☄"){
 
-    // 隕石一発破壊役
-    this.result = 1;
+     // 隕石一発破壊役
+    this.result = 99;
 
     this.meteorHit = true;
 
