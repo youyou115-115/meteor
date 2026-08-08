@@ -10,7 +10,7 @@ const Game={
 canvas:null,
 
 ctx:null,
-bossWaves:[1,5],
+bossWaves:[5],
 
 
 meteor:null,
