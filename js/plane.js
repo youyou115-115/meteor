@@ -357,77 +357,80 @@ if(this.greenAttack){
 
     if(dist > 0){
 
-        this.x +=
-            dx / dist *
-            speed *
-            Game.deltaTime;
+    this.x +=
+        dx / dist *
+        speed *
+        Game.deltaTime;
+
+    this.y +=
+        dy / dist *
+        speed *
+        Game.deltaTime;
+
+}
 
 
-        this.y +=
-            dy / dist *
-            speed *
-            Game.deltaTime;
+// =====================
+// 命中
+// =====================
 
-    }
+if(
+    dist <
+    target.radius + 20
+){
+
+    this.greenAttack = false;
+
+    this.destroy();
 
 
     // =====================
-    // 命中
+    // BOSS戦
     // =====================
 
     if(
-        dist <
-        target.radius + 20
+        Game.bossWave &&
+        Game.bossMeteors &&
+        Game.bossMeteors.includes(target)
     ){
 
-        this.greenAttack = false;
-
-        this.destroy();
-
-
-        // =====================
-        // BOSS戦
-        // =====================
-
-        if(
-            Game.bossWave &&
-            Game.bossMeteors &&
-            Game.bossMeteors.includes(target)
-        ){
-
-            target.damage(20);
-
-        }
-
-
-        // =====================
-        // 月
-        // =====================
-
-        else if(
-            Game.bossWave &&
-            target === Game.boss
-        ){
-
-            target.damage(20);
-
-        }
-
-
-        // =====================
-        // 通常隕石
-        // =====================
-
-        else{
-
-            Game.meteor.greenHit = true;
-
-        }
-
-
-        return;
+        target.damage(20);
 
     }
+
+
+    // =====================
+    // 月
+    // =====================
+
+    else if(
+        Game.bossWave &&
+        target === Game.boss
+    ){
+
+        target.damage(20);
+
+    }
+
+
+    // =====================
+    // 通常隕石
+    // =====================
+
+    else{
+
+        Game.meteor.greenHit = true;
+
+    }
+
+    return;
+
+}
+
+
+// ★これを追加
+// 緑飛行機はここで終了
+return;
 
 }
 

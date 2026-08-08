@@ -21,6 +21,8 @@ reset(){
 
     this.startX=400;
     this.startY=150;
+    this.pushTimer = 0;
+    this.active = true;
 
     this.chargeSoundPlayed=false;
 this.breakSoundPlayed=false;
@@ -126,34 +128,38 @@ update(){
 
     if(this.greenHit){
 
-    this.greenHit=false;
+    this.greenHit = false;
 
-
-    this.z += 350;
-
+    // 隕石を開始地点へ戻す
+    this.pushTimer = 45;
 
     Camera.hitShake(25);
 
-
     Sound.meteorHit();
-
 }
 
 
 
-    if(this.pushTimer>0){
+    if(this.pushTimer > 0){
 
+    this.pushTimer -= Game.deltaTime;
 
-    this.pushTimer--;
-
+    const rate = 0.12;
 
     this.x +=
-    (this.startX-this.x)*0.08;
-
+        (this.startX - this.x) *
+        rate *
+        Game.deltaTime;
 
     this.y +=
-    (this.startY-this.y)*0.08;
+        (this.startY - this.y) *
+        rate *
+        Game.deltaTime;
 
+    this.z +=
+        (1000 - this.z) *
+        rate *
+        Game.deltaTime;
 
 }
 
@@ -260,18 +266,6 @@ Math.min(
     Game.wave++;
      // 前WAVEのボーナス効果を解除
     WaveBonus.current = null;
-
-    // =====================
-// BOSS WAVE判定
-// =====================
-
-if(Game.isBossWave()){
-
-    Game.startBossWave();
-
-    return;
-
-}
 
     if(Game.wave===3){
 

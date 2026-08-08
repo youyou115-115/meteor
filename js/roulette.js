@@ -295,9 +295,6 @@ destroyMeteor(){
     }
 
 
-    // =====================
-    // 通常の隕石
-    // =====================
 
     if(
         Game.meteor &&
@@ -1106,15 +1103,80 @@ if(
 ){
 
 
-    // 緑
-    if(bonusHit === "green"){
+    // =====================
+// GREEN
+// 隕石を押し戻す
+// =====================
+
+if(bonusHit === "green"){
+
+    // 攻撃対象が存在するか確認
+    let targetExists = false;
+
+
+    // =====================
+    // 通常隕石
+    // =====================
 
     if(
+        !Game.bossWave &&
         Game.meteor &&
         Game.meteor.active
     ){
 
-        Game.meteor.greenHit = true;
+        targetExists = true;
+
+    }
+
+
+    // =====================
+    // BOSS戦
+    // =====================
+
+    if(
+        Game.bossWave &&
+        Game.bossPhase === "BATTLE"
+    ){
+
+        // 召喚隕石がいる
+        if(
+            Game.bossMeteors &&
+            Game.bossMeteors.some(
+                meteor =>
+                    meteor &&
+                    meteor.active
+            )
+        ){
+
+            targetExists = true;
+
+        }
+
+        // 召喚隕石がいなければ月
+        else if(
+            Game.boss &&
+            Game.boss.active
+        ){
+
+            targetExists = true;
+
+        }
+
+    }
+
+
+    // =====================
+    // 飛行機発進
+    // =====================
+
+    if(targetExists){
+
+        const plane =
+            new Plane("green");
+
+        Game.planes.push(plane);
+
+        plane.greenAttack = true;
 
     }
 
