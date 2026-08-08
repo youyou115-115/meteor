@@ -362,6 +362,23 @@ if(this.showBonusHelp){
 
     }
 
+    // =====================
+// WAVE表示タイマー
+// ※ゲーム停止中でも進める
+// =====================
+
+if(this.waveTimer > 0){
+
+    this.waveTimer -= this.deltaTime;
+
+    if(this.waveTimer < 0){
+
+        this.waveTimer = 0;
+
+    }
+
+}
+
 
 
     // =====================
@@ -567,11 +584,6 @@ b=>b.active
 
     Camera.update();
 
-    if(this.waveTimer > 0){
-
-    this.waveTimer--;
-
-}
 
 // =====================
 // BOSS
