@@ -262,22 +262,32 @@ this.reachNumber=null;
 
 destroyMeteor(){
 
+    // =====================
     // ボス戦の召喚隕石
+    // =====================
+
     if(
         Game.bossMeteors &&
         Game.bossMeteors.length > 0
     ){
 
-        for(const meteor of Game.bossMeteors){
+        for(
+            const meteor of Game.bossMeteors
+        ){
 
-            if(meteor && meteor.active){
+            if(
+                meteor &&
+                meteor.active
+            ){
 
-                meteor.hp = 99;
+                meteor.hp = 0;
+
                 meteor.active = false;
 
             }
 
         }
+
 
         Game.bossMeteors = [];
 
@@ -290,16 +300,24 @@ destroyMeteor(){
         Sound.meteor();
 
         return;
+
     }
 
 
+    // =====================
     // 通常の隕石
+    // =====================
+
     if(
         Game.meteor &&
         Game.meteor.active
     ){
 
-        Game.meteor.hp = 99;
+        // ★ 完全破壊
+        Game.meteor.hp = 0;
+
+        Game.meteor.active = false;
+
 
         Camera.hitShake(25);
 
