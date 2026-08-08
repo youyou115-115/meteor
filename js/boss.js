@@ -132,7 +132,7 @@ this.explosionParticles = [];
 
 this.z = 1000;
 
-this.secondPhaseSpeed = 4;
+this.secondPhaseSpeed = 3.3;
 
 
     // =====================
