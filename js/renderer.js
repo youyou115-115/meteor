@@ -752,6 +752,247 @@ for(let meteor of Game.bossMeteors){
 
     }
 
+    // =====================================================
+// BOSS WARNING
+// =====================================================
+
+if(
+    Game.bossWarningActive &&
+    Game.bossPhase === "WARNING"
+){
+
+    ctx.save();
+
+
+    // =====================
+    // 画面を少し暗くする
+    // =====================
+
+    ctx.fillStyle =
+        "rgba(0,0,0,0.55)";
+
+    ctx.fillRect(
+        0,
+        0,
+        800,
+        700
+    );
+
+
+    // =====================
+    // 赤い垂れ幕
+    // =====================
+
+    const curtainWidth =
+        185 * Game.bossCurtain;
+
+
+    // 左幕
+
+    const leftGrad =
+        ctx.createLinearGradient(
+            0,
+            0,
+            curtainWidth,
+            0
+        );
+
+    leftGrad.addColorStop(
+        0,
+        "#520000"
+    );
+
+    leftGrad.addColorStop(
+        0.55,
+        "#b00000"
+    );
+
+    leftGrad.addColorStop(
+        1,
+        "#ff2222"
+    );
+
+
+    ctx.fillStyle =
+        leftGrad;
+
+    ctx.fillRect(
+        0,
+        0,
+        curtainWidth,
+        700
+    );
+
+
+    // 左幕の影
+
+    ctx.fillStyle =
+        "rgba(0,0,0,0.25)";
+
+    for(let i=0;i<6;i++){
+
+        ctx.fillRect(
+            i * 32,
+            0,
+            12,
+            700
+        );
+
+    }
+
+
+    // 右幕
+
+    const rightGrad =
+        ctx.createLinearGradient(
+            800 - curtainWidth,
+            0,
+            800,
+            0
+        );
+
+    rightGrad.addColorStop(
+        0,
+        "#ff2222"
+    );
+
+    rightGrad.addColorStop(
+        0.45,
+        "#b00000"
+    );
+
+    rightGrad.addColorStop(
+        1,
+        "#520000"
+    );
+
+
+    ctx.fillStyle =
+        rightGrad;
+
+    ctx.fillRect(
+        800 - curtainWidth,
+        0,
+        curtainWidth,
+        700
+    );
+
+
+    // 右幕の影
+
+    ctx.fillStyle =
+        "rgba(0,0,0,0.25)";
+
+    for(let i=0;i<6;i++){
+
+        ctx.fillRect(
+            800 - i * 32 - 20,
+            0,
+            12,
+            700
+        );
+
+    }
+
+
+    // =====================
+    // WARNING
+    // =====================
+
+    const warningTime =
+        Game.bossWarningTimer;
+
+
+    // 点滅
+    const blink =
+        Math.floor(
+            warningTime / 8
+        ) % 2;
+
+
+    
+
+    ctx.textAlign =
+        "center";
+
+    ctx.textBaseline =
+        "middle";
+
+
+    ctx.font =
+        "bold 82px sans-serif";
+
+
+    ctx.shadowColor =
+        "#ff0000";
+
+    ctx.shadowBlur =
+        35;
+
+
+    ctx.fillStyle =
+        "#ffffff";
+
+
+    ctx.fillText(
+        "WARNING",
+        400,
+        280
+    );
+
+
+    // =====================
+    // サブタイトル
+    // =====================
+
+    ctx.font =
+        "bold 26px sans-serif";
+
+
+    ctx.shadowColor =
+        "#ff2222";
+
+    ctx.shadowBlur =
+        18;
+
+
+    ctx.fillStyle =
+        "#ff4444";
+
+
+    ctx.fillText(
+        "MOON DEVIL APPROACHING",
+        400,
+        350
+    );
+
+
+    // =====================
+    // 赤い警告ライン
+    // =====================
+
+    ctx.shadowColor =
+        "#ff0000";
+
+    ctx.shadowBlur =
+        15;
+
+    ctx.fillStyle =
+        "#ff2222";
+
+
+    ctx.fillRect(
+        220,
+        395,
+        360,
+        4
+    );
+
+
+    ctx.restore();
+
+}
+
 }
 
 };
