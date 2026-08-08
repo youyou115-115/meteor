@@ -1957,6 +1957,210 @@ gameOver(){
 
 
 },
+// =====================================================
+// GAME CLEAR BGM
+// 地球に平和が戻ったイメージ
+// 約3秒
+// =====================================================
+
+clearBGM(){
+
+    if(!this.ctx){
+        return;
+    }
+
+    // 戦闘BGMを完全停止
+    this.stopBattleBGM();
+
+    const now =
+        this.ctx.currentTime;
+
+
+    // =====================
+    // 和音を鳴らす関数
+    // =====================
+
+    const chord = (
+        frequencies,
+        start,
+        duration,
+        volume
+    ) => {
+
+        for(let freq of frequencies){
+
+            const osc =
+                this.ctx.createOscillator();
+
+            const gain =
+                this.ctx.createGain();
+
+
+            osc.type = "sine";
+
+            osc.frequency.setValueAtTime(
+                freq,
+                start
+            );
+
+
+            gain.gain.setValueAtTime(
+                0.001,
+                start
+            );
+
+            gain.gain.linearRampToValueAtTime(
+                volume,
+                start + 0.12
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.001,
+                start + duration
+            );
+
+
+            osc.connect(gain);
+
+            gain.connect(this.master);
+
+
+            osc.start(start);
+
+            osc.stop(
+                start + duration
+            );
+
+        }
+
+    };
+
+
+    // =====================
+    // ① ボス撃破直後
+    // 少し低い余韻
+    // =====================
+
+    chord(
+        [196, 247, 294],
+        now,
+        0.8,
+        0.08
+    );
+
+
+    // =====================
+    // ② 平和が戻る
+    // 明るい和音
+    // =====================
+
+    chord(
+        [261.63, 329.63, 392],
+        now + 0.65,
+        1.0,
+        0.10
+    );
+
+
+    // =====================
+    // ③ 地球救済
+    // さらに明るく
+    // =====================
+
+    chord(
+        [293.66, 369.99, 440],
+        now + 1.35,
+        1.1,
+        0.11
+    );
+
+
+    // =====================
+    // ④ 最後の輝き
+    // =====================
+
+    chord(
+        [392, 493.88, 587.33],
+        now + 2.05,
+        0.9,
+        0.13
+    );
+
+
+    // =====================
+    // 高いキラッという音
+    // =====================
+
+    const sparkle =
+        (freq, start, duration) => {
+
+            const osc =
+                this.ctx.createOscillator();
+
+            const gain =
+                this.ctx.createGain();
+
+
+            osc.type = "triangle";
+
+
+            osc.frequency.setValueAtTime(
+                freq,
+                start
+            );
+
+
+            gain.gain.setValueAtTime(
+                0.001,
+                start
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.12,
+                start + 0.03
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.001,
+                start + duration
+            );
+
+
+            osc.connect(gain);
+
+            gain.connect(this.master);
+
+
+            osc.start(start);
+
+            osc.stop(
+                start + duration
+            );
+
+        };
+
+
+    sparkle(
+        880,
+        now + 1.55,
+        0.35
+    );
+
+
+    sparkle(
+        1174.66,
+        now + 2.15,
+        0.4
+    );
+
+
+    sparkle(
+        1567.98,
+        now + 2.45,
+        0.5
+    );
+
+},
 
 
 };
