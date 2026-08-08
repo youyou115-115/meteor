@@ -7,67 +7,72 @@
 Game.init();
 
 
-
 const canvas =
-document.getElementById("gameCanvas");
-
-function resizeCanvas(){
-
-
-    const canvas =
     document.getElementById("gameCanvas");
 
 
+// =================================================
+// CANVAS RESIZE
+// =================================================
+
+function resizeCanvas(){
+
+    const mobile =
+        window.innerWidth < 700;
+
+
     const gameWidth = 800;
-    const gameHeight = 700;
+
+
+    const gameHeight =
+        mobile
+        ? 1200
+        : 700;
 
 
     const screenWidth =
-    window.innerWidth;
+        window.innerWidth;
 
 
     const screenHeight =
-    window.innerHeight;
-
+        window.innerHeight;
 
 
     const scaleX =
-    screenWidth / gameWidth;
+        screenWidth /
+        gameWidth;
 
 
     const scaleY =
-    screenHeight / gameHeight;
+        screenHeight /
+        gameHeight;
 
-
-
-    // 小さい方を採用して比率維持
 
     const scale =
-    Math.min(
-        scaleX,
-        scaleY
-    );
-
+        Math.min(
+            scaleX,
+            scaleY
+        );
 
 
     canvas.style.width =
-    (gameWidth * scale) + "px";
+        (gameWidth * scale) + "px";
 
 
     canvas.style.height =
-    (gameHeight * scale) + "px";
-
+        (gameHeight * scale) + "px";
 
 }
 
 
 window.addEventListener(
-"resize",
-resizeCanvas
+    "resize",
+    resizeCanvas
 );
 
 
 resizeCanvas();
+
 
 
 

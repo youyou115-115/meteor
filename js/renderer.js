@@ -1,8 +1,8 @@
+
 /*
-    Meteor Ver0.2
+    Meteor Ver0.5
     renderer.js
 */
-
 
 const Renderer = {
 
@@ -10,51 +10,62 @@ draw(){
 
     const ctx = Game.ctx;
 
+    // =================================================
+    // 基本サイズ
+    // =================================================
+
+    const GAME_WIDTH = 800;
+    const GAME_HEIGHT = 700;
+
+
+    // =================================================
+    // 画面クリア
+    // =================================================
 
     ctx.clearRect(
         0,
         0,
-        800,
-        700
+        Game.canvas.width,
+        Game.canvas.height
     );
 
 
-    // =====================
+    // =================================================
     // 背景
-    // =====================
+    // =================================================
 
     ctx.fillStyle = "#02020a";
 
     ctx.fillRect(
         0,
         0,
-        800,
-        700
+        Game.canvas.width,
+        Game.canvas.height
     );
 
 
-    // =====================
-// カメラ
-// =====================
+    // =================================================
+    // カメラ開始
+    // =================================================
 
-ctx.save();
+    ctx.save();
 
-if(
-    Game.state === "GAME" ||
-    Game.state === "GAMEOVER"
-){
+    if(
+        Game.state === "GAME" ||
+        Game.state === "GAMEOVER"
+    ){
 
-    ctx.translate(
-        Camera.getX(),
-        Camera.getY()
-    );
+        ctx.translate(
+            Camera.getX(),
+            Camera.getY()
+        );
 
-}
+    }
 
 
-    // =====================
+    // =================================================
     // 危険演出
-    // =====================
+    // =================================================
 
     if(Game.danger > 0){
 
@@ -64,16 +75,16 @@ if(
         ctx.fillRect(
             0,
             0,
-            800,
-            700
+            GAME_WIDTH,
+            GAME_HEIGHT
         );
 
     }
 
 
-    // =====================
+    // =================================================
     // WAVE表示
-    // =====================
+    // =================================================
 
     if(
         Game.state === "GAME" &&
@@ -95,26 +106,26 @@ if(
     }
 
 
-    // =====================
+    // =================================================
     // ゲーム画面
-    // =====================
+    // =================================================
 
     if(Game.state !== "TITLE"){
 
 
-// =================================================
-// 通常隕石
-// =================================================
+        // =================================================
+        // 通常隕石
+        // =================================================
 
-if(
-    !Game.bossWave &&
-    Game.meteor &&
-    Game.state === "GAME"
-){
+        if(
+            !Game.bossWave &&
+            Game.meteor &&
+            Game.state === "GAME"
+        ){
 
-    Game.meteor.draw(ctx);
+            Game.meteor.draw(ctx);
 
-}
+        }
 
 
         // =================================================
@@ -139,33 +150,45 @@ if(
         }
 
 
-      
-// =====================
-// BOSS
-// =====================
+        // =================================================
+        // BOSS
+        // =================================================
 
-if(Game.bossWave){
+        if(Game.bossWave){
 
-    // 月
-if(Game.boss){
-    Game.boss.draw(ctx);
-}
+            // -----------------------------
+            // 月 / BOSS
+            // -----------------------------
 
-// 召喚隕石
-for(let meteor of Game.bossMeteors){
-    meteor.draw(ctx);
-}
+            if(Game.boss){
 
-}
+                Game.boss.draw(ctx);
+
+            }
 
 
+            // -----------------------------
+            // ボス召喚隕石
+            // -----------------------------
+
+            for(let meteor of Game.bossMeteors){
+
+                meteor.draw(ctx);
+
+            }
+
+        }
 
 
         // =================================================
         // コイン
         // =================================================
 
-        Game.coin.draw(ctx);
+        if(Game.coin){
+
+            Game.coin.draw(ctx);
+
+        }
 
 
         // =================================================
@@ -177,9 +200,9 @@ for(let meteor of Game.bossMeteors){
     }
 
 
-    // =====================
+    // =================================================
     // カメラ終了
-    // =====================
+    // =================================================
 
     ctx.restore();
 
@@ -189,7 +212,6 @@ for(let meteor of Game.bossMeteors){
     // =====================================================
 
     if(Game.state === "GAMEOVER"){
-
 
         // =====================
         // 画面ひび割れ
@@ -209,8 +231,8 @@ for(let meteor of Game.bossMeteors){
 
             for(let c of Game.cracks){
 
-                let x = 400;
-                let y = 350;
+                const x = 400;
+                const y = 350;
 
 
                 const ex =
@@ -300,8 +322,8 @@ for(let meteor of Game.bossMeteors){
             ctx.fillRect(
                 0,
                 0,
-                800,
-                700
+                GAME_WIDTH,
+                GAME_HEIGHT
             );
 
         }
@@ -318,10 +340,14 @@ for(let meteor of Game.bossMeteors){
         ctx.fillRect(
             0,
             0,
-            800,
-            700
+            GAME_WIDTH,
+            GAME_HEIGHT
         );
 
+
+        // =====================
+        // GAME OVER
+        // =====================
 
         ctx.fillStyle = "red";
 
@@ -357,15 +383,17 @@ for(let meteor of Game.bossMeteors){
 
     if(Game.state === "TITLE"){
 
+        // =====================
         // 背景
+        // =====================
 
         ctx.fillStyle = "#02020a";
 
         ctx.fillRect(
             0,
             0,
-            800,
-            700
+            GAME_WIDTH,
+            GAME_HEIGHT
         );
 
 
@@ -376,11 +404,11 @@ for(let meteor of Game.bossMeteors){
         for(let i=0;i<80;i++){
 
             const x =
-                (i * 97) % 800;
+                (i * 97) % GAME_WIDTH;
 
 
             const y =
-                (i * 53) % 700;
+                (i * 53) % GAME_HEIGHT;
 
 
             const size =
@@ -559,7 +587,9 @@ for(let meteor of Game.bossMeteors){
         ctx.fill();
 
 
+        // =====================
         // クレーター
+        // =====================
 
         ctx.fillStyle =
             "rgba(0,0,0,0.45)";
@@ -641,7 +671,9 @@ for(let meteor of Game.bossMeteors){
         ctx.shadowBlur = 0;
 
 
+        // =====================
         // サブタイトル
+        // =====================
 
         ctx.fillStyle = "#ff9900";
 
@@ -655,7 +687,9 @@ for(let meteor of Game.bossMeteors){
         );
 
 
+        // =====================
         // START
+        // =====================
 
         const alpha =
             (
@@ -679,7 +713,9 @@ for(let meteor of Game.bossMeteors){
         );
 
 
+        // =====================
         // 操作説明
+        // =====================
 
         ctx.fillStyle =
             "rgba(255,255,255,0.6)";
@@ -754,619 +790,245 @@ for(let meteor of Game.bossMeteors){
 
     }
 
+
     // =====================================================
-// BOSS WARNING
-// =====================================================
-
-if(
-    Game.bossWarningActive &&
-    Game.bossPhase === "WARNING"
-){
-
-    ctx.save();
-
-
-    // =====================
-    // 画面を少し暗くする
-    // =====================
-
-    ctx.fillStyle =
-        "rgba(0,0,0,0.55)";
-
-    ctx.fillRect(
-        0,
-        0,
-        800,
-        700
-    );
-
-
-    // =====================
-    // 赤い垂れ幕
-    // =====================
-
-    const curtainWidth =
-        185 * Game.bossCurtain;
-
-
-    // 左幕
-
-    const leftGrad =
-        ctx.createLinearGradient(
-            0,
-            0,
-            curtainWidth,
-            0
-        );
-
-    leftGrad.addColorStop(
-        0,
-        "#520000"
-    );
-
-    leftGrad.addColorStop(
-        0.55,
-        "#b00000"
-    );
-
-    leftGrad.addColorStop(
-        1,
-        "#ff2222"
-    );
-
-
-    ctx.fillStyle =
-        leftGrad;
-
-    ctx.fillRect(
-        0,
-        0,
-        curtainWidth,
-        700
-    );
-
-
-    // 左幕の影
-
-    ctx.fillStyle =
-        "rgba(0,0,0,0.25)";
-
-    for(let i=0;i<6;i++){
-
-        ctx.fillRect(
-            i * 32,
-            0,
-            12,
-            700
-        );
-
-    }
-
-
-    // 右幕
-
-    const rightGrad =
-        ctx.createLinearGradient(
-            800 - curtainWidth,
-            0,
-            800,
-            0
-        );
-
-    rightGrad.addColorStop(
-        0,
-        "#ff2222"
-    );
-
-    rightGrad.addColorStop(
-        0.45,
-        "#b00000"
-    );
-
-    rightGrad.addColorStop(
-        1,
-        "#520000"
-    );
-
-
-    ctx.fillStyle =
-        rightGrad;
-
-    ctx.fillRect(
-        800 - curtainWidth,
-        0,
-        curtainWidth,
-        700
-    );
-
-
-    // 右幕の影
-
-    ctx.fillStyle =
-        "rgba(0,0,0,0.25)";
-
-    for(let i=0;i<6;i++){
-
-        ctx.fillRect(
-            800 - i * 32 - 20,
-            0,
-            12,
-            700
-        );
-
-    }
-
-
-    // =====================
-    // WARNING
-    // =====================
-
-    const warningTime =
-        Game.bossWarningTimer;
-
-
-    // 点滅
-    const blink =
-        Math.floor(
-            warningTime / 8
-        ) % 2;
-
-
-    
-
-    ctx.textAlign =
-        "center";
-
-    ctx.textBaseline =
-        "middle";
-
-
-    ctx.font =
-        "bold 82px sans-serif";
-
-
-    ctx.shadowColor =
-        "#ff0000";
-
-    ctx.shadowBlur =
-        35;
-
-
-    ctx.fillStyle =
-        "#ffffff";
-
-
-    ctx.fillText(
-        "WARNING",
-        400,
-        280
-    );
-
-
-    // =====================
-    // サブタイトル
-    // =====================
-
-    ctx.font =
-        "bold 26px sans-serif";
-
-
-    ctx.shadowColor =
-        "#ff2222";
-
-    ctx.shadowBlur =
-        18;
-
-
-    ctx.fillStyle =
-        "#ff4444";
-
-
-    ctx.fillText(
-        "MOON DEVIL APPROACHING",
-        400,
-        350
-    );
-
-
-    // =====================
-    // 赤い警告ライン
-    // =====================
-
-    ctx.shadowColor =
-        "#ff0000";
-
-    ctx.shadowBlur =
-        15;
-
-    ctx.fillStyle =
-        "#ff2222";
-
-
-    ctx.fillRect(
-        220,
-        395,
-        360,
-        4
-    );
-
-
-    ctx.restore();
-
-}
-
-// =====================================================
-// GAME CLEAR
-// =====================================================
-
-if(Game.state === "CLEAR"){
-
-    ctx.save();
-
-    // =====================
-    // 宇宙背景
-    // =====================
-
-    ctx.fillStyle = "#02020a";
-
-    ctx.fillRect(
-        0,
-        0,
-        800,
-        700
-    );
-
-
-    // =====================
-    // 星
-    // =====================
-
-    for(let i=0;i<100;i++){
-
-        const x =
-            (i * 137) % 800;
-
-        const y =
-            (i * 83) % 700;
-
-        const twinkle =
-            Math.sin(
-                Game.clearAnimation * 0.08 +
-                i
-            );
-
-        const size =
-            1 +
-            (i % 2) +
-            Math.max(0,twinkle);
-
-        ctx.fillStyle =
-            "rgba(255,255,255,0.7)";
-
-        ctx.fillRect(
-            x,
-            y,
-            size,
-            size
-        );
-
-    }
-
-
-    // =====================
-    // 地球
-    // =====================
-
-    const earthX = 400;
-    const earthY = 390;
-
-    const earthRadius = 115;
-
-
-    // 大気
-
-    const atmosphere =
-        ctx.createRadialGradient(
-            earthX,
-            earthY,
-            70,
-            earthX,
-            earthY,
-            150
-        );
-
-    atmosphere.addColorStop(
-        0,
-        "rgba(40,120,255,0)"
-    );
-
-    atmosphere.addColorStop(
-        0.75,
-        "rgba(40,140,255,0.25)"
-    );
-
-    atmosphere.addColorStop(
-        1,
-        "rgba(0,100,255,0)"
-    );
-
-    ctx.fillStyle = atmosphere;
-
-    ctx.beginPath();
-
-    ctx.arc(
-        earthX,
-        earthY,
-        150,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    // 地球本体
-
-    const earth =
-        ctx.createRadialGradient(
-            earthX - 35,
-            earthY - 40,
-            10,
-            earthX,
-            earthY,
-            earthRadius
-        );
-
-    earth.addColorStop(
-        0,
-        "#4fa8ff"
-    );
-
-    earth.addColorStop(
-        0.55,
-        "#1261b5"
-    );
-
-    earth.addColorStop(
-        1,
-        "#03152d"
-    );
-
-    ctx.fillStyle = earth;
-
-    ctx.beginPath();
-
-    ctx.arc(
-        earthX,
-        earthY,
-        earthRadius,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    // =====================
-    // 大陸
-    // =====================
-
-    ctx.fillStyle =
-        "rgba(60,180,90,0.75)";
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        350,
-        350,
-        45,
-        22,
-        -0.4,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        430,
-        405,
-        50,
-        28,
-        0.3,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        360,
-        445,
-        28,
-        18,
-        0.5,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    // =====================
-    // 援軍の軌道
-    // =====================
-
-    ctx.strokeStyle =
-        "rgba(80,160,255,0.25)";
-
-    ctx.lineWidth = 2;
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        earthX,
-        earthY,
-        220,
-        100,
-        -0.25,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.stroke();
-
-
-    // =====================
-    // 援軍
-    // =====================
-
-    const reinforcements = 6;
-
-    for(let i=0;i<reinforcements;i++){
-
-        const angle =
-            Game.clearAnimation * 0.025 +
-            i *
-            Math.PI * 2 /
-            reinforcements;
-
-
-        const x =
-            earthX +
-            Math.cos(angle) *
-            220;
-
-
-        const y =
-            earthY +
-            Math.sin(angle) *
-            100;
-
+    // BOSS WARNING
+    // =====================================================
+
+    if(
+        Game.bossWarningActive &&
+        Game.bossPhase === "WARNING"
+    ){
 
         ctx.save();
 
-        ctx.translate(
-            x,
-            y
-        );
 
-
-        ctx.rotate(
-            angle + Math.PI / 2
-        );
-
-
-        // エンジン光
+        // =====================
+        // 画面を少し暗くする
+        // =====================
 
         ctx.fillStyle =
-            "rgba(255,180,60,0.8)";
+            "rgba(0,0,0,0.55)";
 
-        ctx.beginPath();
 
-        ctx.moveTo(
-            -4,
-            15
-        );
-
-        ctx.lineTo(
+        ctx.fillRect(
             0,
-            30 +
-            Math.sin(
-                Game.clearAnimation * 0.2
-            ) * 5
+            0,
+            GAME_WIDTH,
+            GAME_HEIGHT
         );
 
-        ctx.lineTo(
-            4,
-            15
+
+        // =====================
+        // 赤い垂れ幕
+        // =====================
+
+        const curtainWidth =
+            185 * Game.bossCurtain;
+
+
+        // =====================
+        // 左幕
+        // =====================
+
+        const leftGrad =
+            ctx.createLinearGradient(
+                0,
+                0,
+                curtainWidth,
+                0
+            );
+
+
+        leftGrad.addColorStop(
+            0,
+            "#520000"
         );
 
-        ctx.fill();
+
+        leftGrad.addColorStop(
+            0.55,
+            "#b00000"
+        );
 
 
-        // 機体
+        leftGrad.addColorStop(
+            1,
+            "#ff2222"
+        );
+
 
         ctx.fillStyle =
-            "#d8e4f0";
+            leftGrad;
 
-        ctx.beginPath();
 
-        ctx.moveTo(
+        ctx.fillRect(
             0,
-            -15
-        );
-
-        ctx.lineTo(
-            6,
-            10
-        );
-
-        ctx.lineTo(
             0,
-            7
+            curtainWidth,
+            GAME_HEIGHT
         );
 
-        ctx.lineTo(
-            -6,
-            10
-        );
 
-        ctx.closePath();
-
-        ctx.fill();
-
-
-        // 翼
+        // 左幕の影
 
         ctx.fillStyle =
-            "#7890aa";
+            "rgba(0,0,0,0.25)";
 
-        ctx.beginPath();
 
-        ctx.moveTo(
-            -5,
-            0
+        for(let i=0;i<6;i++){
+
+            ctx.fillRect(
+                i * 32,
+                0,
+                12,
+                GAME_HEIGHT
+            );
+
+        }
+
+
+        // =====================
+        // 右幕
+        // =====================
+
+        const rightGrad =
+            ctx.createLinearGradient(
+                GAME_WIDTH - curtainWidth,
+                0,
+                GAME_WIDTH,
+                0
+            );
+
+
+        rightGrad.addColorStop(
+            0,
+            "#ff2222"
         );
 
-        ctx.lineTo(
-            -17,
-            9
+
+        rightGrad.addColorStop(
+            0.45,
+            "#b00000"
         );
 
-        ctx.lineTo(
-            -5,
-            7
+
+        rightGrad.addColorStop(
+            1,
+            "#520000"
         );
 
-        ctx.closePath();
 
-        ctx.fill();
+        ctx.fillStyle =
+            rightGrad;
 
-        ctx.beginPath();
 
-        ctx.moveTo(
-            5,
-            0
+        ctx.fillRect(
+            GAME_WIDTH - curtainWidth,
+            0,
+            curtainWidth,
+            GAME_HEIGHT
         );
 
-        ctx.lineTo(
-            17,
-            9
+
+        // 右幕の影
+
+        ctx.fillStyle =
+            "rgba(0,0,0,0.25)";
+
+
+        for(let i=0;i<6;i++){
+
+            ctx.fillRect(
+                GAME_WIDTH - i * 32 - 20,
+                0,
+                12,
+                GAME_HEIGHT
+            );
+
+        }
+
+
+        // =====================
+        // WARNING
+        // =====================
+
+        ctx.textAlign =
+            "center";
+
+        ctx.textBaseline =
+            "middle";
+
+
+        ctx.font =
+            "bold 82px sans-serif";
+
+
+        ctx.shadowColor =
+            "#ff0000";
+
+        ctx.shadowBlur =
+            35;
+
+
+        ctx.fillStyle =
+            "#ffffff";
+
+
+        ctx.fillText(
+            "WARNING",
+            400,
+            280
         );
 
-        ctx.lineTo(
-            5,
-            7
+
+        // =====================
+        // サブタイトル
+        // =====================
+
+        ctx.font =
+            "bold 26px sans-serif";
+
+
+        ctx.shadowColor =
+            "#ff2222";
+
+        ctx.shadowBlur =
+            18;
+
+
+        ctx.fillStyle =
+            "#ff4444";
+
+
+        ctx.fillText(
+            "MOON DEVIL APPROACHING",
+            400,
+            350
         );
 
-        ctx.closePath();
 
-        ctx.fill();
+        // =====================
+        // 赤い警告ライン
+        // =====================
+
+        ctx.shadowColor =
+            "#ff0000";
+
+        ctx.shadowBlur =
+            15;
+
+
+        ctx.fillStyle =
+            "#ff2222";
+
+
+        ctx.fillRect(
+            220,
+            395,
+            360,
+            4
+        );
 
 
         ctx.restore();
@@ -1374,98 +1036,521 @@ if(Game.state === "CLEAR"){
     }
 
 
-    // =====================
+    // =====================================================
     // GAME CLEAR
-    // =====================
+    // =====================================================
 
-    const pulse =
-        Math.sin(
-            Game.clearAnimation * 0.08
-        ) * 10 + 35;
+    if(Game.state === "CLEAR"){
 
-
-    ctx.textAlign = "center";
-
-    ctx.shadowColor =
-        "#00aaff";
-
-    ctx.shadowBlur = pulse;
-
-    ctx.fillStyle =
-        "#ffffff";
-
-    ctx.font =
-        "bold 76px sans-serif";
+        ctx.save();
 
 
-    ctx.fillText(
-        "GAME CLEAR",
-        400,
-        120
-    );
+        // =====================
+        // 宇宙背景
+        // =====================
+
+        ctx.fillStyle = "#02020a";
+
+        ctx.fillRect(
+            0,
+            0,
+            GAME_WIDTH,
+            GAME_HEIGHT
+        );
 
 
-    ctx.shadowBlur = 0;
+        // =====================
+        // 星
+        // =====================
+
+        for(let i=0;i<100;i++){
+
+            const x =
+                (i * 137) % GAME_WIDTH;
 
 
-    ctx.fillStyle =
-        "#66ccff";
-
-    ctx.font =
-        "bold 30px sans-serif";
+            const y =
+                (i * 83) % GAME_HEIGHT;
 
 
-    ctx.fillText(
-        "EARTH DEFENDED",
-        400,
-        165
-    );
+            const twinkle =
+                Math.sin(
+                    Game.clearAnimation * 0.08 +
+                    i
+                );
 
 
-    ctx.fillStyle =
-        "rgba(255,255,255,0.8)";
-
-    ctx.font =
-        "22px sans-serif";
-
-
-    ctx.fillText(
-        "ALL METEORS HAVE BEEN DESTROYED",
-        400,
-        205
-    );
+            const size =
+                1 +
+                (i % 2) +
+                Math.max(
+                    0,
+                    twinkle
+                );
 
 
-    // =====================
-    // 戻る表示
-    // =====================
+            ctx.fillStyle =
+                "rgba(255,255,255,0.7)";
 
-    const alpha =
-        (
+
+            ctx.fillRect(
+                x,
+                y,
+                size,
+                size
+            );
+
+        }
+
+
+        // =====================
+        // 地球
+        // =====================
+
+        const earthX = 400;
+        const earthY = 390;
+
+        const earthRadius = 115;
+
+
+        // 大気
+
+        const atmosphere =
+            ctx.createRadialGradient(
+                earthX,
+                earthY,
+                70,
+                earthX,
+                earthY,
+                150
+            );
+
+
+        atmosphere.addColorStop(
+            0,
+            "rgba(40,120,255,0)"
+        );
+
+
+        atmosphere.addColorStop(
+            0.75,
+            "rgba(40,140,255,0.25)"
+        );
+
+
+        atmosphere.addColorStop(
+            1,
+            "rgba(0,100,255,0)"
+        );
+
+
+        ctx.fillStyle = atmosphere;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            earthX,
+            earthY,
+            150,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        // 地球本体
+
+        const earth =
+            ctx.createRadialGradient(
+                earthX - 35,
+                earthY - 40,
+                10,
+                earthX,
+                earthY,
+                earthRadius
+            );
+
+
+        earth.addColorStop(
+            0,
+            "#4fa8ff"
+        );
+
+
+        earth.addColorStop(
+            0.55,
+            "#1261b5"
+        );
+
+
+        earth.addColorStop(
+            1,
+            "#03152d"
+        );
+
+
+        ctx.fillStyle = earth;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            earthX,
+            earthY,
+            earthRadius,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        // =====================
+        // 大陸
+        // =====================
+
+        ctx.fillStyle =
+            "rgba(60,180,90,0.75)";
+
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            350,
+            350,
+            45,
+            22,
+            -0.4,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            430,
+            405,
+            50,
+            28,
+            0.3,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            360,
+            445,
+            28,
+            18,
+            0.5,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        // =====================
+        // 援軍の軌道
+        // =====================
+
+        ctx.strokeStyle =
+            "rgba(80,160,255,0.25)";
+
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            earthX,
+            earthY,
+            220,
+            100,
+            -0.25,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.stroke();
+
+
+        // =====================
+        // 援軍
+        // =====================
+
+        const reinforcements = 6;
+
+
+        for(let i=0;i<reinforcements;i++){
+
+            const angle =
+                Game.clearAnimation * 0.025 +
+                i *
+                Math.PI * 2 /
+                reinforcements;
+
+
+            const x =
+                earthX +
+                Math.cos(angle) *
+                220;
+
+
+            const y =
+                earthY +
+                Math.sin(angle) *
+                100;
+
+
+            ctx.save();
+
+            ctx.translate(
+                x,
+                y
+            );
+
+
+            ctx.rotate(
+                angle + Math.PI / 2
+            );
+
+
+            // エンジン光
+
+            ctx.fillStyle =
+                "rgba(255,180,60,0.8)";
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                -4,
+                15
+            );
+
+
+            ctx.lineTo(
+                0,
+                30 +
+                Math.sin(
+                    Game.clearAnimation * 0.2
+                ) * 5
+            );
+
+
+            ctx.lineTo(
+                4,
+                15
+            );
+
+
+            ctx.fill();
+
+
+            // 機体
+
+            ctx.fillStyle =
+                "#d8e4f0";
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                0,
+                -15
+            );
+
+
+            ctx.lineTo(
+                6,
+                10
+            );
+
+
+            ctx.lineTo(
+                0,
+                7
+            );
+
+
+            ctx.lineTo(
+                -6,
+                10
+            );
+
+
+            ctx.closePath();
+
+            ctx.fill();
+
+
+            // 翼
+
+            ctx.fillStyle =
+                "#7890aa";
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                -5,
+                0
+            );
+
+
+            ctx.lineTo(
+                -17,
+                9
+            );
+
+
+            ctx.lineTo(
+                -5,
+                7
+            );
+
+
+            ctx.closePath();
+
+            ctx.fill();
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                5,
+                0
+            );
+
+
+            ctx.lineTo(
+                17,
+                9
+            );
+
+
+            ctx.lineTo(
+                5,
+                7
+            );
+
+
+            ctx.closePath();
+
+            ctx.fill();
+
+
+            ctx.restore();
+
+        }
+
+
+        // =====================
+        // GAME CLEAR文字
+        // =====================
+
+        const pulse =
             Math.sin(
                 Game.clearAnimation * 0.08
-            ) + 1
-        ) / 2;
+            ) * 10 + 35;
 
 
-    ctx.fillStyle =
-        `rgba(255,255,255,${0.5 + alpha * 0.5})`;
+        ctx.textAlign = "center";
 
-    ctx.font =
-        "22px sans-serif";
+        ctx.textBaseline = "alphabetic";
+
+        ctx.shadowColor =
+            "#00aaff";
+
+        ctx.shadowBlur = pulse;
+
+        ctx.fillStyle =
+            "#ffffff";
+
+        ctx.font =
+            "bold 76px sans-serif";
 
 
-    ctx.fillText(
-        "RETURNING TO TITLE...",
-        400,
-        650
-    );
+        ctx.fillText(
+            "GAME CLEAR",
+            400,
+            120
+        );
 
 
-    ctx.restore();
+        ctx.shadowBlur = 0;
 
-}
+
+        ctx.fillStyle =
+            "#66ccff";
+
+        ctx.font =
+            "bold 30px sans-serif";
+
+
+        ctx.fillText(
+            "EARTH DEFENDED",
+            400,
+            165
+        );
+
+
+        ctx.fillStyle =
+            "rgba(255,255,255,0.8)";
+
+        ctx.font =
+            "22px sans-serif";
+
+
+        ctx.fillText(
+            "ALL METEORS HAVE BEEN DESTROYED",
+            400,
+            205
+        );
+
+
+        // =====================
+        // 戻る表示
+        // =====================
+
+        const alpha =
+            (
+                Math.sin(
+                    Game.clearAnimation * 0.08
+                ) + 1
+            ) / 2;
+
+
+        ctx.fillStyle =
+            `rgba(255,255,255,${0.5 + alpha * 0.5})`;
+
+
+        ctx.font =
+            "22px sans-serif";
+
+
+        ctx.fillText(
+            "RETURNING TO TITLE...",
+            400,
+            650
+        );
+
+
+        ctx.restore();
+
+    }
 
 }
 
 };
+

@@ -128,8 +128,10 @@ window.innerWidth < 700;
 
     this.canvas.width = 800;
 
-    this.canvas.height = 700;
-
+    this.canvas.height =
+    this.isMobile
+    ? 1200
+    : 700;
 
 
     this.ctx =
