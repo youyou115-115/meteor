@@ -993,6 +993,477 @@ if(
 
 }
 
+// =====================================================
+// GAME CLEAR
+// =====================================================
+
+if(Game.state === "CLEAR"){
+
+    ctx.save();
+
+    // =====================
+    // 宇宙背景
+    // =====================
+
+    ctx.fillStyle = "#02020a";
+
+    ctx.fillRect(
+        0,
+        0,
+        800,
+        700
+    );
+
+
+    // =====================
+    // 星
+    // =====================
+
+    for(let i=0;i<100;i++){
+
+        const x =
+            (i * 137) % 800;
+
+        const y =
+            (i * 83) % 700;
+
+        const twinkle =
+            Math.sin(
+                Game.clearAnimation * 0.08 +
+                i
+            );
+
+        const size =
+            1 +
+            (i % 2) +
+            Math.max(0,twinkle);
+
+        ctx.fillStyle =
+            "rgba(255,255,255,0.7)";
+
+        ctx.fillRect(
+            x,
+            y,
+            size,
+            size
+        );
+
+    }
+
+
+    // =====================
+    // 地球
+    // =====================
+
+    const earthX = 400;
+    const earthY = 390;
+
+    const earthRadius = 115;
+
+
+    // 大気
+
+    const atmosphere =
+        ctx.createRadialGradient(
+            earthX,
+            earthY,
+            70,
+            earthX,
+            earthY,
+            150
+        );
+
+    atmosphere.addColorStop(
+        0,
+        "rgba(40,120,255,0)"
+    );
+
+    atmosphere.addColorStop(
+        0.75,
+        "rgba(40,140,255,0.25)"
+    );
+
+    atmosphere.addColorStop(
+        1,
+        "rgba(0,100,255,0)"
+    );
+
+    ctx.fillStyle = atmosphere;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        earthX,
+        earthY,
+        150,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    // 地球本体
+
+    const earth =
+        ctx.createRadialGradient(
+            earthX - 35,
+            earthY - 40,
+            10,
+            earthX,
+            earthY,
+            earthRadius
+        );
+
+    earth.addColorStop(
+        0,
+        "#4fa8ff"
+    );
+
+    earth.addColorStop(
+        0.55,
+        "#1261b5"
+    );
+
+    earth.addColorStop(
+        1,
+        "#03152d"
+    );
+
+    ctx.fillStyle = earth;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        earthX,
+        earthY,
+        earthRadius,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    // =====================
+    // 大陸
+    // =====================
+
+    ctx.fillStyle =
+        "rgba(60,180,90,0.75)";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        350,
+        350,
+        45,
+        22,
+        -0.4,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        430,
+        405,
+        50,
+        28,
+        0.3,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        360,
+        445,
+        28,
+        18,
+        0.5,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    // =====================
+    // 援軍の軌道
+    // =====================
+
+    ctx.strokeStyle =
+        "rgba(80,160,255,0.25)";
+
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        earthX,
+        earthY,
+        220,
+        100,
+        -0.25,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.stroke();
+
+
+    // =====================
+    // 援軍
+    // =====================
+
+    const reinforcements = 6;
+
+    for(let i=0;i<reinforcements;i++){
+
+        const angle =
+            Game.clearAnimation * 0.025 +
+            i *
+            Math.PI * 2 /
+            reinforcements;
+
+
+        const x =
+            earthX +
+            Math.cos(angle) *
+            220;
+
+
+        const y =
+            earthY +
+            Math.sin(angle) *
+            100;
+
+
+        ctx.save();
+
+        ctx.translate(
+            x,
+            y
+        );
+
+
+        ctx.rotate(
+            angle + Math.PI / 2
+        );
+
+
+        // エンジン光
+
+        ctx.fillStyle =
+            "rgba(255,180,60,0.8)";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -4,
+            15
+        );
+
+        ctx.lineTo(
+            0,
+            30 +
+            Math.sin(
+                Game.clearAnimation * 0.2
+            ) * 5
+        );
+
+        ctx.lineTo(
+            4,
+            15
+        );
+
+        ctx.fill();
+
+
+        // 機体
+
+        ctx.fillStyle =
+            "#d8e4f0";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            -15
+        );
+
+        ctx.lineTo(
+            6,
+            10
+        );
+
+        ctx.lineTo(
+            0,
+            7
+        );
+
+        ctx.lineTo(
+            -6,
+            10
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+
+        // 翼
+
+        ctx.fillStyle =
+            "#7890aa";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -5,
+            0
+        );
+
+        ctx.lineTo(
+            -17,
+            9
+        );
+
+        ctx.lineTo(
+            -5,
+            7
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            5,
+            0
+        );
+
+        ctx.lineTo(
+            17,
+            9
+        );
+
+        ctx.lineTo(
+            5,
+            7
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+
+        ctx.restore();
+
+    }
+
+
+    // =====================
+    // GAME CLEAR
+    // =====================
+
+    const pulse =
+        Math.sin(
+            Game.clearAnimation * 0.08
+        ) * 10 + 35;
+
+
+    ctx.textAlign = "center";
+
+    ctx.shadowColor =
+        "#00aaff";
+
+    ctx.shadowBlur = pulse;
+
+    ctx.fillStyle =
+        "#ffffff";
+
+    ctx.font =
+        "bold 76px sans-serif";
+
+
+    ctx.fillText(
+        "GAME CLEAR",
+        400,
+        120
+    );
+
+
+    ctx.shadowBlur = 0;
+
+
+    ctx.fillStyle =
+        "#66ccff";
+
+    ctx.font =
+        "bold 30px sans-serif";
+
+
+    ctx.fillText(
+        "EARTH DEFENDED",
+        400,
+        165
+    );
+
+
+    ctx.fillStyle =
+        "rgba(255,255,255,0.8)";
+
+    ctx.font =
+        "22px sans-serif";
+
+
+    ctx.fillText(
+        "ALL METEORS HAVE BEEN DESTROYED",
+        400,
+        205
+    );
+
+
+    // =====================
+    // 戻る表示
+    // =====================
+
+    const alpha =
+        (
+            Math.sin(
+                Game.clearAnimation * 0.08
+            ) + 1
+        ) / 2;
+
+
+    ctx.fillStyle =
+        `rgba(255,255,255,${0.5 + alpha * 0.5})`;
+
+    ctx.font =
+        "22px sans-serif";
+
+
+    ctx.fillText(
+        "RETURNING TO TITLE...",
+        400,
+        650
+    );
+
+
+    ctx.restore();
+
+}
+
 }
 
 };
