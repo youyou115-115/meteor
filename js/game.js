@@ -10,7 +10,7 @@ const Game={
 canvas:null,
 
 ctx:null,
-bossWaves:[1,5],
+bossWaves:[5],
 
 
 meteor:null,
@@ -680,6 +680,12 @@ finishBossWave(){
         this.state = "CLEAR";
 
         this.clearTimer = 240;
+
+        // =====================
+// クリア専用BGM
+// =====================
+
+Sound.clearBGM();
 
         this.clearAnimation = 0;
 
