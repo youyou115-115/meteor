@@ -280,27 +280,28 @@ destroyMeteor(){
                 meteor.active
             ){
 
-                meteor.hp = 0;
-
-                meteor.active = false;
+                // ★ 現在HPを全部削る
+                meteor.damage(meteor.hp);
 
             }
 
         }
 
-
-        Game.bossMeteors = [];
+        Game.bossMeteors =
+            Game.bossMeteors.filter(
+                meteor =>
+                    meteor &&
+                    meteor.active
+            );
 
         Camera.hitShake(25);
 
         this.resultEffect = "meteor";
-
         this.resultEffectTimer = 60;
 
         Sound.meteor();
 
         return;
-
     }
 
 
@@ -313,16 +314,14 @@ destroyMeteor(){
         Game.meteor.active
     ){
 
-        // ★ 完全破壊
-        Game.meteor.hp = 0;
-
-        Game.meteor.active = false;
-
+        // ★ 現在HPを全部削る
+        Game.meteor.damage(
+            Game.meteor.hp
+        );
 
         Camera.hitShake(25);
 
         this.resultEffect = "meteor";
-
         this.resultEffectTimer = 60;
 
         Sound.meteor();
