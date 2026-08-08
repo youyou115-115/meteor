@@ -10,7 +10,7 @@ const Game={
 canvas:null,
 
 ctx:null,
-bossWaves:[5],
+bossWaves:[6],
 
 
 meteor:null,
@@ -664,11 +664,11 @@ startBossWave(){
 finishBossWave(){
 
     // =====================
-    // WAVE 5
+    // WAVE 6
     // GAME CLEAR
     // =====================
 
-    if(this.wave === 5){
+    if(this.wave === 6){
 
         this.bossPhase = "NONE";
 

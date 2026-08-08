@@ -264,6 +264,20 @@ Math.min(
 
 
     Game.wave++;
+
+    if(Game.isBossWave()){
+
+    Game.waveMessage =
+        "WAVE " + Game.wave;
+
+    Game.waveTimer = 90;
+
+    this.reset();
+
+    Game.startBossWave();
+
+    return;
+}
      // 前WAVEのボーナス効果を解除
     WaveBonus.current = null;
 
