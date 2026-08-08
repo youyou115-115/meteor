@@ -49,6 +49,13 @@ bossWarningMax:120,
 
 bossStarted:false,
 
+// =====================
+// GAME CLEAR
+// =====================
+
+clearTimer:0,
+clearAnimation:0,
+
 
 
 roulette:Roulette,
@@ -285,6 +292,26 @@ if(this.showBonusHelp){
 }
 
 
+// =====================
+// GAME CLEAR
+// =====================
+
+if(this.state === "CLEAR"){
+
+    this.clearAnimation += this.deltaTime;
+
+    this.clearTimer -= this.deltaTime;
+
+    Camera.update();
+
+    if(this.clearTimer <= 0){
+
+        this.toTitle();
+
+    }
+
+    return;
+}
 
 
 
@@ -635,22 +662,63 @@ startBossWave(){
 
 finishBossWave(){
 
+    // =====================
+    // WAVE 5
+    // GAME CLEAR
+    // =====================
+
+    if(this.wave === 5){
+
+        this.bossPhase = "NONE";
+
+        this.bossWave = false;
+
+        this.bossStarted = false;
+
+        this.bossMeteors = [];
+
+        this.state = "CLEAR";
+
+        this.clearTimer = 240;
+
+        this.clearAnimation = 0;
+
+        Roulette.active = false;
+        Roulette.visible = false;
+
+        this.coin.active = false;
+
+        this.meteor.active = false;
+
+        this.planes = [];
+        this.bullets = [];
+
+        Camera.shake = 0;
+
+        Sound.stopBGM();
+
+        console.log("GAME CLEAR!");
+
+        return;
+
+    }
+
+
+    // =====================
+    // 通常のボスクリア
+    // =====================
+
     this.bossPhase = "NONE";
 
     this.bossWave = false;
 
     this.bossStarted = false;
 
-
     this.bossMeteors = [];
 
 
-    // 次WAVE
-
     this.wave++;
 
-
-    // 通常隕石復帰
 
     this.meteor.reset();
 
