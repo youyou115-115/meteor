@@ -235,11 +235,9 @@ if(
 
 this.reelSpeed = [
 
-    0.012 * slow * fast,
-
-    0.015 * slow * fast,
-
-    0.018 * slow * fast
+    0.010 * slow * fast,
+    0.0125 * slow * fast,
+    0.015 * slow * fast
 
 ];
 
