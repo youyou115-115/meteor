@@ -122,7 +122,7 @@ this.laughDuration = 0;
 
 this.z = 1000;
 
-this.secondPhaseSpeed = 4;
+this.secondPhaseSpeed = 2;
 
 
     // =====================
@@ -828,30 +828,6 @@ ctx.fillRect(
         );
 
     }
-
-    if(this.debuffTimer > 0){
-
-    ctx.save();
-
-    ctx.textAlign = "center";
-
-    ctx.font = "bold 24px sans-serif";
-
-    ctx.fillStyle = "#ff4444";
-
-    ctx.shadowColor = "#ff0000";
-
-    ctx.shadowBlur = 12;
-
-    ctx.fillText(
-        this.debuffMessage,
-        this.x,
-        this.y + this.radius + 65
-    );
-
-    ctx.restore();
-
-}
 
 
 
@@ -1796,6 +1772,39 @@ ctx.restore();
 
 ctx.restore();
 
+// =====================================================
+// デバフ表示
+// 画面中央固定
+// =====================================================
+
+if(
+    this.phase === 2 &&
+    this.debuffTimer > 0
+){
+
+    ctx.save();
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.font = "bold 30px sans-serif";
+
+    ctx.fillStyle = "#ff4444";
+
+    ctx.shadowColor = "#ff0000";
+    ctx.shadowBlur = 18;
+
+    ctx.fillText(
+        this.debuffMessage,
+        400,
+        350
+    );
+
+    ctx.shadowBlur = 0;
+
+    ctx.restore();
+}
+
 
 
 
@@ -1803,7 +1812,10 @@ ctx.restore();
 // CHANCE中だけボスHP表示
 // =====================================================
 
-if(this.attackState === "CHANCE"){
+if(
+    this.attackState === "CHANCE" ||
+    this.phase === 2
+){
 
     const barWidth =
         180;
@@ -2010,14 +2022,25 @@ hitPlayer(){
     }
 
 
+    // =====================
+    // 即ゲームオーバー
+    // =====================
+
     Game.state = "GAMEOVER";
 
 
+    // =====================
     // ボーナス初期化
+    // =====================
+
     WaveBonus.init();
 
     WaveBonusUI.active = false;
 
+
+    // =====================
+    // 弾・飛行機停止
+    // =====================
 
     Game.bullets = [];
 
@@ -2029,23 +2052,38 @@ hitPlayer(){
     }
 
 
+    // =====================
+    // BGM停止
+    // =====================
+
     Sound.stopBattleBGM();
 
+
+    // =====================
+    // 強烈な衝撃
+    // =====================
+
     Game.impactFlash = 30;
+
+    Camera.hitShake(30);
 
     Sound.gameOver();
 
 
-    Camera.hitShake(30);
+    // =====================
+    // ★ この瞬間に画面を割る
+    // =====================
 
-
-    // 画面破壊
     Game.screenCrack = 1;
 
     Game.cracks = [];
 
 
-    for(let i=0;i<25;i++){
+    // =====================
+    // 亀裂生成
+    // =====================
+
+    for(let i = 0; i < 25; i++){
 
         const angle =
             Math.random() *
