@@ -192,20 +192,55 @@ let slow=1;
 
 
 // 青ボーナスは次の1回転だけ
+let slow = 1;
+let fast = 1;
+
+
+// =====================
+// 青ボーナス
+// 次の1回転だけ減速
+// =====================
+
 if(WaveBonus.blueSpin){
 
-    slow=0.6;
+    slow = 0.6;
 
-    // 使用済み
-    WaveBonus.blueSpin=false;
+    WaveBonus.blueSpin = false;
 
 }
 
 
-this.reelSpeed=[
-    0.012*slow,
-    0.015*slow,
-    0.018*slow
+// =====================
+// 月のデバフ
+// 次の1回転だけ高速
+// =====================
+
+if(
+    Game.boss &&
+    Game.boss.active &&
+    Game.boss.nextSlotFast
+){
+
+    fast = 1.8;
+
+    // 使用済み
+    Game.boss.nextSlotFast = false;
+
+}
+
+
+// =====================
+// リール速度
+// =====================
+
+this.reelSpeed = [
+
+    0.012 * slow * fast,
+
+    0.015 * slow * fast,
+
+    0.018 * slow * fast
+
 ];
 
     this.phase=0;

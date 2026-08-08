@@ -10,6 +10,7 @@ const Game={
 canvas:null,
 
 ctx:null,
+bossWaves:[1,5],
 
 
 meteor:null,
@@ -22,13 +23,28 @@ bonusHelpWait:false,
 bonusHelpReady:false,
 bonusHelpShown:false,
 
+
+bossMeteors: [],
 planes:[],
 bullets:[],
 screenCrack:0,
 cracks:[],
 
-
 wave:1,
+
+// =====================
+// BOSS
+// =====================
+
+bossWave:false,
+
+bossPhase:"NONE",
+
+bossTimer:0,
+
+bossWarningTimer:0,
+
+bossStarted:false,
 
 
 
@@ -96,6 +112,7 @@ window.innerWidth < 700;
     this.canvas.getContext("2d");
 
     let touchLock=false;
+    this.boss = null;
 
 
 
@@ -176,6 +193,38 @@ start(){
     Roulette.resultTimer=0;
     this.power=1;
     this.wave = 1;
+
+this.wave = 1;
+
+
+// =====================
+// BOSS
+// =====================
+
+this.bossWave = false;
+
+this.bossPhase = "NONE";
+
+this.bossTimer = 0;
+
+this.bossWarningTimer = 0;
+
+this.bossStarted = false;
+
+this.bossMeteors = [];
+
+this.boss = new Boss();
+
+
+// =====================
+// ボスWAVE判定
+// =====================
+
+if(this.isBossWave()){
+
+    this.startBossWave();
+
+}
 
     this.showBonusHelp=false;
 this.bonusHelpWait=false;
@@ -271,7 +320,48 @@ if(this.showBonusHelp){
     // =====================
 
 
+// =====================
+// ルーレット更新
+// =====================
+// 
+// 先にルーレットだけ動かす
+// =====================
+
+Roulette.update();
+
+
+// =====================
+// スロット中はゲーム停止
+// =====================
+
+if(Roulette.active){
+
+    Camera.update();
+
+    return;
+
+}
+
+
+
+// =====================
+// BOSS WAVE
+// =====================
+
+if(this.bossWave){
+
+    this.updateBossWave();
+
+}
+else{
+
+    // =====================
+    // 通常WAVE
+    // =====================
+
     this.meteor.update();
+
+}
 
 
     this.coin.update();
@@ -314,7 +404,244 @@ b=>b.active
 
 }
 
+// =====================
+// BOSS
+// =====================
 
+if(this.boss && this.bossWave){
+
+    this.boss.update();
+
+}
+
+// =====================
+// ボス隕石
+// =====================
+
+for(let i = this.bossMeteors.length - 1; i >= 0; i--){
+
+    const meteor = this.bossMeteors[i];
+
+
+    meteor.update();
+
+
+    if(!meteor.active){
+
+        this.bossMeteors.splice(i, 1);
+
+    }
+
+}
+
+
+
+
+
+},
+
+
+updateBossWave(){
+
+    // =====================
+    // ボス演出中
+    // =====================
+
+    if(this.bossPhase === "WARNING"){
+
+        this.bossWarningTimer -=
+            Game.deltaTime;
+
+
+        // 通常隕石は完全停止
+
+        this.meteor.active = false;
+
+
+        if(this.bossWarningTimer <= 0){
+
+            this.bossPhase = "BATTLE";
+
+            this.bossStarted = true;
+
+
+            // =====================
+            // ボス本体生成
+            // =====================
+
+            this.boss =
+                new Boss();
+
+
+            // =====================
+            // ボス隕石を一旦クリア
+            // =====================
+
+            this.bossMeteors = [];
+
+
+            // =====================
+            // 最初の召喚隕石
+            // =====================
+
+            this.boss.summonMeteors();
+
+        }
+
+
+        return;
+
+    }
+
+
+
+    // =====================
+    // ボス戦
+    // =====================
+
+    // =====================
+// ボス戦
+// =====================
+
+if(this.bossPhase === "BATTLE"){
+
+    // =====================
+    // 通常隕石を完全停止
+    // =====================
+
+    this.meteor.active = false;
+
+
+    // =====================
+    // ボス撃破
+    // =====================
+
+    if(
+        this.bossStarted &&
+        this.boss &&
+        !this.boss.active
+    ){
+
+        this.finishBossWave();
+
+        return;
+
+    }
+
+
+    // =====================
+    // 召喚隕石が全部破壊された
+    // =====================
+
+    if(
+    this.boss &&
+    this.boss.active &&
+    this.boss.attackState === "METEOR" &&
+    this.bossMeteors.length === 0
+){
+
+    // まだ2個目が残っている
+    if(this.boss.summonIndex < 2){
+
+        this.boss.summonMeteors();
+
+    }
+    else{
+
+        // 2個とも破壊された
+        this.boss.openAttackChance();
+
+    }
+
+}
+
+}
+
+},
+
+isBossWave(){
+
+    return this.bossWaves.includes(
+        this.wave
+    );
+
+},
+
+startBossWave(){
+
+    console.log(
+        "BOSS WAVE:",
+        this.wave
+    );
+
+
+    this.bossWave = true;
+
+    this.bossPhase = "WARNING";
+
+    this.bossWarningTimer = 180;
+
+    this.bossStarted = false;
+
+
+    // =====================
+    // 通常隕石停止
+    // =====================
+
+    this.meteor.active = false;
+
+
+    // =====================
+    // 通常システム停止
+    // =====================
+
+    Roulette.active = false;
+
+    Roulette.visible = false;
+
+    WaveBonusUI.active = false;
+
+
+    // =====================
+    // ボス隕石初期化
+    // =====================
+
+    this.bossMeteors = [];
+
+
+    // ボス本体はWARNING終了後に生成
+    this.boss = null;
+
+},
+
+finishBossWave(){
+
+    this.bossPhase = "NONE";
+
+    this.bossWave = false;
+
+    this.bossStarted = false;
+
+
+    this.bossMeteors = [];
+
+
+    // 次WAVE
+
+    this.wave++;
+
+
+    // 通常隕石復帰
+
+    this.meteor.reset();
+
+    this.meteor.active = true;
+
+
+    console.log(
+        "BOSS CLEAR → WAVE",
+        this.wave
+    );
 
 },
 toTitle(){

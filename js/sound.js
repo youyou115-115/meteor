@@ -289,6 +289,285 @@ meteorCharge(){
     );
 
 },
+bossLaugh(){
+
+    if(!this.ctx){
+        return;
+    }
+
+
+    const now =
+    this.ctx.currentTime;
+
+
+
+    // =====================
+    // 低い唸り
+    // =====================
+
+    const growl =
+    this.ctx.createOscillator();
+
+
+    const growlGain =
+    this.ctx.createGain();
+
+
+    growl.type = "sawtooth";
+
+
+    growl.frequency.setValueAtTime(
+        75,
+        now
+    );
+
+
+    growl.frequency.exponentialRampToValueAtTime(
+        45,
+        now + 1.2
+    );
+
+
+    growlGain.gain.setValueAtTime(
+        0.001,
+        now
+    );
+
+
+    growlGain.gain.exponentialRampToValueAtTime(
+        0.22,
+        now + 0.08
+    );
+
+
+    growlGain.gain.exponentialRampToValueAtTime(
+        0.001,
+        now + 1.3
+    );
+
+
+    growl.connect(growlGain);
+
+    growlGain.connect(this.master);
+
+
+    growl.start(now);
+
+    growl.stop(now + 1.3);
+
+
+
+    // =====================
+    // HA
+    // =====================
+
+    const laugh = (start, freq, duration) => {
+
+        const osc =
+        this.ctx.createOscillator();
+
+
+        const gain =
+        this.ctx.createGain();
+
+
+        osc.type = "sawtooth";
+
+
+        osc.frequency.setValueAtTime(
+            freq,
+            start
+        );
+
+
+        osc.frequency.exponentialRampToValueAtTime(
+            freq * 0.65,
+            start + duration
+        );
+
+
+        gain.gain.setValueAtTime(
+            0.001,
+            start
+        );
+
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.32,
+            start + 0.025
+        );
+
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            start + duration
+        );
+
+
+        osc.connect(gain);
+
+        gain.connect(this.master);
+
+
+        osc.start(start);
+
+        osc.stop(start + duration);
+
+    };
+
+
+
+    // =====================
+    // HA... HA... HAHAHA!!
+    // =====================
+
+    laugh(
+        now,
+        115,
+        0.20
+    );
+
+
+    laugh(
+        now + 0.28,
+        105,
+        0.20
+    );
+
+
+    laugh(
+        now + 0.56,
+        125,
+        0.16
+    );
+
+
+    laugh(
+        now + 0.76,
+        115,
+        0.16
+    );
+
+
+    laugh(
+        now + 0.96,
+        135,
+        0.22
+    );
+
+
+
+    // =====================
+    // 高い不気味な響き
+    // =====================
+
+    const evil =
+    this.ctx.createOscillator();
+
+
+    const evilGain =
+    this.ctx.createGain();
+
+
+    evil.type = "triangle";
+
+
+    evil.frequency.setValueAtTime(
+        260,
+        now
+    );
+
+
+    evil.frequency.exponentialRampToValueAtTime(
+        180,
+        now + 1.2
+    );
+
+
+    evilGain.gain.setValueAtTime(
+        0.001,
+        now
+    );
+
+
+    evilGain.gain.exponentialRampToValueAtTime(
+        0.10,
+        now + 0.15
+    );
+
+
+    evilGain.gain.exponentialRampToValueAtTime(
+        0.001,
+        now + 1.3
+    );
+
+
+    evil.connect(evilGain);
+
+    evilGain.connect(this.master);
+
+
+    evil.start(now);
+
+    evil.stop(now + 1.3);
+
+
+
+    // =====================
+    // 最後の低音
+    // =====================
+
+    const hit =
+    this.ctx.createOscillator();
+
+
+    const hitGain =
+    this.ctx.createGain();
+
+
+    hit.type = "sine";
+
+
+    hit.frequency.setValueAtTime(
+        55,
+        now + 0.9
+    );
+
+
+    hit.frequency.exponentialRampToValueAtTime(
+        30,
+        now + 1.4
+    );
+
+
+    hitGain.gain.setValueAtTime(
+        0.001,
+        now
+    );
+
+
+    hitGain.gain.setValueAtTime(
+        0.35,
+        now + 0.9
+    );
+
+
+    hitGain.gain.exponentialRampToValueAtTime(
+        0.001,
+        now + 1.4
+    );
+
+
+    hit.connect(hitGain);
+
+    hitGain.connect(this.master);
+
+
+    hit.start(now);
+
+    hit.stop(now + 1.4);
+
+},
 
 meteorBreak(){
 

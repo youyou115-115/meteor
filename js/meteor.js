@@ -261,6 +261,18 @@ Math.min(
      // 前WAVEのボーナス効果を解除
     WaveBonus.current = null;
 
+    // =====================
+// BOSS WAVE判定
+// =====================
+
+if(Game.isBossWave()){
+
+    Game.startBossWave();
+
+    return;
+
+}
+
     if(Game.wave===3){
 
     Game.planes.push(

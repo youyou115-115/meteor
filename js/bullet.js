@@ -45,89 +45,280 @@ this.explosionRadius = 0;
 
 update(){
 
+    // =====================
+    // 爆発中
+    // =====================
+
     if(this.exploding){
 
-    this.explosionRadius += 6 * Game.deltaTime;
+        this.explosionRadius +=
+            6 * Game.deltaTime;
 
-    this.explosionTimer -= Game.deltaTime;
-
-
-    // 爆発開始時だけダメージ
-   if(
-    this.explosionTimer > 19 &&
-    !this.explosionDamage
-){
-
-    const damage =
-    Math.floor(Game.meteor.hp * 0.25);
-
-    Game.meteor.damage(damage);
-
-    Sound.explosion();
-
-    Camera.hitShake(12);
-
-    this.explosionDamage=true;
-
-}
+        this.explosionTimer -=
+            Game.deltaTime;
 
 
-    if(this.explosionTimer <= 0){
+        // 爆発開始時だけダメージ
+        if(
+            this.explosionTimer > 19 &&
+            !this.explosionDamage
+        ){
 
-        this.active = false;
+            let damage = 0;
+
+
+            // =====================
+            // ボス戦
+            // =====================
+
+            if(
+                Game.bossWave &&
+                Game.boss &&
+                Game.boss.active &&
+                Game.boss.attackState === "CHANCE"
+            ){
+
+                damage =
+                    Math.floor(
+                        Game.boss.hp * 0.25
+                    );
+
+                Game.boss.damage(damage);
+
+            }
+
+
+            // =====================
+            // 通常戦
+            // =====================
+
+            else if(!Game.bossWave){
+
+                damage =
+                    Math.floor(
+                        Game.meteor.hp * 0.25
+                    );
+
+                Game.meteor.damage(damage);
+
+            }
+
+
+            Sound.explosion();
+
+            Camera.hitShake(12);
+
+            this.explosionDamage = true;
+
+        }
+
+
+        if(this.explosionTimer <= 0){
+
+            this.active = false;
+
+        }
+
+        return;
 
     }
 
-    return;
 
-}
+    // =====================
+    // 移動
+    // =====================
 
-    this.x += 
-    this.vx * Game.deltaTime;
+    this.x +=
+        this.vx *
+        Game.deltaTime;
 
-    this.y += 
-    this.vy * Game.deltaTime;
+    this.y +=
+        this.vy *
+        Game.deltaTime;
 
 
+    // =====================================================
+    // BOSS戦
+    // =====================================================
+
+    if(Game.bossWave){
+
+        // =====================
+        // ボス隕石
+        // =====================
+
+        for(let meteor of Game.bossMeteors){
+
+            if(!meteor.active){
+
+                continue;
+
+            }
+
+
+            const dx =
+                this.x - meteor.x;
+
+            const dy =
+                this.y - meteor.y;
+
+
+            const d =
+                Math.sqrt(
+                    dx*dx +
+                    dy*dy
+                );
+
+
+            if(d < meteor.radius){
+
+                if(this.powerBullet){
+
+                    this.exploding = true;
+
+                    this.explosionTimer = 20;
+
+                    this.explosionRadius = 0;
+
+                    this.explosionDamage = false;
+
+
+                    this.vx = 0;
+
+                    this.vy = 0;
+
+                }
+                else{
+
+                    meteor.damage(5);
+
+                    Sound.planeShot();
+
+                    this.active = false;
+
+                }
+
+
+                return;
+
+            }
+
+        }
+
+
+        // =====================
+        // 月本体
+        // =====================
+
+        if(
+            Game.boss &&
+            Game.boss.active &&
+            Game.boss.attackState === "CHANCE"
+        ){
+
+            const dx =
+                this.x - Game.boss.x;
+
+            const dy =
+                this.y - Game.boss.y;
+
+
+            const d =
+                Math.sqrt(
+                    dx*dx +
+                    dy*dy
+                );
+
+
+            if(d < Game.boss.radius){
+
+                if(this.powerBullet){
+
+                    this.exploding = true;
+
+                    this.explosionTimer = 20;
+
+                    this.explosionRadius = 0;
+
+                    this.explosionDamage = false;
+
+
+                    this.vx = 0;
+
+                    this.vy = 0;
+
+                }
+                else{
+
+                    Game.boss.damage(5);
+
+                    Sound.planeShot();
+
+                    this.active = false;
+
+                }
+
+
+                return;
+
+            }
+
+        }
+
+
+        return;
+
+    }
+
+
+    // =====================================================
+    // 通常戦
+    // =====================================================
 
     const dx =
-    this.x-Game.meteor.x;
+        this.x - Game.meteor.x;
 
 
     const dy =
-    this.y-Game.meteor.y;
+        this.y - Game.meteor.y;
 
 
     const d =
-    Math.sqrt(
-        dx*dx+
-        dy*dy
-    );
+        Math.sqrt(
+            dx*dx +
+            dy*dy
+        );
 
 
     if(d < Game.meteor.radius){
 
-   if(this.powerBullet){
+        if(this.powerBullet){
 
-    this.exploding = true;
-    this.explosionTimer = 20;
-    this.explosionRadius = 0;
-    this.explosionDamage=false;
+            this.exploding = true;
 
-        // ミサイルはその場で停止
-        this.vx = 0;
-        this.vy = 0;
+            this.explosionTimer = 20;
+
+            this.explosionRadius = 0;
+
+            this.explosionDamage = false;
+
+
+            this.vx = 0;
+
+            this.vy = 0;
+
+        }
+        else{
+
+            Game.meteor.damage(5);
+
+            Sound.planeShot();
+
+            this.active = false;
+
+        }
 
     }
-    else{
-
-        Game.meteor.damage(5);
-        Sound.planeShot();
-        this.active = false;
-
-    }
-
-}
 
 }
 
