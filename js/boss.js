@@ -28,9 +28,9 @@ reset(){
     this.targetY = 120;
 
 
-    this.maxHp = 1000;
+    this.maxHp = 1200;
 
-    this.hp = 1000;
+    this.hp = 1200;
 
     this.meteorSummonTimer = 0;
     this.summonIndex = 0;
