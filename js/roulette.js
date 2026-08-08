@@ -1107,14 +1107,16 @@ if(
 
 
     // 緑
-    if(bonusHit==="green"){
+    if(bonusHit === "green"){
 
-    const plane =
-    new Plane("green");
+    if(
+        Game.meteor &&
+        Game.meteor.active
+    ){
 
-    Game.planes.push(plane);
+        Game.meteor.greenHit = true;
 
-    plane.greenAttack = true;
+    }
 
 }
 
