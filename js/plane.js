@@ -126,16 +126,80 @@ this.vy = -5;
 
 getTarget(){
 
+    // =====================
+    // BOSS戦
+    // =====================
+
     if(
         Game.bossWave &&
-        Game.bossPhase === "BATTLE" &&
-        Game.boss &&
-        Game.boss.active
+        Game.bossPhase === "BATTLE"
     ){
 
-        return Game.boss;
+        // 生きている召喚隕石を探す
+        if(
+            Game.bossMeteors &&
+            Game.bossMeteors.length > 0
+        ){
+
+            const targets =
+                Game.bossMeteors.filter(
+                    meteor =>
+                        meteor &&
+                        meteor.active
+                );
+
+            if(targets.length > 0){
+
+                // 一番近い隕石を狙う
+                let target = targets[0];
+
+                let minDist = Infinity;
+
+                for(const meteor of targets){
+
+                    const dx =
+                        meteor.x - this.x;
+
+                    const dy =
+                        meteor.y - this.y;
+
+                    const dist =
+                        dx * dx +
+                        dy * dy;
+
+                    if(dist < minDist){
+
+                        minDist = dist;
+
+                        target = meteor;
+
+                    }
+
+                }
+
+                return target;
+
+            }
+
+        }
+
+
+        // 召喚隕石がいなければ月
+        if(
+            Game.boss &&
+            Game.boss.active
+        ){
+
+            return Game.boss;
+
+        }
 
     }
+
+
+    // =====================
+    // 通常WAVE
+    // =====================
 
     return Game.meteor;
 
@@ -146,11 +210,105 @@ getTarget(){
 
 update(){
 
-    // GREEN BONUS 突撃
+// =====================
+// GREEN BONUS 突撃
+// =====================
 
 if(this.greenAttack){
 
-    const target = this.getTarget();
+    let target = null;
+
+
+    // =====================
+    // BOSS戦
+    // =====================
+
+    if(
+        Game.bossWave &&
+        Game.bossMeteors &&
+        Game.bossMeteors.length > 0
+    ){
+
+        const targets =
+            Game.bossMeteors.filter(
+                meteor =>
+                    meteor &&
+                    meteor.active
+            );
+
+
+        if(targets.length > 0){
+
+            // 一番近い召喚隕石を狙う
+
+            target = targets[0];
+
+            let minDist = Infinity;
+
+
+            for(const meteor of targets){
+
+                const dx =
+                    meteor.x - this.x;
+
+                const dy =
+                    meteor.y - this.y;
+
+
+                const dist =
+                    dx * dx +
+                    dy * dy;
+
+
+                if(dist < minDist){
+
+                    minDist = dist;
+
+                    target = meteor;
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    // =====================
+    // 召喚隕石がなければ月
+    // =====================
+
+    if(
+        !target &&
+        Game.bossWave &&
+        Game.boss &&
+        Game.boss.active
+    ){
+
+        target = Game.boss;
+
+    }
+
+
+    // =====================
+    // 通常ステージ
+    // =====================
+
+    if(
+        !target &&
+        Game.meteor &&
+        Game.meteor.active
+    ){
+
+        target = Game.meteor;
+
+    }
+
+
+    // =====================
+    // 攻撃対象なし
+    // =====================
 
     if(!target){
 
@@ -161,49 +319,54 @@ if(this.greenAttack){
     }
 
 
+    // =====================
+    // ターゲットへ向かう
+    // =====================
+
     this.angle =
-    Math.atan2(
-        target.y - this.y,
-        target.x - this.x
-    );
+        Math.atan2(
+            target.y - this.y,
+            target.x - this.x
+        );
 
 
     const dx =
-    target.x - this.x;
+        target.x - this.x;
 
     const dy =
-    target.y - this.y;
+        target.y - this.y;
 
 
     const dist =
-    Math.sqrt(
-        dx*dx + dy*dy
-    );
+        Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
 
 
     this.greenAttackSpeed =
-    (this.greenAttackSpeed || 0) + 0.2;
+        (this.greenAttackSpeed || 0) + 0.2;
 
 
     const speed =
-    Math.min(
-        this.greenAttackSpeed,
-        10
-    );
+        Math.min(
+            this.greenAttackSpeed,
+            10
+        );
 
 
     if(dist > 0){
 
         this.x +=
-        dx / dist *
-        speed *
-        Game.deltaTime;
+            dx / dist *
+            speed *
+            Game.deltaTime;
 
 
         this.y +=
-        dy / dist *
-        speed *
-        Game.deltaTime;
+            dy / dist *
+            speed *
+            Game.deltaTime;
 
     }
 
@@ -212,13 +375,9 @@ if(this.greenAttack){
     // 命中
     // =====================
 
-    const targetRadius =
-    target.radius || 40;
-
-
     if(
         dist <
-        targetRadius + 20
+        target.radius + 20
     ){
 
         this.greenAttack = false;
@@ -226,25 +385,49 @@ if(this.greenAttack){
         this.destroy();
 
 
+        // =====================
+        // BOSS戦
+        // =====================
+
+        if(
+            Game.bossWave &&
+            Game.bossMeteors &&
+            Game.bossMeteors.includes(target)
+        ){
+
+            target.damage(20);
+
+        }
+
+
+        // =====================
+        // 月
+        // =====================
+
+        else if(
+            Game.bossWave &&
+            target === Game.boss
+        ){
+
+            target.damage(20);
+
+        }
+
+
+        // =====================
         // 通常隕石
-        if(target === Game.meteor){
+        // =====================
+
+        else{
 
             Game.meteor.greenHit = true;
 
         }
 
-        // ボス
-        else if(target === Game.boss){
 
-            // GREEN援軍のダメージ
-            Game.boss.damage(20);
-
-        }
+        return;
 
     }
-
-
-    return;
 
 }
 
@@ -326,11 +509,129 @@ else{
 
 shoot(){
 
-    const target = this.getTarget();
+    // =====================
+    // 攻撃対象
+    // =====================
+
+    let target = null;
+
+
+    // =====================
+    // BOSS戦
+    // =====================
+
+    if(
+        Game.bossWave &&
+        Game.bossMeteors &&
+        Game.bossMeteors.length > 0
+    ){
+
+        // 生きている召喚隕石を探す
+
+        const targets =
+            Game.bossMeteors.filter(
+                meteor =>
+                    meteor &&
+                    meteor.active
+            );
+
+
+        if(targets.length > 0){
+
+            // 一番近い召喚隕石を狙う
+
+            target = targets[0];
+
+            let minDist = Infinity;
+
+
+            for(const meteor of targets){
+
+                const dx =
+                    meteor.x - this.x;
+
+                const dy =
+                    meteor.y - this.y;
+
+
+                const dist =
+                    dx * dx +
+                    dy * dy;
+
+
+                if(dist < minDist){
+
+                    minDist = dist;
+
+                    target = meteor;
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    // =====================
+    // ボス戦・召喚隕石がない
+    // → 月を狙う
+    // =====================
+
+    if(
+        !target &&
+        Game.bossWave &&
+        Game.boss &&
+        Game.boss.active
+    ){
+
+        target = Game.boss;
+
+    }
+
+
+    // =====================
+    // 通常ステージ
+    // → 通常隕石
+    // =====================
+
+    if(
+        !target &&
+        Game.meteor &&
+        Game.meteor.active
+    ){
+
+        target = Game.meteor;
+
+    }
+
+
+    // 攻撃対象がいなければ終了
 
     if(!target){
+
         return;
+
     }
+
+
+    // =====================
+    // 攻撃角度
+    // =====================
+
+    const dx =
+        target.x - this.x;
+
+    const dy =
+        target.y - this.y;
+
+
+    const angle =
+        Math.atan2(
+            dy,
+            dx
+        );
 
 
     // =====================
@@ -342,19 +643,6 @@ shoot(){
         WaveBonus.yellowShots < 2 &&
         (this.side==="left" || this.side==="right")
     ){
-
-        const dx =
-        target.x - this.x;
-
-        const dy =
-        target.y - this.y;
-
-        const angle =
-        Math.atan2(
-            dy,
-            dx
-        );
-
 
         Game.bullets.push(
             new Bullet(
@@ -373,11 +661,14 @@ shoot(){
         WaveBonus.yellowShots++;
 
 
-        if(WaveBonus.yellowShots >= 2){
+        if(
+            WaveBonus.yellowShots >= 2
+        ){
 
             WaveBonus.yellowActive=false;
 
         }
+
 
         return;
 
@@ -388,23 +679,9 @@ shoot(){
     // 通常弾
     // =====================
 
-    const dx =
-    target.x - this.x;
+    let bulletSpeed = 1;
 
-    const dy =
-    target.y - this.y;
-
-
-    const angle =
-    Math.atan2(
-        dy,
-        dx
-    );
-
-
-    let bulletSpeed=1;
-
-    let powerBullet=false;
+    let powerBullet = false;
 
 
     if(
@@ -412,16 +689,18 @@ shoot(){
         WaveBonus.yellowShots < 2
     ){
 
-        bulletSpeed=2;
+        bulletSpeed = 2;
 
-        powerBullet=true;
+        powerBullet = true;
 
         Sound.missile();
 
         WaveBonus.yellowShots++;
 
 
-        if(WaveBonus.yellowShots >= 2){
+        if(
+            WaveBonus.yellowShots >= 2
+        ){
 
             WaveBonus.yellowActive=false;
 
