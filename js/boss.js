@@ -95,6 +95,16 @@ this.laughDuration = 0;
 
     this.damageFlash = 0;
 
+    // =====================
+// 撃破爆発演出
+// =====================
+
+this.dying = false;
+
+this.explosionTimer = 0;
+
+this.explosionParticles = [];
+
 
     // =====================
     // 変身演出
@@ -150,6 +160,108 @@ update(){
         return;
 
     }
+
+    // =====================
+// 撃破爆発中
+// =====================
+
+// =====================
+// 撃破爆発中
+// =====================
+
+if(this.dying){
+
+    this.explosionTimer -=
+        Game.deltaTime;
+
+
+    // =====================
+    // 爆発パーティクル更新
+    // =====================
+
+    for(let p of this.explosionParticles){
+
+        p.x +=
+            p.vx *
+            Game.deltaTime;
+
+        p.y +=
+            p.vy *
+            Game.deltaTime;
+
+
+        p.vx *= 0.98;
+        p.vy *= 0.98;
+
+
+        p.life -=
+            Game.deltaTime;
+
+    }
+
+
+    // =====================
+    // 爆発終了
+    // =====================
+
+    if(this.explosionTimer <= 0){
+
+        this.active = false;
+
+        this.dying = false;
+
+
+
+        // ボス隕石を消す
+        Game.bossMeteors = [];
+
+
+        // 通常隕石を消す
+        if(Game.meteor){
+
+            Game.meteor.active = false;
+
+        }
+
+
+        // 弾を消す
+        Game.bullets = [];
+
+
+        // 飛行機を停止
+        for(let p of Game.planes){
+
+            if(
+                p.active &&
+                !p.destroying
+            ){
+
+                p.destroy();
+
+            }
+
+        }
+
+
+        // ボーナス終了
+        WaveBonus.init();
+
+        WaveBonusUI.active = false;
+
+
+        // BGM停止
+        Sound.stopBattleBGM();
+
+
+        // 最後の衝撃
+        Camera.hitShake(20);
+
+    }
+
+
+    return;
+
+}
 
 
     // =====================
@@ -722,17 +834,91 @@ damage(value){
 
 
 
-    // =====================
-    // HP0
-    // =====================
+   // =====================
+// HP0
+// =====================
 
-    if(this.hp <= 0){
+if(this.hp <= 0){
 
-        this.hp = 0;
+    this.hp = 0;
 
-        this.active = false;
+
+    // すでに爆発中なら無視
+
+    if(this.dying){
+
+        return;
 
     }
+
+
+    // =====================
+    // 撃破爆発開始
+    // =====================
+
+    this.dying = true;
+
+    this.explosionTimer = 70;
+
+
+    // =====================
+    // 爆発パーティクル生成
+    // =====================
+
+    this.explosionParticles = [];
+
+
+    for(let i = 0; i < 45; i++){
+
+        const angle =
+            Math.random() *
+            Math.PI * 2;
+
+
+        const speed =
+            1.5 +
+            Math.random() * 5;
+
+
+        this.explosionParticles.push({
+
+            x: this.x,
+
+            y: this.y,
+
+            vx: Math.cos(angle) * speed,
+
+            vy: Math.sin(angle) * speed,
+
+            size:
+                3 +
+                Math.random() * 9,
+
+            life:
+                25 +
+                Math.random() * 40
+
+        });
+
+    }
+
+
+    // =====================
+    // 月隕石を消す
+    // =====================
+
+    Game.bossMeteors = [];
+
+
+    // =====================
+    // 爆発演出
+    // =====================
+
+    Camera.hitShake(25);
+
+    Sound.explosion();
+
+}
 
 
 }
@@ -747,15 +933,6 @@ draw(ctx){
 
     }
 
-    ctx.fillStyle = "red";
-
-ctx.fillRect(
-    this.x - 3,
-    this.y - 3,
-    6,
-    6
-);
-
 
 
     const r = this.radius;
@@ -763,6 +940,162 @@ ctx.fillRect(
 
 
     ctx.save();
+
+    // =====================
+// 撃破爆発
+// =====================
+
+if(this.dying){
+
+    const progress =
+        1 -
+        this.explosionTimer / 70;
+
+
+    // =====================
+    // 爆発フラッシュ
+    // =====================
+
+    if(progress < 0.25){
+
+        const flash =
+            1 -
+            progress / 0.25;
+
+
+        ctx.fillStyle =
+            `rgba(255,255,255,${flash})`;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            this.x,
+            this.y,
+            this.radius *
+            (1 + progress * 0.5),
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    // =====================
+    // 爆発リング
+    // =====================
+
+    const explosionRadius =
+        this.radius *
+        (
+            0.5 +
+            progress * 2.5
+        );
+
+
+    const alpha =
+        Math.max(
+            0,
+            1 - progress
+        );
+
+
+    const gradient =
+        ctx.createRadialGradient(
+
+            this.x,
+            this.y,
+            0,
+
+            this.x,
+            this.y,
+            explosionRadius
+
+        );
+
+
+    gradient.addColorStop(
+        0,
+        `rgba(255,255,220,${alpha})`
+    );
+
+    gradient.addColorStop(
+        0.25,
+        `rgba(255,180,40,${alpha})`
+    );
+
+    gradient.addColorStop(
+        0.55,
+        `rgba(255,60,10,${alpha * 0.8})`
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(255,0,0,0)"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        this.x,
+        this.y,
+        explosionRadius,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    // =====================
+    // 爆発粒子
+    // =====================
+
+    for(let p of this.explosionParticles){
+
+        if(p.life <= 0){
+
+            continue;
+
+        }
+
+
+        const particleAlpha =
+            Math.min(
+                1,
+                p.life / 20
+            );
+
+
+        ctx.fillStyle =
+            `rgba(255,${80 + Math.random() * 150},30,${particleAlpha})`;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    return;
+
+}
 
 
 
