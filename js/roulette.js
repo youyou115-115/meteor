@@ -1039,9 +1039,6 @@ this.mode="RESULT";
 this.active=false;
 
 
-// コイン投げ待機
-Game.state="READY";
-
 // 結果表示時間
 this.resultTimer = 25;
 

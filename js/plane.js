@@ -79,19 +79,23 @@ else{
 
 }
 
-const dx =
-Game.meteor.x - this.x;
+const target = this.getTarget();
 
+if(target){
 
-const dy =
-Game.meteor.y - this.y;
+    const dx =
+    target.x - this.x;
 
+    const dy =
+    target.y - this.y;
 
-this.angle =
-Math.atan2(
-    dy,
-    dx
-);
+    this.angle =
+    Math.atan2(
+        dy,
+        dx
+    );
+
+}
 
 
 }
@@ -120,6 +124,23 @@ this.vy = -5;
 
 }
 
+getTarget(){
+
+    if(
+        Game.bossWave &&
+        Game.bossPhase === "BATTLE" &&
+        Game.boss &&
+        Game.boss.active
+    ){
+
+        return Game.boss;
+
+    }
+
+    return Game.meteor;
+
+}
+
 
 
 
@@ -129,59 +150,96 @@ update(){
 
 if(this.greenAttack){
 
+    const target = this.getTarget();
+
+    if(!target){
+
+        this.greenAttack = false;
+
+        return;
+
+    }
+
+
     this.angle =
     Math.atan2(
-        Game.meteor.y-this.y,
-        Game.meteor.x-this.x
+        target.y - this.y,
+        target.x - this.x
     );
 
 
     const dx =
-    Game.meteor.x - this.x;
-
+    target.x - this.x;
 
     const dy =
-    Game.meteor.y - this.y;
+    target.y - this.y;
 
 
     const dist =
     Math.sqrt(
-        dx*dx+dy*dy
+        dx*dx + dy*dy
     );
 
 
     this.greenAttackSpeed =
-(this.greenAttackSpeed || 0) + 0.2;
-
-const speed =
-Math.min(
-    this.greenAttackSpeed,
-    10
-);
+    (this.greenAttackSpeed || 0) + 0.2;
 
 
-    this.x +=
-    dx/dist *
-    speed *
-    Game.deltaTime;
+    const speed =
+    Math.min(
+        this.greenAttackSpeed,
+        10
+    );
 
 
-    this.y +=
-    dy/dist *
-    speed *
-    Game.deltaTime;
+    if(dist > 0){
+
+        this.x +=
+        dx / dist *
+        speed *
+        Game.deltaTime;
+
+
+        this.y +=
+        dy / dist *
+        speed *
+        Game.deltaTime;
+
+    }
+
+
+    // =====================
+    // 命中
+    // =====================
+
+    const targetRadius =
+    target.radius || 40;
 
 
     if(
-    dist <
-    Game.meteor.radius + 20
+        dist <
+        targetRadius + 20
     ){
 
-        this.greenAttack=false;
+        this.greenAttack = false;
 
         this.destroy();
 
-        Game.meteor.greenHit=true;
+
+        // 通常隕石
+        if(target === Game.meteor){
+
+            Game.meteor.greenHit = true;
+
+        }
+
+        // ボス
+        else if(target === Game.boss){
+
+            // GREEN援軍のダメージ
+            Game.boss.damage(20);
+
+        }
 
     }
 
@@ -268,6 +326,12 @@ else{
 
 shoot(){
 
+    const target = this.getTarget();
+
+    if(!target){
+        return;
+    }
+
 
     // =====================
     // YELLOW ミサイル
@@ -279,17 +343,17 @@ shoot(){
         (this.side==="left" || this.side==="right")
     ){
 
-
         const dx =
-        Game.meteor.x - this.x;
+        target.x - this.x;
 
         const dy =
-        Game.meteor.y - this.y;
-
+        target.y - this.y;
 
         const angle =
-        Math.atan2(dy,dx);
-
+        Math.atan2(
+            dy,
+            dx
+        );
 
 
         Game.bullets.push(
@@ -309,24 +373,26 @@ shoot(){
         WaveBonus.yellowShots++;
 
 
-        if(WaveBonus.yellowShots>=2){
+        if(WaveBonus.yellowShots >= 2){
 
             WaveBonus.yellowActive=false;
 
         }
 
-
         return;
+
     }
 
 
-    // ↓ここから通常弾処理
+    // =====================
+    // 通常弾
+    // =====================
 
     const dx =
-    Game.meteor.x - this.x;
+    target.x - this.x;
 
     const dy =
-    Game.meteor.y - this.y;
+    target.y - this.y;
 
 
     const angle =
@@ -337,36 +403,42 @@ shoot(){
 
 
     let bulletSpeed=1;
-let powerBullet=false;
 
-if(
-    WaveBonus.yellowActive &&
-    WaveBonus.yellowShots < 2
-){
-
-    bulletSpeed=2;
-    powerBullet=true;
-    Sound.missile();
-    WaveBonus.yellowShots++;
-
-    if(WaveBonus.yellowShots>=2){
-
-    WaveBonus.yellowActive=false;
-
-}
-
-}
+    let powerBullet=false;
 
 
-Game.bullets.push(
-    new Bullet(
-        this.x,
-        this.y,
-        angle,
-        bulletSpeed,
-        powerBullet
-    )
-);
+    if(
+        WaveBonus.yellowActive &&
+        WaveBonus.yellowShots < 2
+    ){
+
+        bulletSpeed=2;
+
+        powerBullet=true;
+
+        Sound.missile();
+
+        WaveBonus.yellowShots++;
+
+
+        if(WaveBonus.yellowShots >= 2){
+
+            WaveBonus.yellowActive=false;
+
+        }
+
+    }
+
+
+    Game.bullets.push(
+        new Bullet(
+            this.x,
+            this.y,
+            angle,
+            bulletSpeed,
+            powerBullet
+        )
+    );
 
 }
 
