@@ -552,6 +552,16 @@ if(this.bossPhase === "WARNING"){
         // 最初の隕石召喚
         this.boss.summonMeteors();
 
+        // =====================
+    // WAVE5 スロット強制開始
+    // =====================
+
+    if(this.wave === 5){
+
+        Roulette.start();
+
+    }
+
 
         return;
 

@@ -141,22 +141,20 @@ function rouletteInput(event){
 
 
 
-     // 隕石破壊演出中
+     /// =====================
+// 隕石破壊演出中
+// =====================
 
-    if(Game.meteor.destroying){
-
-        return;
-
-    }
-
-
-
-
-    if(Game.meteor.destroying){
+if(
+    !Game.bossWave &&
+    Game.meteor.destroying
+){
 
     return;
 
 }
+
+
 
 
 // ルーレット結果表示中は入力禁止
@@ -174,8 +172,26 @@ if(Roulette.resultTimer > 0){
     // =====================
 
 
+// =====================
+// BOSS WARNING中
+// =====================
+// WARNING中は完全に操作禁止
 
-   if(Roulette.active){
+if(
+    Game.bossWave &&
+    Game.bossPhase === "WARNING"
+){
+
+    return;
+
+}
+
+
+// =====================
+// ルーレット操作中
+// =====================
+
+if(Roulette.active){
 
     Roulette.stop();
 
@@ -184,11 +200,27 @@ if(Roulette.resultTimer > 0){
 }
 
 
+// =====================
+// BOSS BATTLE
+// =====================
 
+if(
+    Game.bossWave &&
+    Game.bossPhase === "BATTLE"
+){
 
     Roulette.start();
 
+    return;
 
+}
+
+
+// =====================
+// 通常WAVE
+// =====================
+
+Roulette.start();
 
 }
 

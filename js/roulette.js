@@ -272,7 +272,7 @@ destroyMeteor(){
 
             if(meteor && meteor.active){
 
-                meteor.hp = 0;
+                meteor.hp = 99;
                 meteor.active = false;
 
             }
@@ -299,7 +299,7 @@ destroyMeteor(){
         Game.meteor.active
     ){
 
-        Game.meteor.hp = 0;
+        Game.meteor.hp = 99;
 
         Camera.hitShake(25);
 
