@@ -12,7 +12,7 @@ const Game={
 canvas:null,
 
 ctx:null,
-bossWaves:[6],
+bossWaves:[5],
 
 // =====================
 // スロットチャージ
@@ -838,11 +838,11 @@ startBossWave(){
 finishBossWave(){
 
     // =====================
-    // WAVE 6
+    // WAVE 5
     // GAME CLEAR
     // =====================
 
-    if(this.wave === 6){
+    if(this.wave === 5){
 
         this.bossPhase = "NONE";
 
