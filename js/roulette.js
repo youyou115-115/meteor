@@ -188,9 +188,6 @@ this.stopLight=[
 ];
 
 
-let slow=1;
-
-
 // 青ボーナスは次の1回転だけ
 let slow = 1;
 let fast = 1;

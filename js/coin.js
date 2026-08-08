@@ -366,81 +366,98 @@ if(Game.boss.nextAttackHalf){
 
 
             // =================================================
-            // 月への攻撃
-            // =================================================
+// 月への攻撃
+// =================================================
 
-            if(
-                Game.boss &&
-                Game.boss.active &&
-                Game.boss.attackState === "CHANCE"
-            ){
+if(
+    Game.boss &&
+    Game.boss.active &&
+    (
+        Game.boss.attackState === "CHANCE" ||
+        Game.boss.phase === 2
+    )
+){
 
-                const dx =
-                    this.x -
-                    Game.boss.x;
-
-
-                const dy =
-                    this.y -
-                    Game.boss.y;
+    const dx =
+        this.x -
+        Game.boss.x;
 
 
-                const distance =
-                    Math.sqrt(
-                        dx * dx +
-                        dy * dy
-                    );
+    const dy =
+        this.y -
+        Game.boss.y;
 
 
-                if(
-                    distance <
-                    Game.boss.radius +
-                    this.radius
-                ){
-
-                    let damage = 10;
+    const distance =
+        Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
 
 
-                    // =====================
-                    // ボーナス
-                    // =====================
+    if(
+        distance <
+        Game.boss.radius +
+        this.radius
+    ){
 
-                    if(Game.bonus){
-
-                        damage =
-                            20 *
-                            this.power;
+        let damage = 10;
 
 
-                        Game.bonus = false;
+        // =====================
+        // ボーナス
+        // =====================
 
-                    }
+        if(Game.bonus){
 
-
-                    // =====================
-                    // 月にダメージ
-                    // =====================
-
-                    Game.boss.damage(
-                        damage
-                    );
+            damage =
+                20 *
+                this.power;
 
 
-                    Sound.coinHit();
+            Game.bonus = false;
+
+        }
 
 
-                    this.reset();
+        // =====================
+        // 第2形態デバフ
+        // 次の攻撃だけ半減
+        // =====================
+
+        if(Game.boss.nextAttackHalf){
+
+            damage *= 0.5;
+
+            Game.boss.nextAttackHalf = false;
+
+        }
 
 
-                    Game.state =
-                        "GAME";
+        // =====================
+        // 月にダメージ
+        // =====================
+
+        Game.boss.damage(
+            damage
+        );
 
 
-                    return;
+        Sound.coinHit();
 
-                }
 
-            }
+        this.reset();
+
+
+        Game.state =
+            "GAME";
+
+
+        return;
+
+    }
+
+}
 
 
             // =====================

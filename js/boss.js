@@ -405,19 +405,8 @@ if(this.debuffTimer > 0){
         Game.deltaTime;
 
 }
-    // =====================
-// ボス隕石管理
 // =====================
-
-if(
-    this.attackState === "METEOR" &&
-    Game.bossMeteors.length === 0
-){
-
-
-    // =====================
 // ボス隕石管理
-// 第1形態のみ
 // =====================
 
 if(
@@ -426,31 +415,21 @@ if(
     Game.bossMeteors.length === 0
 ){
 
-    if(this.summonIndex < 2){
-
-        this.summonMeteors();
-
-    }
-    else{
-
-        this.openAttackChance();
-
-    }
-
-}
-
-    // まだ2個目が残っている
+    // =====================
+    // まだ召喚する隕石がある
+    // =====================
 
     if(this.summonIndex < 2){
 
         this.summonMeteors();
 
     }
-    else{
 
-        // =====================
-        // 2個とも破壊
-        // =====================
+    // =====================
+    // 2個とも破壊された
+    // =====================
+
+    else{
 
         this.openAttackChance();
 
@@ -570,6 +549,29 @@ summonMeteors(){
     Sound.bossLaugh();
 
     Camera.hitShake(8);
+
+}
+
+openAttackChance(){
+
+    // =====================
+    // 攻撃チャンス開始
+    // =====================
+
+    this.attackState = "CHANCE";
+
+    // 攻撃チャンス時間
+    this.attackChanceTimer = 180;
+
+    // 念のため召喚インデックスをリセット
+    this.summonIndex = 0;
+
+    // =====================
+    // 笑いを止める
+    // =====================
+
+    this.laughing = false;
+    this.mouthOpen = false;
 
 }
 laugh(){

@@ -528,33 +528,6 @@ if(this.bossPhase === "BATTLE"){
 
     }
 
-
-    // =====================
-    // 召喚隕石が全部破壊された
-    // =====================
-
-    if(
-    this.boss &&
-    this.boss.active &&
-    this.boss.attackState === "METEOR" &&
-    this.bossMeteors.length === 0
-){
-
-    // まだ2個目が残っている
-    if(this.boss.summonIndex < 2){
-
-        this.boss.summonMeteors();
-
-    }
-    else{
-
-        // 2個とも破壊された
-        this.boss.openAttackChance();
-
-    }
-
-}
-
 }
 
 },
