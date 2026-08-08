@@ -526,8 +526,6 @@ shoot(){
         Game.bossMeteors.length > 0
     ){
 
-        // 生きている召喚隕石を探す
-
         const targets =
             Game.bossMeteors.filter(
                 meteor =>
@@ -553,7 +551,6 @@ shoot(){
                 const dy =
                     meteor.y - this.y;
 
-
                 const dist =
                     dx * dx +
                     dy * dy;
@@ -575,8 +572,8 @@ shoot(){
 
 
     // =====================
-    // ボス戦・召喚隕石がない
-    // → 月を狙う
+    // BOSS戦
+    // 召喚隕石がなければ月
     // =====================
 
     if(
@@ -593,13 +590,12 @@ shoot(){
 
     // =====================
     // 通常ステージ
-    // → 通常隕石
     // =====================
 
     if(
         !target &&
-        Game.meteor &&
-        Game.meteor.active
+        !Game.bossWave &&
+        Game.meteor
     ){
 
         target = Game.meteor;
@@ -607,7 +603,9 @@ shoot(){
     }
 
 
-    // 攻撃対象がいなければ終了
+    // =====================
+    // 攻撃対象なし
+    // =====================
 
     if(!target){
 
@@ -665,7 +663,7 @@ shoot(){
             WaveBonus.yellowShots >= 2
         ){
 
-            WaveBonus.yellowActive=false;
+            WaveBonus.yellowActive = false;
 
         }
 
@@ -702,7 +700,7 @@ shoot(){
             WaveBonus.yellowShots >= 2
         ){
 
-            WaveBonus.yellowActive=false;
+            WaveBonus.yellowActive = false;
 
         }
 
