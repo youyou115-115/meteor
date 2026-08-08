@@ -14,6 +14,7 @@ resultEffectTimer:0,
 
 effectMessage:"",
 effectMessageTimer:0,
+meteorHit:false,
 
 
     active:false,
@@ -126,6 +127,7 @@ this.reels=[
 ];
 
 
+
     },
 
 
@@ -159,6 +161,7 @@ this.reels=[
     this.reachTimer=0;
     this.reachEffectTimer=0;
     this.reachLine=null;
+    this.meteorHit = false;
 
         // ★追加
     this.stopped=[
@@ -254,6 +257,59 @@ this.reachLine=null;
 this.reachNumber=null;
 
 
+
+},
+
+destroyMeteor(){
+
+    // ボス戦の召喚隕石
+    if(
+        Game.bossMeteors &&
+        Game.bossMeteors.length > 0
+    ){
+
+        for(const meteor of Game.bossMeteors){
+
+            if(meteor && meteor.active){
+
+                meteor.hp = 0;
+                meteor.active = false;
+
+            }
+
+        }
+
+        Game.bossMeteors = [];
+
+        Camera.hitShake(25);
+
+        this.resultEffect = "meteor";
+
+        this.resultEffectTimer = 60;
+
+        Sound.meteor();
+
+        return;
+    }
+
+
+    // 通常の隕石
+    if(
+        Game.meteor &&
+        Game.meteor.active
+    ){
+
+        Game.meteor.hp = 0;
+
+        Camera.hitShake(25);
+
+        this.resultEffect = "meteor";
+
+        this.resultEffectTimer = 60;
+
+        Sound.meteor();
+
+    }
 
 },
 
@@ -821,7 +877,10 @@ const c=resultGrid[line[2]];
 
                 if(a==="☄"){
 
-    this.result = 99;
+    // 隕石一発破壊役
+    this.result = 1;
+
+    this.meteorHit = true;
 
 }
 else if(a==="★"){
@@ -881,8 +940,55 @@ else if(
         }
 
 
+Game.power = this.result;
 
-        Game.power=this.result;
+if(this.meteorHit){
+
+    // =====================
+    // ☄ 隕石役
+    // =====================
+
+    // ボス第2形態
+    // → 月に50%ダメージ
+    if(
+        Game.boss &&
+        Game.boss.active &&
+        Game.boss.phase === 2
+    ){
+
+        const damage =
+    Game.boss.hp * 0.5;
+
+Game.boss.damage(damage);
+
+        // 強烈なヒット演出
+        Camera.hitShake(40);
+
+        this.resultEffect = "meteor";
+
+        this.resultEffectTimer = 60;
+
+        Sound.meteor();
+
+        console.log(
+            "MOON DEVIL HIT:",
+            damage
+        );
+
+    }
+
+    // =====================
+    // 通常隕石
+    // =====================
+    else{
+
+        this.destroyMeteor();
+
+    }
+
+}
+
+
 
 
 //=====================
@@ -892,7 +998,12 @@ else if(
 this.resultEffect="normal";
 
 
-if(this.result === 7){
+if(this.meteorHit){
+
+    this.resultEffect="meteor";
+
+}
+else if(this.result === 7){
 
     this.resultEffect="seven";
 
@@ -905,11 +1016,6 @@ else if(this.result === 10){
 else if(this.result === 9){
 
     this.resultEffect="nine";
-
-}
-else if(this.result === 99){
-
-    this.resultEffect="meteor";
 
 }
 
