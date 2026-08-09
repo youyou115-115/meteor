@@ -208,6 +208,16 @@ if(this.dying){
 
         this.dying = false;
 
+            // =====================
+    // 爆発を完全消去
+    // =====================
+
+    this.explosionParticles = [];
+
+    this.explosionTimer = 0;
+
+
+
 
 
         // ボス隕石を消す
