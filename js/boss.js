@@ -130,7 +130,7 @@ this.explosionParticles = [];
 
 this.z = 1000;
 
-this.secondPhaseSpeed = 3;
+this.secondPhaseSpeed = 2.5;
 
 
     // =====================
@@ -637,12 +637,6 @@ summonMeteors(){
     // 次は左
 
     this.summonIndex++;
-
-    if(side === "right"){
-
-    meteor.moveState = "CENTER";
-
-}
 
 
     // =====================
