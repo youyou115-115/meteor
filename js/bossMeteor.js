@@ -56,7 +56,7 @@ reset(){
 // =====================
 
 this.maxHp =
-    100 +
+    200 +
     Math.floor(
         Math.random() * 201
     );

@@ -47,7 +47,7 @@ this.greenHit=false;
 case 1:
 
     this.maxHp = 100;
-    this.speed = 3;
+    this.speed = 4;
     this.type = 0;
 
     break;
