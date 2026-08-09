@@ -389,7 +389,7 @@ if(this.dying){
 
     if(
     this.phase === 1 &&
-    this.hp < 500
+    this.hp < 400
 ){
 
     this.phase = 2;

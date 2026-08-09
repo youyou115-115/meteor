@@ -576,70 +576,88 @@ if(
 
     draw(ctx){
 
-        ctx.save();
+    // =====================
+    // スロットチャージゲージ
+    // =====================
 
+    if(
+        Game.state === "GAME" &&
+        Game.bossPhase !== "WARNING"
+    ){
 
-        ctx.translate(
-            this.x,
-            this.y
-        );
+        const barWidth = 70;
+        const barHeight = 7;
+
+        const rate =
+            Math.max(
+                0,
+                Math.min(
+                    1,
+                    Game.slotCharge /
+                    Game.slotChargeMax
+                )
+            );
+
 
         // =====================
-// スロットチャージゲージ
-// =====================
+        // ゲージ位置
+        // =====================
 
-if(
-    Game.state === "GAME" &&
-    Game.bossPhase !== "WARNING"
-){
-
-    const barWidth = 70;
-    const barHeight = 7;
-
-    const rate =
-        Game.slotCharge /
-        Game.slotChargeMax;
+        const barX = 400;
+        const barY = 585;
 
 
-    // 背景
-    ctx.fillStyle =
-        "rgba(0,0,0,0.75)";
+        // 背景
+        ctx.fillStyle =
+            "rgba(0,0,0,0.75)";
 
-    ctx.fillRect(
-        -barWidth / 2,
-        -this.radius - 18,
-        barWidth,
-        barHeight
+        ctx.fillRect(
+            barX - barWidth / 2,
+            barY,
+            barWidth,
+            barHeight
+        );
+
+
+        // チャージ
+        ctx.fillStyle =
+            "#ffd83d";
+
+        ctx.fillRect(
+            barX - barWidth / 2,
+            barY,
+            barWidth * rate,
+            barHeight
+        );
+
+
+        // 枠
+        ctx.strokeStyle =
+            "#ffffff";
+
+        ctx.lineWidth = 1;
+
+        ctx.strokeRect(
+            barX - barWidth / 2,
+            barY,
+            barWidth,
+            barHeight
+        );
+
+    }
+
+
+    // =====================
+    // コイン描画
+    // =====================
+
+    ctx.save();
+
+
+    ctx.translate(
+        this.x,
+        this.y
     );
-
-
-    // チャージ
-    ctx.fillStyle =
-        "#ffd83d";
-
-    ctx.fillRect(
-        -barWidth / 2,
-        -this.radius - 18,
-        barWidth * rate,
-        barHeight
-    );
-
-
-    // 枠
-    ctx.strokeStyle =
-        "#ffffff";
-
-    ctx.lineWidth = 1;
-
-    ctx.strokeRect(
-        -barWidth / 2,
-        -this.radius - 18,
-        barWidth,
-        barHeight
-    );
-
-}
-
 
         // =====================
         // 横回転
