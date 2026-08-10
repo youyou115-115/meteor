@@ -258,8 +258,8 @@ if(
 
 // 目押し用に速度を低下
 const baseSpeed = [
-    0.0100,
-    0.0100,
+    0.0105,
+    0.0105,
     0.0080
 ];
 
@@ -588,52 +588,63 @@ for(let y = 0; y < 3; y++){
 // 最大1段だけ補正
 // =====================
 
-if(candidates.length > 0){
+// =====================
+// 中央リール補正率
+// =====================
 
-    let reachChance =
-        0.7 +
-        (Game.wave - 1) * 0.03;
+// 通常数字
+let reachChance =
+    0.7 +
+    (Game.wave - 1) * 0.03;
 
-    reachChance =
-        Math.min(reachChance, 0.9);
+reachChance =
+    Math.min(reachChance, 0.9);
 
 
-    if(Math.random() < reachChance){
+// ☄・★だけ30%固定
+if(
+    target === "☄" ||
+    target === "★"
+){
 
-        // 候補から1段だけ選ぶ
-        const y =
-            candidates[
-                Math.floor(
-                    Math.random() * candidates.length
-                )
-            ];
+    reachChance = 0.30;
 
-        const target =
-            leftGrid[y];
+}
 
-        const current =
+
+if(Math.random() < reachChance){
+
+    // 候補から1段だけ選ぶ
+    const y =
+        candidates[
             Math.floor(
-                this.reelPos[1] *
-                this.reels[1].length
-            );
+                Math.random() * candidates.length
+            )
+        ];
 
+    const target =
+        leftGrid[y];
 
-        for(
-            let i = 0;
-            i < this.reels[1].length;
-            i++
+    const current =
+        Math.floor(
+            this.reelPos[1] *
+            this.reels[1].length
+        );
+
+    for(
+        let i = 0;
+        i < this.reels[1].length;
+        i++
+    ){
+
+        if(
+            this.reels[1][i] === target
         ){
 
-            if(
-                this.reels[1][i] === target
-            ){
+            this.rowStopOffset[1][y] =
+                i - current - y;
 
-                this.rowStopOffset[1][y] =
-                    i - current - y;
-
-                break;
-
-            }
+            break;
 
         }
 
@@ -896,8 +907,8 @@ if(
 ){
 
     chance =
-        0.35 -
-        (Game.wave - 1) * 0.025;
+        0.20 -
+        (Game.wave - 1) * 0.02;
 
     chance =
         Math.max(
@@ -911,8 +922,8 @@ else if(
 ){
 
     chance =
-        0.45 -
-        (Game.wave - 1) * 0.04;
+        0.30 -
+        (Game.wave - 1) * 0.25;
 
     chance =
         Math.max(
