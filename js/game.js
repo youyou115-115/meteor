@@ -205,6 +205,47 @@ new Coin();
     return;
 
 }
+window.addEventListener("keydown", (e) => {
+
+    if(Game.state !== "TITLE"){
+        return;
+    }
+
+
+    // =========================================
+    // M → METEOR FINISH
+    // =========================================
+
+    if(e.key.toLowerCase() === "m"){
+
+        Game.meteorClear = true;
+
+        Game.startSpecialClear();
+
+        return;
+
+    }
+
+
+    // =========================================
+    // C → GAME CLEAR
+    // =========================================
+
+    if(e.key.toLowerCase() === "c"){
+
+        Game.state = "CLEAR";
+
+        Game.clearTimer = 240;
+
+        Game.clearAnimation = 0;
+
+        Sound.stopBGM();
+
+        return;
+
+    }
+
+});
 
 
 
@@ -761,6 +802,15 @@ updateSpecialClear(){
             this.specialClearFlash = 1;
 
             Camera.hitShake(35);
+            
+
+              // =====================================
+    // ボス撃破音
+    // =====================================
+
+    Sound.gameOver();
+
+    Camera.hitShake(35);
 
             // =====================
             // 亀裂生成
