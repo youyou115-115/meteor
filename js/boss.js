@@ -916,7 +916,7 @@ if(this.hp <= 0){
     // 爆発演出
     // =====================
 
-    Camera.hitShake(25);
+    Camera.hitShake(10);
 
     Sound.explosion();
 
