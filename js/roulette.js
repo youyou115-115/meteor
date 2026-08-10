@@ -1159,6 +1159,12 @@ else if(this.result === 7){
     Sound.seven();
 }
 
+else if(this.result === 8){
+
+    Sound.success(8);
+
+}
+
 else if(this.result===9){
 
     Sound.nine();
