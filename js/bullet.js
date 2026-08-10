@@ -23,6 +23,7 @@ constructor(
     this.speed = 15 * speed;
 
     this.explosionDamage=false;
+    this.explosionTarget = null;
 
     this.vx =
     Math.cos(angle)*this.speed;
@@ -49,79 +50,98 @@ update(){
     // 爆発中
     // =====================
 
-    if(this.exploding){
+   if(this.exploding){
 
-        this.explosionRadius +=
-            6 * Game.deltaTime;
+    this.explosionRadius +=
+        6 * Game.deltaTime;
 
-        this.explosionTimer -=
-            Game.deltaTime;
+    this.explosionTimer -=
+        Game.deltaTime;
 
 
-        // 爆発開始時だけダメージ
+    // =====================
+    // 爆発開始時だけダメージ
+    // =====================
+
+    if(
+        this.explosionTimer > 19 &&
+        !this.explosionDamage
+    ){
+
+        // =====================
+        // 召喚隕石
+        // 現在HPの50%
+        // =====================
+
         if(
-            this.explosionTimer > 19 &&
-            !this.explosionDamage
+            this.explosionTarget &&
+            this.explosionTarget.active
         ){
 
-            let damage = 0;
+            const damage =
+                Math.floor(
+                    this.explosionTarget.hp * 0.5
+                );
 
+            this.explosionTarget.damage(damage);
 
-            // =====================
-            // ボス戦
-            // =====================
+        }
 
-            if(
-                Game.bossWave &&
-                Game.boss &&
-                Game.boss.active &&
-                Game.boss.attackState === "CHANCE"
-            ){
+        // =====================
+        // 月
+        // CHANCE時のみ25%
+        // =====================
 
-                damage =
-                    Math.floor(
-                        Game.boss.hp * 0.25
-                    );
+        else if(
+            Game.bossWave &&
+            Game.boss &&
+            Game.boss.active &&
+            Game.boss.attackState === "CHANCE"
+        ){
 
-                Game.boss.damage(damage);
+            const damage =
+                Math.floor(
+                    Game.boss.hp * 0.25
+                );
 
-            }
+            Game.boss.damage(damage);
 
+        }
 
-            // =====================
-            // 通常戦
-            // =====================
+        // =====================
+        // 通常戦
+        // =====================
 
-            else if(!Game.bossWave){
+        else if(!Game.bossWave){
 
-                damage =
-                    Math.floor(
-                        Game.meteor.hp * 0.25
-                    );
+            const damage =
+                Math.floor(
+                    Game.meteor.hp * 0.25
+                );
 
-                Game.meteor.damage(damage);
-
-            }
-
-
-            Sound.explosion();
-
-            Camera.hitShake(12);
-
-            this.explosionDamage = true;
+            Game.meteor.damage(damage);
 
         }
 
 
-        if(this.explosionTimer <= 0){
+        Sound.explosion();
 
-            this.active = false;
+        Camera.hitShake(12);
 
-        }
-
-        return;
+        this.explosionDamage = true;
 
     }
+
+
+    if(this.explosionTimer <= 0){
+
+        this.active = false;
+
+    }
+
+    return;
+
+}
 
 
     // =====================
@@ -172,36 +192,35 @@ update(){
 
             if(d < meteor.radius){
 
-                if(this.powerBullet){
+    if(this.powerBullet){
 
-                    this.exploding = true;
+        this.exploding = true;
 
-                    this.explosionTimer = 20;
+        this.explosionTimer = 20;
 
-                    this.explosionRadius = 0;
+        this.explosionRadius = 0;
 
-                    this.explosionDamage = false;
+        this.explosionDamage = false;
 
+        this.explosionTarget = meteor;
 
-                    this.vx = 0;
+        this.vx = 0;
+        this.vy = 0;
 
-                    this.vy = 0;
+    }
+    else{
 
-                }
-                else{
+        meteor.damage(5);
 
-                    meteor.damage(5);
+        Sound.planeShot();
 
-                    Sound.planeShot();
+        this.active = false;
 
-                    this.active = false;
+    }
 
-                }
+    return;
 
-
-                return;
-
-            }
+}
 
         }
 

@@ -1609,7 +1609,7 @@ if(Game.state === "SPECIAL_CLEAR"){
             "#ffffff";
 
         ctx.fillText(
-            "それはあかんやろ",
+            "☄はあかんやろ",
             400,
             470
         );

@@ -953,69 +953,103 @@ if(this.meteorHit){
     // ☄ 隕石役
     // =====================
 
-    // ボス第2形態
-    // → 月に50%ダメージ
+    // =====================
+    // BOSS戦
+    // =====================
+
     if(
-        Game.boss &&
-        Game.boss.active &&
-        Game.boss.phase === 2
+        Game.bossWave &&
+        Game.bossPhase === "BATTLE"
     ){
 
-        const damage =
-    Game.boss.hp * 0.5;
+        // =====================
+        // ① 召喚隕石が存在する場合
+        // =====================
 
-Game.boss.damage(damage);
+        if(
+            Game.bossMeteors &&
+            Game.bossMeteors.length > 0
+        ){
 
-// WAVE5のボスをMETEOR役で倒した
-if(
-    Game.wave === 5 &&
-    Game.boss &&
-    Game.boss.hp <= 0
-){
+            this.destroyMeteor();
 
-    Game.meteorClear = true;
+            // ★実際に召喚隕石を破壊した
+            Game.meteorClear = true;
 
-    // =====================
-    // METEOR FINISH
-    // =====================
+        }
 
-    this.meteorFinish = true;
+        // =====================
+        // ② 召喚隕石がなく、月がCHANCEの場合
+        // =====================
 
-    this.meteorFinishTimer = 100;
+        else if(
+            Game.boss &&
+            Game.boss.active &&
+            Game.boss.attackState === "CHANCE" &&
+            Game.boss.phase === 2
+        ){
 
-    this.resultEffect = "meteorFinish";
+            const damage =
+                Game.boss.hp * 0.5;
 
-    this.resultEffectTimer = 100;
+            Game.boss.damage(damage);
 
-    this.stopTimer = 100;
+            // ★本当に月を倒した場合だけ
+            if(Game.boss.hp <= 0){
 
-    this.resultTimer = 100;
+                Game.meteorClear = true;
 
-    Camera.hitShake(80);
+                this.meteorFinish = true;
 
-    console.log("★ METEOR FINISH ★");
+                this.meteorFinishTimer = 100;
 
-}
+                this.resultEffect = "meteorFinish";
 
-        // 強烈なヒット演出
-        Camera.hitShake(40);
+                this.resultEffectTimer = 100;
 
-        this.resultEffect = "meteor";
+                this.stopTimer = 100;
 
-        this.resultEffectTimer = 60;
+                this.resultTimer = 100;
 
-        Sound.meteor();
+                Camera.hitShake(80);
 
-        console.log(
-            "MOON DEVIL HIT:",
-            damage
-        );
+                console.log(
+                    "★ METEOR FINISH : MOON DESTROYED ★"
+                );
+
+            }
+            else{
+
+                Camera.hitShake(40);
+
+                this.resultEffect = "meteor";
+
+                this.resultEffectTimer = 60;
+
+                Sound.meteor();
+
+            }
+
+        }
+
+        // =====================
+        // ③ それ以外
+        // =====================
+
+        else{
+
+            console.log(
+                "☄ METEOR役発動：対象なし"
+            );
+
+        }
 
     }
 
     // =====================
-    // 通常隕石
+    // 通常WAVE
     // =====================
+
     else{
 
         this.destroyMeteor();
