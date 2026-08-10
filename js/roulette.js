@@ -57,6 +57,12 @@ meteorFinishTimer:0,
     false
 ],
 
+rowStopOffset:[
+    [0,0,0],
+    [0,0,0],
+    [0,0,0]
+],
+
 stopOffset:[
     0,
     0,
@@ -125,7 +131,7 @@ this.reels=[
     // 右リール
     [
 2,6,7,3,9,1,"☄",5,8,4,7,
-6,"★",2
+6,"★"
 ]
 ];
 
@@ -175,6 +181,12 @@ this.meteorFinishTimer = 0;
         false,
         false
     ];
+
+    this.rowStopOffset = [
+    [0,0,0],
+    [0,0,0],
+    [0,0,0]
+];
 
 
     // ★追加
@@ -239,13 +251,24 @@ if(
 // リール速度
 // =====================
 
-this.reelSpeed = [
 
-    0.010 * slow * fast,
-    0.0125 * slow * fast,
-    0.015 * slow * fast
+// =====================
+// リール速度
+// =====================
 
+// 目押し用に速度を低下
+const baseSpeed = [
+    0.0070,
+    0.0080,
+    0.0085
 ];
+
+this.reelSpeed = [
+    baseSpeed[0] * slow * fast,
+    baseSpeed[1] * slow * fast,
+    baseSpeed[2] * slow * fast
+];
+
 
     this.phase=0;
 
@@ -434,8 +457,7 @@ for(let x=0;x<3;x++){
 
 
 
-   stop(){
-
+stop(){
 
     if(!this.active){
 
@@ -444,94 +466,114 @@ for(let x=0;x<3;x++){
     }
 
 
+    // =====================
+    // 左リール
+    // =====================
 
-   // 左
+    if(this.phase===0){
 
-if(this.phase===0){
+        Sound.stop(1);
 
-    Sound.stop(1);
+        this.stopped[0]=true;
 
-    this.stopped[0]=true;
-
-    this.stopLight[0]=true;
-
-
-    const pos =
-    Math.floor(
-        this.reelPos[0] *
-        this.reels[0].length
-    );
+        this.stopLight[0]=true;
 
 
-    const leftIndex =
-(
-pos + 1 + this.reels[0].length
-)
-%
-this.reels[0].length;
+        const pos =
+        Math.floor(
+            this.reelPos[0] *
+            this.reels[0].length
+        );
 
 
-this.targetNumber =
-this.reels[0][leftIndex];
+        const leftIndex =
+        (
+            pos +
+            1 +
+            this.reels[0].length
+        )
+        %
+        this.reels[0].length;
 
-    this.phase=1;
 
-    return;
-
-}
+        this.targetNumber =
+        this.reels[0][leftIndex];
 
 
+        this.phase=1;
+
+        return;
+
+    }
+
+
+
+    // =====================
+    // 中央リール
+    // =====================
 
     if(this.phase===1){
+
         Sound.stop(2);
 
-    this.stopped[1]=true;
+        this.stopped[1]=true;
 
-    this.stopLight[1]=true;
-
-
-
-    // 40%で左と同じ数字を狙う
-
-    let reachChance =
-0.7 +
-(Game.wave - 1) * 0.03;
+        this.stopLight[1]=true;
 
 
-// 最大90%
-reachChance =
-Math.min(
-    reachChance,
-    0.9
-);
+        // =====================
+        // 現在の左リール表示
+        // 上・中央・下を取得
+        // =====================
+
+        const leftGrid=[];
 
 
-// レア役は少し低くする
-if(
-    this.targetNumber==="☄" ||
-    this.targetNumber==="★"
-){
+        for(let y=0;y<3;y++){
 
-    reachChance=0.4;
+            leftGrid[y] =
+            this.reels[0][
+                (
+                    Math.floor(
+                        this.reelPos[0] *
+                        this.reels[0].length
+                    )
+                    +
+                    this.stopOffset[0]
+                    +
+                    y
+                    +
+                    this.reels[0].length
+                )
+                %
+                this.reels[0].length
+            ];
 
-}
+        }
 
 
-if(Math.random()<reachChance){
 
-    const current =
-    Math.floor(
-        this.reelPos[1] *
-        this.reels[1].length
-    );
+// =====================
+// 中央リール補正
+// 最大1段だけリーチさせる
+// =====================
+
+this.rowStopOffset[1] = [0, 0, 0];
+
+const candidates = [];
 
 
-    for(let i=0;i<this.reels[1].length;i++){
+// 左と同じ図柄が中央リールに存在する段を候補にする
+for(let y = 0; y < 3; y++){
 
-        if(this.reels[1][i]===this.targetNumber){
+    const target = leftGrid[y];
 
-            this.stopOffset[1] =
-            i - current - 1;
+    // ☄・★も候補
+    for(let i = 0; i < this.reels[1].length; i++){
+
+        if(this.reels[1][i] === target){
+
+            candidates.push(y);
 
             break;
 
@@ -541,198 +583,53 @@ if(Math.random()<reachChance){
 
 }
 
-//=====================
-// 左・中央 表示位置でリーチ判定
-//=====================
 
-const leftGrid=[];
-const centerGrid=[];
+// =====================
+// 最大1段だけ補正
+// =====================
 
+if(candidates.length > 0){
 
-for(let y=0;y<3;y++){
+    let reachChance =
+        0.7 +
+        (Game.wave - 1) * 0.03;
 
-    leftGrid[y] =
-    this.reels[0][
-        (
-        Math.floor(
-            this.reelPos[0] *
-            this.reels[0].length
-        )
-        +
-        this.stopOffset[0]
-        +
-        y
-        +
-        this.reels[0].length
-        )
-        %
-        this.reels[0].length
-    ];
+    reachChance =
+        Math.min(reachChance, 0.9);
 
 
-    centerGrid[y] =
-    this.reels[1][
-        (
-        Math.floor(
-            this.reelPos[1] *
-            this.reels[1].length
-        )
-        +
-        this.stopOffset[1]
-        +
-        y
-        +
-        this.reels[1].length
-        )
-        %
-        this.reels[1].length
-    ];
+    if(Math.random() < reachChance){
 
-}
-
-
-
-const leftValue = leftGrid[1];
-
-
-// 真ん中ラインだけリーチ判定
-if(
-    leftValue === centerGrid[1]
-){
-
-    this.reachLine="middle";
-
-    // ★実際のリーチ数字
-    this.reachNumber = leftValue;
-
-}
-
-
-
-if(this.reachLine){
-
-    this.reach=true;
-
-    this.reachWait=true;
-
-    this.reachTimer=60;
-
-    this.reachEffectTimer=120;
-
-}
-
-
-
-
-
-
-
-    this.phase=2;
-
-    return;
-
-}
-
-
-
-// 右
-
-if(this.phase===2){
-
-
-    // リーチ演出待ち
-
-if(this.reachWait){
-
-    this.reachTimer -= Game.deltaTime;
-
-
-    if(this.reachTimer <= 0){
-
-        this.reachWait=false;
-
-    }
-
-}
-
-Sound.stop(3);
-
-    this.stopped[2]=true;
-
-    this.stopLight[2]=true;
-
-
-
-// リーチ時補正
-
-if(this.reach){
-
-    let chance =
-0.6 +
-(Game.wave - 1) * 0.04;
-
-
-chance =
-Math.min(
-    chance,
-    0.9
-);
-
-
-    // レア役リーチ補正
-if(this.reachNumber==="☄"){
-
-
-    chance =
-    0.25 +
-    (Game.wave-1)*0.03;
-
-
-    chance =
-    Math.min(
-        chance,
-        0.45
-    );
-
-
-}
-else if(this.reachNumber==="★"){
-
-
-    chance =
-    0.8 +
-    (Game.wave-1)*0.02;
-
-
-    chance =
-    Math.min(
-        chance,
-        0.95
-    );
-
-
-}
-
-
-    if(Math.random() < chance){
-
-        const target = this.targetNumber;
-
-
-        for(let i=0;i<this.reels[2].length;i++){
-
-            if(this.reels[2][i] === target){
-
-                const current =
+        // 候補から1段だけ選ぶ
+        const y =
+            candidates[
                 Math.floor(
-                    this.reelPos[2] *
-                    this.reels[2].length
-                );
+                    Math.random() * candidates.length
+                )
+            ];
+
+        const target =
+            leftGrid[y];
+
+        const current =
+            Math.floor(
+                this.reelPos[1] *
+                this.reels[1].length
+            );
 
 
-                this.stopOffset[2] =
-                i - current - 1;
+        for(
+            let i = 0;
+            i < this.reels[1].length;
+            i++
+        ){
 
+            if(
+                this.reels[1][i] === target
+            ){
+
+                this.rowStopOffset[1][y] =
+                    i - current - y;
 
                 break;
 
@@ -741,25 +638,381 @@ else if(this.reachNumber==="★"){
         }
 
     }
-    else{
 
-        // ハズレ時は補正なし
-        this.stopOffset[2]=0;
+}
+
+
+
+        // =====================
+        // 中央リール表示位置
+        // =====================
+
+        const centerGrid=[];
+
+
+        for(let y=0;y<3;y++){
+
+            const offset =
+                this.rowStopOffset[1][y];
+
+
+            centerGrid[y] =
+            this.reels[1][
+                (
+                    Math.floor(
+                        this.reelPos[1] *
+                        this.reels[1].length
+                    )
+                    +
+                    offset
+                    +
+                    y
+                    +
+                    this.reels[1].length
+                )
+                %
+                this.reels[1].length
+            ];
+
+        }
+
+
+
+// =====================
+// リーチ判定
+// 横3ライン + 斜め2ライン
+// =====================
+
+this.rowReach = [
+    false,
+    false,
+    false
+];
+
+this.rowReachNumber = [
+    null,
+    null,
+    null
+];
+
+
+// =====================
+// 横ライン
+// =====================
+
+for(let y = 0; y < 3; y++){
+
+    if(
+        leftGrid[y] === centerGrid[y]
+    ){
+
+        this.rowReach[y] = true;
+
+        this.rowReachNumber[y] =
+            leftGrid[y];
 
     }
 
 }
 
 
+// =====================
+// 斜めリーチ
+//
+// 左上 → 中央 → 右下
+// 左下 → 中央 → 右上
+//
+// 右リールはまだ回転中なので
+// 「左＋中央」が一致しているかだけを見る
+// =====================
 
-    this.phase=3;
+this.diagonalReach = [
+    false,
+    false
+];
 
-    this.phaseTimer=20;
 
-    return;
+// 左上 → 中央
+
+if(
+    leftGrid[0] === centerGrid[1]
+){
+
+    this.diagonalReach[0] = true;
 
 }
 
+
+// 左下 → 中央
+
+if(
+    leftGrid[2] === centerGrid[1]
+){
+
+    this.diagonalReach[1] = true;
+
+}
+
+
+// =====================
+// どこか1ラインでもリーチ
+// =====================
+
+if(
+    this.rowReach[0] ||
+    this.rowReach[1] ||
+    this.rowReach[2] ||
+    this.diagonalReach[0] ||
+    this.diagonalReach[1]
+){
+
+    this.reach = true;
+
+    this.reachWait = true;
+
+    this.reachTimer = 60;
+
+    this.reachEffectTimer = 120;
+
+}
+
+
+        this.phase=2;
+
+        return;
+
+    }
+
+
+
+    // =====================
+    // 右リール
+    // =====================
+
+    if(this.phase===2){
+
+        // =====================
+        // リーチ演出待ち
+        // =====================
+
+        if(this.reachWait){
+
+            this.reachTimer -=
+                Game.deltaTime;
+
+
+            if(this.reachTimer <= 0){
+
+                this.reachWait=false;
+
+            }
+
+        }
+
+
+        Sound.stop(3);
+
+
+        this.stopped[2]=true;
+
+        this.stopLight[2]=true;
+
+
+
+        // =====================
+        // 現在の中央リール
+        // 上・中央・下
+        // =====================
+
+        const centerGrid=[];
+
+
+        for(let y=0;y<3;y++){
+
+            centerGrid[y] =
+            this.reels[1][
+                (
+                    Math.floor(
+                        this.reelPos[1] *
+                        this.reels[1].length
+                    )
+                    +
+                    this.rowStopOffset[1][y]
+                    +
+                    y
+                    +
+                    this.reels[1].length
+                )
+                %
+                this.reels[1].length
+            ];
+
+        }
+
+
+
+// =====================
+// 右リール補正
+// 最大1段だけ補正
+// =====================
+
+this.rowStopOffset[2] = [0, 0, 0];
+
+const rightCandidates = [];
+
+
+// =====================
+// 補正候補を作る
+// =====================
+
+for(let y = 0; y < 3; y++){
+
+    const target =
+        centerGrid[y];
+
+    // =====================
+// 基本補正確率
+// WAVEが上がるほど弱くする
+// =====================
+
+let chance =
+    0.55 -
+    (Game.wave - 1) * 0.04;
+
+chance =
+    Math.max(
+        chance,
+        0.15
+    );
+
+
+// =====================
+// レア役補正
+// WAVEが上がるほど弱くする
+// =====================
+
+if(
+    centerGrid[y] === "☄"
+){
+
+    chance =
+        0.35 -
+        (Game.wave - 1) * 0.025;
+
+    chance =
+        Math.max(
+            chance,
+            0.15
+        );
+
+}
+else if(
+    centerGrid[y] === "★"
+){
+
+    chance =
+        0.45 -
+        (Game.wave - 1) * 0.04;
+
+    chance =
+        Math.max(
+            chance,
+            0.30
+        );
+
+}
+
+    // この段を補正候補に入れる
+    if(Math.random() < chance){
+
+        rightCandidates.push(y);
+
+    }
+
+}
+
+
+// =====================
+// 最大1段だけ補正
+// =====================
+
+if(rightCandidates.length > 0){
+
+    // 候補の中から1段だけ選択
+    const y =
+        rightCandidates[
+            Math.floor(
+                Math.random() *
+                rightCandidates.length
+            )
+        ];
+
+
+    const target =
+        centerGrid[y];
+
+
+    const current =
+        Math.floor(
+            this.reelPos[2] *
+            this.reels[2].length
+        );
+
+
+    // =====================
+    // 対応する図柄を探す
+    // =====================
+
+    for(
+        let i = 0;
+        i < this.reels[2].length;
+        i++
+    ){
+
+        if(
+            this.reels[2][i] === target
+        ){
+
+            this.rowStopOffset[2][y] =
+                i - current - y;
+
+            break;
+
+        }
+
+    }
+
+}
+
+
+        // =====================
+        // 既存の中央ライン用
+        // リーチ演出との整合
+        // =====================
+
+        if(this.reach){
+
+            // 中央段がリーチしている場合だけ
+            // これまでの中央ライン補正を維持
+
+            if(this.rowReach[1]){
+
+                this.rowStopOffset[2][1] =
+                    this.rowStopOffset[2][1];
+
+            }
+
+        }
+
+
+
+        this.phase=3;
+
+        this.phaseTimer=20;
+
+        return;
+
+    }
 
 },
 
@@ -790,22 +1043,23 @@ for(let y=0;y<3;y++){
 
         const pos =
 (
-Math.floor(
- this.reelPos[x] * this.reels[x].length
-)
-+
-this.stopOffset[x]
-+
-this.reels[x].length
+    Math.floor(
+        this.reelPos[x] *
+        this.reels[x].length
+    )
+    +
+    this.rowStopOffset[x][y]
+    +
+    y
+    +
+    this.reels[x].length
 )
 %
-this.reels[x].length
+this.reels[x].length;
 
 
-        let value =
-this.reels[x][
-(pos+y) % this.reels[x].length
-];
+let value =
+this.reels[x][pos];
 
 
 
@@ -947,11 +1201,14 @@ else if(
 
 Game.power = this.result;
 
+
 if(this.meteorHit){
 
-    // =====================
-    // ☄ 隕石役
-    // =====================
+  // =====================
+// ☄ 隕石役
+// =====================
+
+if(this.meteorHit){
 
     // =====================
     // BOSS戦
@@ -963,89 +1220,111 @@ if(this.meteorHit){
     ){
 
         // =====================
-        // ① 召喚隕石が存在する場合
+        // ① 召喚隕石が存在
         // =====================
 
         if(
             Game.bossMeteors &&
-            Game.bossMeteors.length > 0
+            Game.bossMeteors.some(
+                meteor =>
+                    meteor &&
+                    meteor.active
+            )
         ){
 
             this.destroyMeteor();
 
-            // ★実際に召喚隕石を破壊した
             Game.meteorClear = true;
 
         }
 
         // =====================
-        // ② 召喚隕石がなく、月がCHANCEの場合
+        // ② 月本体がCHANCE状態
         // =====================
 
-       else if(
-    Game.boss &&
-    Game.boss.active &&
-    Game.boss.attackState === "CHANCE" &&
-    Game.boss.phase === 2
-){
+        else if(
+            Game.boss &&
+            Game.boss.active &&
+            Game.boss.attackState === "CHANCE" &&
+            Game.boss.phase === 2
+        ){
 
-    // ★METEOR役によるボス攻撃
-    const damage =
-        Game.boss.hp * 0.5;
+            // ★ 月本体へのMETEOR攻撃
+            // ダメージ計算は今まで通り
 
-    // ★ボス撃破処理より先に判定フラグを準備
-    Game.meteorClear = true;
+            const damage =
+                Game.boss.hp * 0.5;
 
-    Game.boss.damage(damage);
+            Game.meteorClear = true;
 
-    // ★実際に月を倒した場合
-    if(Game.boss.hp <= 0){
+            Game.boss.damage(damage);
 
-        this.meteorFinish = true;
 
-        this.meteorFinishTimer = 100;
+            // =====================
+            // 月本体を撃破
+            // =====================
 
-        this.resultEffect = "meteorFinish";
+            if(
+                Game.boss.hp <= 0
+            ){
 
-        this.resultEffectTimer = 100;
+                this.meteorFinish = true;
 
-        this.stopTimer = 100;
+                this.meteorFinishTimer = 100;
 
-        this.resultTimer = 100;
+                this.resultEffect =
+                    "meteorFinish";
 
-        Camera.hitShake(80);
+                this.resultEffectTimer = 100;
 
-        console.log(
-            "★ METEOR FINISH : MOON DESTROYED ★"
-        );
+                this.stopTimer = 100;
 
-    }
-    else{
+                this.resultTimer = 100;
 
-        // ★倒せなかったのでフラグを戻す
-        Game.meteorClear = false;
+                Camera.hitShake(80);
 
-        Camera.hitShake(40);
+                console.log(
+                    "★ METEOR FINISH : MOON DESTROYED ★"
+                );
 
-        this.resultEffect = "meteor";
+            }
 
-        this.resultEffectTimer = 60;
+            // =====================
+            // 月を倒せなかった
+            // =====================
 
-        Sound.meteor();
+            else{
 
-    }
+                Game.meteorClear = false;
 
-}
+                Camera.hitShake(40);
+
+                this.resultEffect =
+                    "meteor";
+
+                this.resultEffectTimer = 60;
+
+                Sound.meteor();
+
+            }
+
+        }
 
         // =====================
-        // ③ それ以外
+        // ③ 対象がなくても
+        //    ☄役成立として扱う
         // =====================
 
         else{
 
             console.log(
-                "☄ METEOR役発動：対象なし"
+                "☄ METEOR役成立：BOSS条件成立"
             );
+
+            // ★ ダメージ処理は行わない
+            // ★ 特殊エンディング条件だけ成立
+
+            Game.meteorClear = true;
 
         }
 
@@ -1062,6 +1341,10 @@ if(this.meteorHit){
     }
 
 }
+
+}
+
+
 
 
 
@@ -1106,11 +1389,6 @@ this.resultEffectTimer=60;
 
        this.stopTimer=40;
 
-
-this.mode="RESULT";
-
-
-this.active=false;
 
 
 // ルーレット終了
@@ -1380,9 +1658,26 @@ if(
 
 
 
-        const startX=295;
-        const startY=220;
-        const size=70;
+        
+// =====================
+// スロットサイズ
+// =====================
+
+const size = 90;
+
+// 3列分を常に中央配置
+const slotWidth = size * 3;
+
+const startX =
+    400 - slotWidth / 2;
+
+const startY = 185;
+
+// スロット全体
+const slotHeight =
+    size * 3;
+
+
 
 
         // =====================================================
@@ -1719,94 +2014,176 @@ if(
 
 }
 
-        //====================
+
+// =====================
 // スロット筐体
-//====================
+// =====================
 
+// =====================
 // リーチ演出
-//====================
-// リーチ演出
-//====================
+// =====================
 
-let reachGlow = false;
+// リーチしている段だけ演出する
+const reachGlow =
+    this.reachEffectTimer > 0 &&
+    (
+        this.rowReach &&
+        (
+            this.rowReach[0] ||
+            this.rowReach[1] ||
+            this.rowReach[2]
+        )
+    );
 
-if(this.reachEffectTimer > 0){
 
-    reachGlow = true;
-
-}
-
+// =====================
+// リーチ演出の色
+// =====================
 
 if(reachGlow){
 
-    if(this.targetNumber==="☄"){
+    let reachColor = "#00ffff";
+    let reachBlur = 30;
 
-        ctx.shadowColor="#ff5500";
-        ctx.shadowBlur=60;
+    // 実際にリーチしている数字を見る
+    for(let y = 0; y < 3; y++){
+
+        if(
+            this.rowReach &&
+            this.rowReach[y]
+        ){
+
+            const value =
+                this.rowReachNumber[y];
+
+            // ☄リーチ
+            if(value === "☄"){
+
+                reachColor = "#ff5500";
+                reachBlur = 60;
+
+                break;
+
+            }
+
+            // ★リーチ
+            if(value === "★"){
+
+                reachColor = "#ffff00";
+                reachBlur = 40;
+
+                break;
+
+            }
+
+        }
 
     }
-    else if(this.targetNumber==="★"){
 
-        ctx.shadowColor="#ffff00";
-        ctx.shadowBlur=40;
-
-    }
-    else{
-
-        ctx.shadowColor="#00ffff";
-        ctx.shadowBlur=30;
-
-    }
+    ctx.shadowColor = reachColor;
+    ctx.shadowBlur = reachBlur;
 
 }
 
+
+
+// =====================
 // 外枠
-ctx.fillStyle = "#2b2f3a";
+// =====================
+
+const frameX =
+    startX - 45;
+
+const frameY =
+    startY - 75;
+
+const frameW =
+    slotWidth + 90;
+
+const frameH =
+    slotHeight + 170;
+
+
+ctx.fillStyle =
+    "#2b2f3a";
 
 ctx.beginPath();
+
 ctx.roundRect(
-    startX - 35,
-    startY - 60,
-    size * 3 + 65,
-    size * 3 + 120,
+    frameX,
+    frameY,
+    frameW,
+    frameH,
     18
 );
+
 ctx.fill();
 
 
+// =====================
 // 内枠
+// =====================
+
 const frame =
-ctx.createLinearGradient(
-    startX,
-    startY - 40,
-    startX,
-    startY + size * 3 + 40
+    ctx.createLinearGradient(
+        0,
+        frameY,
+        0,
+        frameY + frameH
+    );
+
+frame.addColorStop(
+    0,
+    "#3e5cff"
 );
 
-frame.addColorStop(0, "#3e5cff");
-frame.addColorStop(0.5, "#101830");
-frame.addColorStop(1, "#5fb7ff");
+frame.addColorStop(
+    0.5,
+    "#101830"
+);
 
-ctx.fillStyle = frame;
+frame.addColorStop(
+    1,
+    "#5fb7ff"
+);
+
+ctx.fillStyle =
+    frame;
 
 ctx.beginPath();
+
 ctx.roundRect(
-    startX - 20,
-    startY - 45,
-    size * 3 + 30,
-    size * 3 + 90,
+    frameX + 15,
+    frameY + 15,
+    frameW - 30,
+    frameH - 30,
     14
 );
+
 ctx.fill();
 
-ctx.fillStyle = "#ffffff";
 
-ctx.font = "bold 28px sans-serif";
+// =====================
+// タイトル
+// =====================
 
-ctx.textAlign = "center";
+ctx.fillStyle =
+    "#ffffff";
 
-ctx.shadowColor = "#55aaff";
-ctx.shadowBlur = 18;
+ctx.font =
+    "bold 28px sans-serif";
+
+ctx.textAlign =
+    "center";
+
+ctx.textBaseline =
+    "middle";
+
+ctx.shadowColor =
+    "#55aaff";
+
+ctx.shadowBlur =
+    18;
 
 ctx.fillText(
     "☄ METEOR SLOT ☄",
@@ -1816,40 +2193,49 @@ ctx.fillText(
 
 ctx.shadowBlur = 0;
 
-        //====================
-// スロット背景
-//====================
 
-ctx.fillStyle="#0b1024";
+
+// =====================
+// スロット背景
+// =====================
+
+const slotX = startX - 15;
+const slotY = startY - 15;
+
+const slotW = slotWidth + 30;
+const slotH = slotHeight + 30;
+
+ctx.fillStyle = "#0b1024";
 
 ctx.fillRect(
-    startX-20,
-    startY-20,
-    250,
-    250
+    slotX,
+    slotY,
+    slotW,
+    slotH
 );
 
-ctx.strokeStyle="#55ddff";
-ctx.lineWidth=4;
+ctx.strokeStyle = "#55ddff";
+ctx.lineWidth = 4;
 
 ctx.strokeRect(
-    startX-20,
-    startY-20,
-    250,
-    250
+    slotX,
+    slotY,
+    slotW,
+    slotH
 );
 
-ctx.shadowColor="#33ccff";
-ctx.shadowBlur=20;
+ctx.shadowColor = "#33ccff";
+ctx.shadowBlur = 20;
 
 ctx.strokeRect(
-    startX-20,
-    startY-20,
-    250,
-    250
+    slotX,
+    slotY,
+    slotW,
+    slotH
 );
 
-ctx.shadowBlur=0;
+ctx.shadowBlur = 0;
+
 
 
 
@@ -1977,10 +2363,10 @@ ctx.fillStyle=panel;
 ctx.beginPath();
 
 ctx.rect(
-    startX+x*size,
-    startY+y*size,
-    size-5,
-    size-5
+    startX + x * size,
+    startY + y * size,
+    size - 5,
+    size - 5
 );
 
 ctx.clip();
@@ -1989,23 +2375,23 @@ ctx.clip();
 
 const pos =
 (
-Math.floor(
- this.reelPos[x] * this.reels[x].length
-)
-+
-this.stopOffset[x]
-+
-this.reels[x].length
+    Math.floor(
+        this.reelPos[x] *
+        this.reels[x].length
+    )
+    +
+    this.rowStopOffset[x][y]
+    +
+    y
+    +
+    this.reels[x].length
 )
 %
-this.reels[x].length
+this.reels[x].length;
 
 
 let value =
-this.reels[x][
-(pos+y) % this.reels[x].length
-];
-
+this.reels[x][pos];
 
 if(value==="☄"){
 
@@ -2071,15 +2457,48 @@ else{
 }
 
 
+
+// =====================
+// シンボル表示
+// =====================
+
+const symbolX =
+    startX +
+    x * size +
+    size / 2;
+
+const symbolY =
+    startY +
+    y * size +
+    size / 2;
+
+let fontSize = 52;
+
+// ☄
+if(value === "☄"){
+
+    fontSize = 58;
+
+}
+// ★
+else if(value === "★"){
+
+    fontSize = 60;
+
+}
+
+ctx.font =
+    "bold " +
+    fontSize +
+    "px sans-serif";
+
 ctx.fillText(
-
     value,
-
-    startX+x*size+32,
-
-    startY+y*size+32
-
+    symbolX,
+    symbolY
 );
+
+
 
 ctx.shadowBlur=0;
 
@@ -2095,64 +2514,75 @@ ctx.restore();
 
       ctx.shadowBlur=0;
 
-        //====================
+
+// =====================
 // STOPボタン
-//====================
+// =====================
 
 const buttonY =
-startY + size*3 + 25;
+    startY +
+    slotHeight +
+    25;
+
+const buttonWidth = 75;
+const buttonHeight = 40;
+
+const buttonGap = 15;
+
+const totalButtonWidth =
+    buttonWidth * 3 +
+    buttonGap * 2;
+
+const buttonStartX =
+    400 -
+    totalButtonWidth / 2;
 
 
-for(let i=0;i<3;i++){
+for(let i = 0; i < 3; i++){
 
     const buttonX =
-    startX + i*70;
+        buttonStartX +
+        i * (buttonWidth + buttonGap);
 
-
-    // ボタン本体
 
     const grad =
-    ctx.createLinearGradient(
-        buttonX,
-        buttonY,
-        buttonX,
-        buttonY+35
-    );
+        ctx.createLinearGradient(
+            buttonX,
+            buttonY,
+            buttonX,
+            buttonY + buttonHeight
+        );
 
 
     if(this.stopLight[i]){
 
+        grad.addColorStop(
+            0,
+            "#55ff55"
+        );
 
-    grad.addColorStop(
-        0,
-        "#55ff55"
-    );
+        grad.addColorStop(
+            1,
+            "#008000"
+        );
 
-    grad.addColorStop(
-        1,
-        "#008000"
-    );
+    }
+    else{
 
+        grad.addColorStop(
+            0,
+            "#ff5555"
+        );
 
-}
-else{
+        grad.addColorStop(
+            1,
+            "#800000"
+        );
 
-
-    grad.addColorStop(
-        0,
-        "#ff5555"
-    );
-
-    grad.addColorStop(
-        1,
-        "#800000"
-    );
-
-
-}
+    }
 
 
-    ctx.fillStyle=grad;
+    ctx.fillStyle = grad;
 
 
     ctx.beginPath();
@@ -2160,42 +2590,38 @@ else{
     ctx.roundRect(
         buttonX,
         buttonY,
-        60,
-        35,
+        buttonWidth,
+        buttonHeight,
         8
     );
 
     ctx.fill();
 
 
-
-    // 枠
-
-    ctx.strokeStyle="#ffffff";
+    ctx.strokeStyle = "#ffffff";
 
     ctx.stroke();
 
 
+    ctx.fillStyle = "white";
 
-    // 文字
+    ctx.font =
+        "bold 17px sans-serif";
 
-    ctx.fillStyle="white";
+    ctx.textAlign = "center";
 
-    ctx.font="18px sans-serif";
-
-    ctx.textAlign="center";
-
-    ctx.textBaseline="middle";
+    ctx.textBaseline = "middle";
 
 
     ctx.fillText(
         "STOP",
-        buttonX+30,
-        buttonY+18
+        buttonX + buttonWidth / 2,
+        buttonY + buttonHeight / 2
     );
 
-
 }
+
+
 
 
 
@@ -2284,7 +2710,7 @@ ctx.font=
 ctx.fillText(
     text,
     400,
-    120
+    105
 );
 
 
