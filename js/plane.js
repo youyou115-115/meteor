@@ -495,15 +495,20 @@ if(this.cooldown <= 0){
 
     this.shoot();
 
-   if(
-    WaveBonus.current==="yellow" &&
-    !WaveBonus.yellowUsed
+  if(
+    WaveBonus.current === "yellow" &&
+    WaveBonus.yellowUsedCount < 3
 ){
 
     this.cooldown = 10;
 
-    WaveBonus.yellowUsed=true;
-    WaveBonus.current=null;
+    WaveBonus.yellowActive = true;
+    WaveBonus.yellowShots = 0;
+
+    WaveBonus.yellowUsedCount++;
+
+    WaveBonus.current = null;
+
 }
 else{
 

@@ -982,55 +982,60 @@ if(this.meteorHit){
         // ② 召喚隕石がなく、月がCHANCEの場合
         // =====================
 
-        else if(
-            Game.boss &&
-            Game.boss.active &&
-            Game.boss.attackState === "CHANCE" &&
-            Game.boss.phase === 2
-        ){
+       else if(
+    Game.boss &&
+    Game.boss.active &&
+    Game.boss.attackState === "CHANCE" &&
+    Game.boss.phase === 2
+){
 
-            const damage =
-                Game.boss.hp * 0.5;
+    // ★METEOR役によるボス攻撃
+    const damage =
+        Game.boss.hp * 0.5;
 
-            Game.boss.damage(damage);
+    // ★ボス撃破処理より先に判定フラグを準備
+    Game.meteorClear = true;
 
-            // ★本当に月を倒した場合だけ
-            if(Game.boss.hp <= 0){
+    Game.boss.damage(damage);
 
-                Game.meteorClear = true;
+    // ★実際に月を倒した場合
+    if(Game.boss.hp <= 0){
 
-                this.meteorFinish = true;
+        this.meteorFinish = true;
 
-                this.meteorFinishTimer = 100;
+        this.meteorFinishTimer = 100;
 
-                this.resultEffect = "meteorFinish";
+        this.resultEffect = "meteorFinish";
 
-                this.resultEffectTimer = 100;
+        this.resultEffectTimer = 100;
 
-                this.stopTimer = 100;
+        this.stopTimer = 100;
 
-                this.resultTimer = 100;
+        this.resultTimer = 100;
 
-                Camera.hitShake(80);
+        Camera.hitShake(80);
 
-                console.log(
-                    "★ METEOR FINISH : MOON DESTROYED ★"
-                );
+        console.log(
+            "★ METEOR FINISH : MOON DESTROYED ★"
+        );
 
-            }
-            else{
+    }
+    else{
 
-                Camera.hitShake(40);
+        // ★倒せなかったのでフラグを戻す
+        Game.meteorClear = false;
 
-                this.resultEffect = "meteor";
+        Camera.hitShake(40);
 
-                this.resultEffectTimer = 60;
+        this.resultEffect = "meteor";
 
-                Sound.meteor();
+        this.resultEffectTimer = 60;
 
-            }
+        Sound.meteor();
 
-        }
+    }
+
+}
 
         // =====================
         // ③ それ以外
@@ -1285,14 +1290,11 @@ if(bonusHit === "green"){
 
     // 黄色
     else if(
-    bonusHit==="yellow" &&
-    !WaveBonus.yellowUsed
+    bonusHit==="yellow" 
 ){
 
 
         WaveBonus.yellowActive=true;
-
-        WaveBonus.yellowUsed=true;
 
         WaveBonus.yellowShots=0;
 
@@ -1320,7 +1322,7 @@ if(
 ){
 
         this.effectMessage =
-        "GREEN BONUS\n隕石を押し返す力UP";
+        "GREEN BONUS\n援軍到着！！";
 
     }
 

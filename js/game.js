@@ -1178,6 +1178,27 @@ startBossWave(){
 
 finishBossWave(){
 
+        // =====================
+    // ☄ METEOR FINISH 最優先
+    // =====================
+
+    if(this.meteorClear){
+
+        this.bossPhase = "NONE";
+
+        this.bossWave = false;
+
+        this.bossStarted = false;
+
+        this.bossMeteors = [];
+
+        this.startSpecialClear();
+
+        return;
+
+    }
+
+
     // =====================
     // WAVE 5
     // GAME CLEAR
@@ -1193,18 +1214,6 @@ finishBossWave(){
 
         this.bossMeteors = [];
 
-
-            // =====================
-    // METEOR役クリア
-    // =====================
-
-    if(this.meteorClear){
-
-        this.startSpecialClear();
-
-        return;
-
-    }
 
         this.state = "CLEAR";
 

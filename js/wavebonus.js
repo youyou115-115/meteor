@@ -17,7 +17,7 @@ current:null,
 active:false,
 
 
-yellowUsed:false,
+yellowUsedCount:0,
 
 yellowActive:false,
 yellowShots:0,
@@ -44,7 +44,7 @@ timer:0,
 
     this.active=false;
 
-    this.yellowUsed=false;
+    this.yellowUsedCount=0;
 
     this.yellowActive=false;
 
@@ -97,7 +97,7 @@ timer:0,
         this.yellow = numbers[2];
 
 
-        this.yellowUsed = false;
+        this.yellowUsedCount = 0;
         this.blueSpin = false;
 
 
