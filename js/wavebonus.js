@@ -212,7 +212,7 @@ SPECIAL BONUS
 
         ctx.fillText(
             "🟢 GREEN  : "+this.green+
-            "  隕石を押し返す",
+            "  援軍到着！！",
             400,
             300
         );

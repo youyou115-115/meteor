@@ -107,7 +107,7 @@ const WaveBonusUI = {
 
         ctx.fillText(
             "GREEN  "+WaveBonus.green+
-            " : 隕石を押し返す",
+            " : 援軍到着！！",
             400,
             500
         );

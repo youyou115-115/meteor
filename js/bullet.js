@@ -225,64 +225,70 @@ update(){
         }
 
 
-        // =====================
-        // 月本体
-        // =====================
 
-        if(
-            Game.boss &&
-            Game.boss.active &&
-            Game.boss.attackState === "CHANCE"
-        ){
+// =====================
+// 月本体
+// 第1形態 CHANCE
+// 第2形態 SECOND
+// =====================
 
-            const dx =
-                this.x - Game.boss.x;
+if(
+    Game.boss &&
+    Game.boss.active &&
+    (
+        Game.boss.attackState === "CHANCE" ||
+        Game.boss.phase === 2
+    )
+){
 
-            const dy =
-                this.y - Game.boss.y;
+    const dx =
+        this.x - Game.boss.x;
 
+    const dy =
+        this.y - Game.boss.y;
 
-            const d =
-                Math.sqrt(
-                    dx*dx +
-                    dy*dy
-                );
-
-
-            if(d < Game.boss.radius){
-
-                if(this.powerBullet){
-
-                    this.exploding = true;
-
-                    this.explosionTimer = 20;
-
-                    this.explosionRadius = 0;
-
-                    this.explosionDamage = false;
+    const d =
+        Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
 
 
-                    this.vx = 0;
+    if(d < Game.boss.radius){
 
-                    this.vy = 0;
+        if(this.powerBullet){
 
-                }
-                else{
+            this.exploding = true;
 
-                    Game.boss.damage(5);
+            this.explosionTimer = 20;
 
-                    Sound.planeShot();
+            this.explosionRadius = 0;
 
-                    this.active = false;
+            this.explosionDamage = false;
 
-                }
+            this.explosionTarget = null;
 
-
-                return;
-
-            }
+            this.vx = 0;
+            this.vy = 0;
 
         }
+        else{
+
+            Game.boss.damage(5);
+
+            Sound.planeShot();
+
+            this.active = false;
+
+        }
+
+        return;
+
+    }
+
+}
+
+
 
 
         return;

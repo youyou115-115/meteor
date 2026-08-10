@@ -130,10 +130,20 @@ getTarget(){
     // BOSS戦
     // =====================
 
-    if(
-        Game.bossWave &&
-        Game.bossPhase === "BATTLE"
-    ){
+
+if(
+    Game.bossWave &&
+    (
+        Game.bossPhase === "BATTLE" ||
+        (
+            Game.boss &&
+            Game.boss.active &&
+            Game.boss.phase === 2
+        )
+    )
+){
+
+
 
         // 生きている召喚隕石を探す
         if(
