@@ -399,7 +399,7 @@ if(this.dying){
 
     if(
     this.phase === 1 &&
-    this.hp < 450
+    this.hp < 500
 ){
 
     this.phase = 2;
@@ -755,13 +755,13 @@ applyDebuff(){
         this.hp =
             Math.min(
                 this.maxHp,
-                this.hp + 100
+                this.hp + 150
             );
 
         this.debuffType = "HEAL";
 
         this.debuffMessage =
-            "MOON HEAL +100";
+            "MOON HEAL +150";
 
     }
 
