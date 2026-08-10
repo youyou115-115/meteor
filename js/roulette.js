@@ -2303,6 +2303,15 @@ if(this.effectMessageTimer > 0){
 
     this.effectMessageTimer -= Game.deltaTime;
 
+
+    // undefined / null / 空文字なら表示しない
+    if(
+        this.effectMessage === undefined ||
+        this.effectMessage === null 
+    ){
+        return;
+    }
+
     ctx.save();
 
     ctx.fillStyle="rgba(0,0,0,0.65)";
