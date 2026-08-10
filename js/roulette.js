@@ -563,15 +563,25 @@ this.rowStopOffset[1] = [0, 0, 0];
 const candidates = [];
 
 
-// 左と同じ図柄が中央リールに存在する段を候補にする
+// =====================
+// 左と同じ図柄が中央に
+// 存在する段を候補にする
+// =====================
+
 for(let y = 0; y < 3; y++){
 
-    const target = leftGrid[y];
+    const target =
+        leftGrid[y];
 
-    // ☄・★も候補
-    for(let i = 0; i < this.reels[1].length; i++){
+    for(
+        let i = 0;
+        i < this.reels[1].length;
+        i++
+    ){
 
-        if(this.reels[1][i] === target){
+        if(
+            this.reels[1][i] === target
+        ){
 
             candidates.push(y);
 
@@ -585,51 +595,101 @@ for(let y = 0; y < 3; y++){
 
 
 // =====================
-// 最大1段だけ補正
+// 補正候補
 // =====================
 
+const reachCandidates = [];
+
+
 // =====================
-// 中央リール補正率
+// 各段ごとに確率判定
 // =====================
 
-// 通常数字
-let reachChance =
-    0.7 +
-    (Game.wave - 1) * 0.03;
+for(const y of candidates){
 
-reachChance =
-    Math.min(reachChance, 0.9);
+    const target =
+        leftGrid[y];
 
 
-// ☄・★だけ30%固定
-if(
-    target === "☄" ||
-    target === "★"
-){
+    // =====================
+    // 通常数字
+    // Waveが進むほどアップ
+    // =====================
 
-    reachChance = 0.30;
+    let reachChance =
+        0.70 +
+        (Game.wave - 1) * 0.03;
+
+
+    // 最大90%
+    reachChance =
+        Math.min(
+            reachChance,
+            0.90
+        );
+
+
+    // =====================
+    // ☄・★
+    // 30%固定
+    // =====================
+
+    if(
+        target === "☄" ||
+        target === "★"
+    ){
+
+        reachChance = 0.30;
+
+    }
+
+
+    // =====================
+    // 補正成功
+    // =====================
+
+    if(
+        Math.random() < reachChance
+    ){
+
+        reachCandidates.push(y);
+
+    }
 
 }
 
 
-if(Math.random() < reachChance){
+// =====================
+// 最大1段だけ補正
+// =====================
 
-    // 候補から1段だけ選ぶ
+if(
+    reachCandidates.length > 0
+){
+
     const y =
-        candidates[
+        reachCandidates[
             Math.floor(
-                Math.random() * candidates.length
+                Math.random() *
+                reachCandidates.length
             )
         ];
 
+
     const target =
         leftGrid[y];
+
 
     const current =
         Math.floor(
             this.reelPos[1] *
             this.reels[1].length
         );
+
+
+    // =====================
+    // 対応する図柄を探す
+    // =====================
 
     for(
         let i = 0;
@@ -642,7 +702,9 @@ if(Math.random() < reachChance){
         ){
 
             this.rowStopOffset[1][y] =
-                i - current - y;
+                i -
+                current -
+                y;
 
             break;
 

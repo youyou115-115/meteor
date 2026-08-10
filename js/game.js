@@ -79,6 +79,7 @@ meteorClear:false,
 // =====================
 
 specialClear:false,
+specialClearMeteor:null,
 
 // 0 = 月登場
 // 1 = 「それはあかんやろ」
@@ -706,247 +707,7 @@ for(let i = this.bossMeteors.length - 1; i >= 0; i--){
 
 },
 
-updateSpecialClear(){
 
-    this.specialClearTimer -=
-        this.deltaTime;
-
-    this.clearAnimation +=
-        this.deltaTime;
-
-
-    // =====================================================
-    // PHASE 0
-    // 月が登場
-    // =====================================================
-
-    if(this.specialClearPhase === 0){
-
-        const progress =
-            1 -
-            Math.max(
-                0,
-                this.specialClearTimer / 70
-            );
-
-        // 月が小さい状態から巨大化
-        this.specialClearMoonRadius =
-            20 +
-            progress * 100;
-
-        // 少し上から落ちてくる
-        this.specialClearMoonY =
-            260 +
-            progress * 90;
-
-        // 登場時の光
-        this.specialClearFlash =
-            Math.max(
-                0,
-                1 - progress * 1.5
-            );
-
-        if(this.specialClearTimer <= 0){
-
-            this.specialClearPhase = 1;
-
-            this.specialClearTimer = 100;
-
-            this.specialClearMoonRadius = 100;
-
-            this.specialClearMoonY = 350;
-
-            Camera.hitShake(15);
-
-        }
-
-    }
-
-
-    // =====================================================
-    // PHASE 1
-    // 「それはあかんやろ」
-    // =====================================================
-
-    else if(this.specialClearPhase === 1){
-
-        const progress =
-            1 -
-            Math.max(
-                0,
-                this.specialClearTimer / 100
-            );
-
-        // 文字を徐々に表示
-        this.specialClearMessageAlpha =
-            Math.min(
-                1,
-                progress * 3
-            );
-
-        // 月が少し揺れる
-        this.specialClearMoonX =
-            400 +
-            Math.sin(
-                this.clearAnimation * 0.18
-            ) * 3;
-
-        if(this.specialClearTimer <= 0){
-
-            this.specialClearPhase = 2;
-
-            this.specialClearTimer = 110;
-
-            this.specialClearExplosion = 0;
-
-            this.specialClearFlash = 1;
-
-            Camera.hitShake(35);
-            
-
-              // =====================================
-    // ボス撃破音
-    // =====================================
-
-    Sound.gameOver();
-
-    Camera.hitShake(35);
-
-            // =====================
-            // 亀裂生成
-            // =====================
-
-            this.specialClearCracks = [];
-
-            for(let i = 0; i < 30; i++){
-
-                const angle =
-                    Math.random() *
-                    Math.PI *
-                    2;
-
-                const length =
-                    80 +
-                    Math.random() * 300;
-
-                this.specialClearCracks.push({
-
-                    angle:angle,
-
-                    length:length,
-
-                    width:
-                        1 +
-                        Math.random() * 3
-
-                });
-
-            }
-
-        }
-
-    }
-
-
-    // =====================================================
-    // PHASE 2
-    // 爆発
-    // =====================================================
-
-    else if(this.specialClearPhase === 2){
-
-        const progress =
-            1 -
-            Math.max(
-                0,
-                this.specialClearTimer / 110
-            );
-
-        this.specialClearExplosion =
-            progress;
-
-        // =====================
-        // 爆発フラッシュ
-        // =====================
-
-        this.specialClearFlash =
-            Math.max(
-                0,
-                1 - progress * 2
-            );
-
-        // =====================
-        // 激しく振動
-        // =====================
-
-        this.specialClearMoonX =
-            400 +
-            (
-                Math.random() - 0.5
-            ) *
-            18 *
-            progress;
-
-        this.specialClearMoonY =
-            350 +
-            (
-                Math.random() - 0.5
-            ) *
-            18 *
-            progress;
-
-        Camera.hitShake(
-            Math.floor(
-                8 +
-                progress * 35
-            )
-        );
-
-
-        if(this.specialClearTimer <= 0){
-
-            this.specialClearPhase = 3;
-
-            this.specialClearTimer = 100;
-
-            this.specialClearExplosion = 1;
-
-            Camera.hitShake(45);
-
-        }
-
-    }
-
-
-    // =====================================================
-    // PHASE 3
-    // 終了
-    // =====================================================
-
-    else if(this.specialClearPhase === 3){
-
-        this.specialClearTimer -=
-            this.deltaTime;
-
-        if(this.specialClearTimer <= 0){
-
-    this.specialClear = false;
-
-    this.meteorClear = false;
-
-    this.specialClearPhase = 0;
-
-    this.specialClearExplosion = 0;
-
-    this.specialClearCracks = [];
-
-    this.toTitle();
-
-}
-
-    }
-
-},
 
 
 
@@ -1284,24 +1045,59 @@ startSpecialClear(){
     console.log("☄ METEOR FINISH!");
 
     this.state = "SPECIAL_CLEAR";
-
     this.specialClear = true;
 
-    // =====================
+    // =========================
+    // 特殊エンディング隕石
+    // プレイヤーに降っていた隕石
+    // =========================
+
+    this.specialClearMeteor = {
+
+        x: 400,
+        y: -100,
+
+        targetX: 400,
+        targetY: 350,
+
+        radius: 28,
+
+        speed: 14,
+
+        active: true,
+
+        embedded: false
+
+    };
+
+
+    // =========================
     // 初期化
-    // =====================
+    // =========================
 
     this.specialClearPhase = 0;
 
-    this.specialClearTimer = 70;
+    // Phase 0
+    // 月登場 → 隕石飛来 → 直撃
+    this.specialClearTimer = 100;
 
     this.clearAnimation = 0;
 
+
+    // =========================
+    // 月
+    // =========================
+
     this.specialClearMoonX = 400;
+
     this.specialClearMoonY = 350;
 
-    // 最初は小さい
-    this.specialClearMoonRadius = 10;
+    this.specialClearMoonRadius = 100;
+
+
+    // =========================
+    // 演出値
+    // =========================
 
     this.specialClearFlash = 0;
 
@@ -1313,9 +1109,10 @@ startSpecialClear(){
 
     this.specialClearCracks = [];
 
-    // =====================
+
+    // =========================
     // ゲーム停止
-    // =====================
+    // =========================
 
     Roulette.active = false;
     Roulette.visible = false;
@@ -1329,20 +1126,382 @@ startSpecialClear(){
     this.planes = [];
     this.bullets = [];
 
-    // =====================
+
+    // =========================
     // BGM停止
-    // =====================
+    // =========================
 
     Sound.stopBGM();
 
-    // =====================
-    // 初期衝撃
-    // =====================
-
-    Camera.hitShake(20);
+    Camera.hitShake(10);
 
 },
 
+updateSpecialClear(){
+
+    this.specialClearTimer -= this.deltaTime;
+
+    this.clearAnimation += this.deltaTime;
+
+
+    // =====================================================
+    // PHASE 0
+    //
+    // 月登場
+    // ↓
+    // プレイヤー隕石が上から飛来
+    // ↓
+    // 月へ直撃
+    // ↓
+    // めり込む
+    // =====================================================
+
+    if(this.specialClearPhase === 0){
+
+        const progress =
+            Math.min(
+                1,
+                Math.max(
+                    0,
+                    1 -
+                    this.specialClearTimer / 100
+                )
+            );
+
+
+        // =============================================
+        // 月の位置
+        // =============================================
+
+        this.specialClearMoonX = 400;
+
+        this.specialClearMoonY = 350;
+
+        this.specialClearMoonRadius =
+            30 +
+            Math.min(
+                1,
+                progress * 2
+            ) * 70;
+
+
+        // =============================================
+        // 隕石
+        // =============================================
+
+        const meteor =
+            this.specialClearMeteor;
+
+
+        if(
+            meteor &&
+            meteor.active &&
+            !meteor.embedded
+        ){
+
+            meteor.targetX =
+                this.specialClearMoonX;
+
+            meteor.targetY =
+                this.specialClearMoonY;
+
+
+            const dx =
+                meteor.targetX -
+                meteor.x;
+
+            const dy =
+                meteor.targetY -
+                meteor.y;
+
+
+            const distance =
+                Math.sqrt(
+                    dx * dx +
+                    dy * dy
+                );
+
+
+            // =========================================
+            // 月がある程度出てから隕石飛来
+            // =========================================
+
+            if(progress > 0.25){
+
+                if(distance > meteor.speed){
+
+                    meteor.x +=
+                        dx / distance *
+                        meteor.speed;
+
+                    meteor.y +=
+                        dy / distance *
+                        meteor.speed;
+
+                }
+                else{
+
+                    // =================================
+                    // ☄ 月へ直撃
+                    // =================================
+
+                    meteor.x =
+                        meteor.targetX;
+
+                    meteor.y =
+                        meteor.targetY;
+
+                    meteor.embedded = true;
+
+                    Camera.hitShake(25);
+
+                    // 直撃フラッシュ
+                    this.specialClearFlash = 1;
+
+                }
+
+            }
+
+        }
+
+
+        // =============================================
+        // 隕石がめり込んだら
+        // 少しだけ衝撃を見せてから爆発
+        // =============================================
+
+        if(
+            meteor &&
+            meteor.embedded
+        ){
+
+            this.specialClearTimer -=
+                this.deltaTime * 2;
+
+
+            // 月の衝撃揺れ
+            this.specialClearMoonX =
+                400 +
+                Math.sin(
+                    this.clearAnimation * 1.8
+                ) * 4;
+
+
+            this.specialClearMoonY =
+                350 +
+                Math.cos(
+                    this.clearAnimation * 1.5
+                ) * 3;
+
+
+            // 直撃後の短い時間
+            if(this.specialClearTimer <= 20){
+
+                this.specialClearPhase = 1;
+
+                this.specialClearTimer = 100;
+
+                this.specialClearExplosion = 0;
+
+                this.specialClearFlash = 1;
+
+                Camera.hitShake(35);
+
+                Sound.gameOver();
+
+
+                // =====================================
+                // 爆発用亀裂
+                // =====================================
+
+                this.specialClearCracks = [];
+
+                for(let i = 0; i < 36; i++){
+
+                    const angle =
+                        Math.random() *
+                        Math.PI *
+                        2;
+
+                    const length =
+                        50 +
+                        Math.random() *
+                        180;
+
+
+                    this.specialClearCracks.push({
+
+                        angle: angle,
+
+                        length: length,
+
+                        width:
+                            1 +
+                            Math.random() * 3
+
+                    });
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    // =====================================================
+    // PHASE 1
+    //
+    // 月が爆発
+    // =====================================================
+
+    else if(this.specialClearPhase === 1){
+
+        const progress =
+            Math.min(
+                1,
+                Math.max(
+                    0,
+                    1 -
+                    this.specialClearTimer / 100
+                )
+            );
+
+
+        this.specialClearExplosion =
+            progress;
+
+
+        // =============================================
+        // 月の激しい揺れ
+        // =============================================
+
+        this.specialClearMoonX =
+            400 +
+            (
+                Math.random() -
+                0.5
+            ) *
+            20 *
+            progress;
+
+
+        this.specialClearMoonY =
+            350 +
+            (
+                Math.random() -
+                0.5
+            ) *
+            20 *
+            progress;
+
+
+        // =============================================
+        // 爆発フラッシュ
+        // =============================================
+
+        this.specialClearFlash =
+            Math.max(
+                0,
+                1 -
+                progress * 1.5
+            );
+
+
+        // =============================================
+        // カメラシェイク
+        // =============================================
+
+        Camera.hitShake(
+            Math.floor(
+                10 +
+                progress * 35
+            )
+        );
+
+
+        // =============================================
+        // 爆発終了
+        // =============================================
+
+        if(this.specialClearTimer <= 0){
+
+            this.specialClearPhase = 2;
+
+            this.specialClearTimer = 80;
+
+            this.specialClearExplosion = 1;
+
+            this.specialClearFlash = 1;
+
+            Camera.hitShake(45);
+
+        }
+
+    }
+
+
+    // =====================================================
+    // PHASE 2
+    //
+    // 爆発後
+    // ↓
+    // 白フラッシュ
+    // ↓
+    // タイトル
+    // =====================================================
+
+    else if(this.specialClearPhase === 2){
+
+        const progress =
+            Math.min(
+                1,
+                Math.max(
+                    0,
+                    1 -
+                    this.specialClearTimer / 80
+                )
+            );
+
+
+        this.specialClearExplosion = 1;
+
+
+        // 最初は白
+        this.specialClearFlash =
+            Math.max(
+                0,
+                1 -
+                progress * 1.2
+            );
+
+
+        // =============================================
+        // タイトルへ
+        // =============================================
+
+        if(this.specialClearTimer <= 0){
+
+            this.specialClear = false;
+
+            this.meteorClear = false;
+
+            this.specialClearPhase = 0;
+
+            this.specialClearExplosion = 0;
+
+            this.specialClearCracks = [];
+
+            this.specialClearMeteor = null;
+
+            this.toTitle();
+
+        }
+
+    }
+
+},
 
 toTitle(){
 
