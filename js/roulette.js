@@ -2334,13 +2334,17 @@ if(this.effectMessageTimer > 0){
     ctx.fillStyle="#ffffff";
     ctx.font="bold 28px sans-serif";
 
-    const lines=this.effectMessage.split("\n");
+   const lines = String(this.effectMessage || "").split("\n");
 
+    if(lines[0]){
     ctx.fillText(lines[0],400,550);
+}
 
-    ctx.font="bold 22px sans-serif";
+ctx.font="bold 22px sans-serif";
 
+if(lines[1]){
     ctx.fillText(lines[1],400,585);
+}
 
     ctx.restore();
 }
