@@ -1032,6 +1032,20 @@ if(this.bossPhase === "WARNING"){
         // 最初の隕石召喚
         this.boss.summonMeteors();
 
+        // =====================
+// ボス戦用飛行機
+// =====================
+
+this.planes = [];
+
+this.planes.push(
+    new Plane("left")
+);
+
+this.planes.push(
+    new Plane("right")
+);
+
            // =====================
     // スロットチャージリセット
     // =====================
