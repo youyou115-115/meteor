@@ -1337,38 +1337,212 @@ startSpecialClear(){
 
 toTitle(){
 
+    // =====================
+    // TITLE
+    // =====================
 
-    this.state="TITLE";
+    this.state = "TITLE";
 
-    this.titleBGMStarted=false;
-
-
-    this.meteor.reset();
-
-
-    this.coin.reset();
+    this.titleBGMStarted = false;
 
 
-    Roulette.active=false;
+    // =====================
+    // 通常オブジェクト完全停止
+    // =====================
 
-    Roulette.stopTimer=0;
+    if(this.meteor){
+
+        this.meteor.reset();
+
+        this.meteor.active = false;
+
+        this.meteor.destroying = false;
+
+    }
 
 
-    this.coinCount=3;
+    if(this.coin){
+
+        this.coin.reset();
+
+        this.coin.active = false;
+
+    }
 
 
-    this.power=1;
+    // =====================
+    // BOSS完全消去
+    // =====================
+
+    if(this.boss){
+
+        this.boss.active = false;
+
+        this.boss.dying = false;
+
+        this.boss.explosionTimer = 0;
+
+        this.boss.explosionParticles = [];
+
+        this.boss.damageFlash = 0;
+
+        this.boss.transformTimer = 0;
+
+        this.boss.laughing = false;
+
+        this.boss.mouthOpen = false;
+
+    }
+
+    this.boss = null;
+
+    this.bossMeteors = [];
 
 
-    this.impactFlash=0;
+    // =====================
+    // 飛行機・弾
+    // =====================
 
-    this.bonusHelpShown=false;
+    this.planes = [];
+
+    this.bullets = [];
 
 
-    Camera.shake=0;
+    // =====================
+    // ルーレット完全停止
+    // =====================
+
+    Roulette.active = false;
+
+    Roulette.visible = false;
+
+    Roulette.mode = "IDLE";
+
+    Roulette.stopTimer = 0;
+
+    Roulette.resultTimer = 0;
+
+    Roulette.reachWait = false;
+
+    Roulette.reachNumber = null;
+
+
+    // =====================
+    // ボス状態
+    // =====================
+
+    this.bossWave = false;
+
+    this.bossPhase = "NONE";
+
+    this.bossTimer = 0;
+
+    this.bossWarningTimer = 0;
+
+    this.bossWarningActive = false;
+
+    this.bossCurtain = 0;
+
+    this.bossStarted = false;
+
+
+    // =====================
+    // CLEAR演出完全消去
+    // =====================
+
+    this.clearTimer = 0;
+
+    this.clearAnimation = 0;
+
+
+    // =====================
+    // SPECIAL CLEAR完全消去
+    // =====================
+
+    this.specialClear = false;
+
+    this.meteorClear = false;
+
+    this.specialClearPhase = 0;
+
+    this.specialClearTimer = 0;
+
+    this.specialClearMoonX = 400;
+
+    this.specialClearMoonY = 350;
+
+    this.specialClearMoonRadius = 0;
+
+    this.specialClearFlash = 0;
+
+    this.specialClearShake = 0;
+
+    this.specialClearExplosion = 0;
+
+    this.specialClearCracks = [];
+
+    this.specialClearMessageAlpha = 0;
+
+
+    // =====================
+    // 画面演出完全消去
+    // =====================
+
+    this.impactFlash = 0;
+
+    this.screenCrack = 0;
+
+    this.cracks = [];
+
+
+    // =====================
+    // カメラ演出完全消去
+    // =====================
+
+    Camera.shake = 0;
+
+
+    // =====================
+    // ボーナス完全消去
+    // =====================
+
+    this.showBonusHelp = false;
+
+    this.bonusHelpWait = false;
+
+    this.bonusHelpReady = false;
+
+    this.bonusHelpShown = false;
+
+    WaveBonus.timer = 0;
+
+    WaveBonusUI.timer = 0;
+
+    WaveBonusUI.active = false;
+
+
+    // =====================
+    // ゲーム値
+    // =====================
+
+    this.coinCount = 3;
+
+    this.power = 1;
+
     this.wave = 1;
 
+    this.slotCharge = 0;
 
+    this.slotCharging = false;
+
+    this.slotAutoStart = true;
+
+
+    // =====================
+    // BGM
+    // =====================
+
+    Sound.stopBGM();
 
 }
 
