@@ -16,6 +16,9 @@ effectMessage:"",
 effectMessageTimer:0,
 meteorHit:false,
 
+meteorFinish:false,
+meteorFinishTimer:0,
+
 
     active:false,
 
@@ -162,6 +165,9 @@ this.reels=[
     this.reachEffectTimer=0;
     this.reachLine=null;
     this.meteorHit = false;
+
+    this.meteorFinish = false;
+this.meteorFinishTimer = 0;
 
         // ★追加
     this.stopped=[
@@ -960,6 +966,37 @@ if(this.meteorHit){
 
 Game.boss.damage(damage);
 
+// WAVE5のボスをMETEOR役で倒した
+if(
+    Game.wave === 5 &&
+    Game.boss &&
+    Game.boss.hp <= 0
+){
+
+    Game.meteorClear = true;
+
+    // =====================
+    // METEOR FINISH
+    // =====================
+
+    this.meteorFinish = true;
+
+    this.meteorFinishTimer = 100;
+
+    this.resultEffect = "meteorFinish";
+
+    this.resultEffectTimer = 100;
+
+    this.stopTimer = 100;
+
+    this.resultTimer = 100;
+
+    Camera.hitShake(80);
+
+    console.log("★ METEOR FINISH ★");
+
+}
+
         // 強烈なヒット演出
         Camera.hitShake(40);
 
@@ -997,7 +1034,12 @@ Game.boss.damage(damage);
 this.resultEffect="normal";
 
 
-if(this.meteorHit){
+if(this.meteorFinish){
+
+    this.resultEffect="meteorFinish";
+
+}
+else if(this.meteorHit){
 
     this.resultEffect="meteor";
 
@@ -1039,13 +1081,22 @@ this.active=false;
 
 
 // 結果表示時間
-this.resultTimer = 25;
+this.resultTimer =
+    this.meteorFinish
+    ? 100
+    : 25;
 
-if(this.resultEffect==="meteor"){
+if(this.resultEffect==="meteorFinish"){
 
-     Camera.hitShake(60);
+    // METEOR FINISH
+    Camera.hitShake(80);
 
-       Sound.meteor();
+}
+else if(this.resultEffect==="meteor"){
+
+    Camera.hitShake(60);
+
+    Sound.meteor();
 
 }
 else if(this.resultEffect==="star"){
@@ -1292,6 +1343,326 @@ if(
         const size=70;
 
 
+        // =====================================================
+// ★ METEOR FINISH
+// =====================================================
+
+if(
+    this.meteorFinish &&
+    this.meteorFinishTimer > 0
+){
+
+    this.meteorFinishTimer -= Game.deltaTime;
+
+
+    const t =
+        1 -
+        this.meteorFinishTimer / 100;
+
+
+    // =====================
+    // フラッシュ
+    // =====================
+
+    let flashAlpha = 0;
+
+    if(t < 0.18){
+
+        flashAlpha =
+            1 -
+            t / 0.18;
+
+    }
+    else{
+
+        flashAlpha =
+            Math.max(
+                0,
+                0.35 -
+                t * 0.35
+            );
+
+    }
+
+
+    ctx.fillStyle =
+        `rgba(255,120,20,${flashAlpha})`;
+
+    ctx.fillRect(
+        0,
+        0,
+        800,
+        700
+    );
+
+
+    // =====================
+    // 巨大衝撃波
+    // =====================
+
+    const ringRadius =
+        80 +
+        t * 620;
+
+
+    const ringAlpha =
+        Math.max(
+            0,
+            1 - t
+        );
+
+
+    ctx.save();
+
+    ctx.strokeStyle =
+        `rgba(255,100,20,${ringAlpha})`;
+
+    ctx.lineWidth =
+        12 * (1 - t * 0.6);
+
+    ctx.shadowColor =
+        "#ff3300";
+
+    ctx.shadowBlur =
+        35;
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        400,
+        350,
+        ringRadius,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.stroke();
+
+
+    // =====================
+    // 2本目の衝撃波
+    // =====================
+
+    if(t > 0.08){
+
+        const ring2 =
+            40 +
+            (t - 0.08) * 700;
+
+        ctx.strokeStyle =
+            `rgba(255,220,80,${Math.max(
+                0,
+                0.8 - t
+            )})`;
+
+        ctx.lineWidth = 6;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            400,
+            350,
+            ring2,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    ctx.restore();
+
+
+    // =====================
+    // 放射状の衝撃線
+    // =====================
+
+    ctx.save();
+
+    ctx.translate(400,350);
+
+    const lineAlpha =
+        Math.max(
+            0,
+            1 - t * 1.2
+        );
+
+
+    ctx.strokeStyle =
+        `rgba(255,170,40,${lineAlpha})`;
+
+    ctx.lineWidth = 4;
+
+    ctx.shadowColor =
+        "#ff4400";
+
+    ctx.shadowBlur = 20;
+
+
+    for(let i = 0; i < 20; i++){
+
+        const angle =
+            (Math.PI * 2 / 20) * i;
+
+        const inner =
+            100 + t * 250;
+
+        const outer =
+            180 + t * 420;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            Math.cos(angle) * inner,
+            Math.sin(angle) * inner
+        );
+
+        ctx.lineTo(
+            Math.cos(angle) * outer,
+            Math.sin(angle) * outer
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    ctx.restore();
+
+
+    // =====================
+    // METEOR FINISH
+    // =====================
+
+    const scale =
+        1 +
+        Math.sin(t * Math.PI) * 0.12;
+
+
+    ctx.save();
+
+    ctx.translate(
+        400,
+        285
+    );
+
+    ctx.scale(
+        scale,
+        scale
+    );
+
+
+    ctx.textAlign =
+        "center";
+
+    ctx.textBaseline =
+        "middle";
+
+
+    ctx.font =
+        "italic bold 72px sans-serif";
+
+
+    ctx.shadowColor =
+        "#ff2200";
+
+    ctx.shadowBlur =
+        40;
+
+
+    ctx.fillStyle =
+        "#fff4c0";
+
+
+    ctx.fillText(
+        "METEOR",
+        0,
+        -25
+    );
+
+
+    ctx.fillStyle =
+        "#ff5a00";
+
+
+    ctx.fillText(
+        "FINISH",
+        0,
+        50
+    );
+
+
+    // =====================
+    // 白いハイライト
+    // =====================
+
+    ctx.shadowColor =
+        "#ffffff";
+
+    ctx.shadowBlur =
+        12;
+
+    ctx.fillStyle =
+        "rgba(255,255,255,0.85)";
+
+
+    ctx.font =
+        "bold 16px sans-serif";
+
+
+    ctx.fillText(
+        "★ FINAL IMPACT ★",
+        0,
+        105
+    );
+
+
+    ctx.restore();
+
+
+    // =====================
+    // MOON DEVIL DESTROYED
+    // =====================
+
+    const subAlpha =
+        Math.min(
+            1,
+            t * 3
+        );
+
+
+    ctx.save();
+
+    ctx.textAlign =
+        "center";
+
+    ctx.font =
+        "bold 26px sans-serif";
+
+    ctx.fillStyle =
+        `rgba(255,255,255,${subAlpha})`;
+
+    ctx.shadowColor =
+        "#ff0000";
+
+    ctx.shadowBlur =
+        18;
+
+
+    ctx.fillText(
+        "MOON DEVIL DESTROYED",
+        400,
+        440
+    );
+
+
+    ctx.restore();
+
+}
         if(this.resultEffect==="meteor"
 && this.resultEffectTimer>0){
 
