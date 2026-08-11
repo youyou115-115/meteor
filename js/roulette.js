@@ -613,12 +613,10 @@ for(const y of candidates){
 
     // =====================
     // 通常数字
-    // Waveが進むほどアップ
     // =====================
 
     let reachChance =
-        0.70 +
-        (Game.wave - 1) * 0.03;
+        0.90 
 
 
     // 最大90%
@@ -949,8 +947,8 @@ for(let y = 0; y < 3; y++){
 // =====================
 
 let chance =
-    0.55 -
-    (Game.wave - 1) * 0.04;
+    0.5 //-
+   // (Game.wave - 1) * 0.04;
 
 chance =
     Math.max(
