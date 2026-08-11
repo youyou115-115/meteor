@@ -64,7 +64,6 @@ update(){
     // =====================
 
     if(
-        this.explosionTimer > 19 &&
         !this.explosionDamage
     ){
 
