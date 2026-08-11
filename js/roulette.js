@@ -221,7 +221,7 @@ let fast = 1;
 
 if(WaveBonus.blueSpin){
 
-    slow = 0.6;
+    slow = 0.8;
 
     WaveBonus.blueSpin = false;
 
