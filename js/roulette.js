@@ -637,7 +637,7 @@ for(const y of candidates){
         target === "★"
     ){
 
-        reachChance = 0.30;
+        reachChance = 0.10;
 
     }
 
