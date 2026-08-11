@@ -1792,10 +1792,13 @@ draw(){
 
 
 
+
+
 // =====================================================
 // METEOR FINISH
-// ☄ プレイヤー隕石 → 月へ直撃 → めり込み → 大爆発
-// Game.jsは変更しない
+// ☄ プレイヤー隕石 → 月へ接近 → 消失
+// → 月面に細かいヒビ → 崩壊 → 大爆発
+// → METEOR FINISH
 // =====================================================
 
 if(Game.state === "SPECIAL_CLEAR"){
@@ -1806,21 +1809,16 @@ if(Game.state === "SPECIAL_CLEAR"){
     ctx.save();
 
     // =================================================
-    // 特殊エンディング専用の座標系
+    // 座標系リセット
     // =================================================
 
-    // いったん既存のカメラ・変形を完全解除
     ctx.setTransform(
-        1,
-        0,
-        0,
-        1,
-        0,
-        0
+        1,0,0,1,0,0
     );
 
+
     // =================================================
-    // 800 x 700 のゲーム座標へ合わせる
+    // 800 x 700
     // =================================================
 
     const scale =
@@ -1829,11 +1827,14 @@ if(Game.state === "SPECIAL_CLEAR"){
             Game.canvas.height / H
         );
 
+
     const offsetX =
         (Game.canvas.width - W * scale) / 2;
 
+
     const offsetY =
         (Game.canvas.height - H * scale) / 2;
+
 
     ctx.setTransform(
         scale,
@@ -1843,6 +1844,7 @@ if(Game.state === "SPECIAL_CLEAR"){
         offsetX,
         offsetY
     );
+
 
     // =================================================
     // 宇宙背景
@@ -1857,11 +1859,12 @@ if(Game.state === "SPECIAL_CLEAR"){
         H
     );
 
+
     // =================================================
     // 星
     // =================================================
 
-    for(let i = 0; i < 160; i++){
+    for(let i = 0; i < 180; i++){
 
         const x =
             (i * 137) % W;
@@ -1869,17 +1872,21 @@ if(Game.state === "SPECIAL_CLEAR"){
         const y =
             (i * 83) % H;
 
+
         const twinkle =
             Math.sin(
                 Game.clearAnimation * 0.08 + i
             );
 
+
         const alpha =
-            0.18 +
-            Math.max(0, twinkle) * 0.45;
+            0.15 +
+            Math.max(0,twinkle) * 0.5;
+
 
         ctx.fillStyle =
             `rgba(255,255,255,${alpha})`;
+
 
         ctx.fillRect(
             x,
@@ -1890,13 +1897,581 @@ if(Game.state === "SPECIAL_CLEAR"){
 
     }
 
+
     // =================================================
-    // METEOR FINISH 専用座標
+    // 月座標
     // =================================================
 
     const moonX = 400;
     const moonY = 300;
     const moonR = 100;
+
+
+    // =================================================
+    // ヒビ描画
+    // =================================================
+
+    function drawMoonCracks(progress){
+
+        if(progress <= 0){
+            return;
+        }
+
+
+        ctx.save();
+
+
+        ctx.translate(
+            moonX,
+            moonY
+        );
+
+
+        // ---------------------------------------------
+        // 月面内だけ
+        // ---------------------------------------------
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            moonR * 0.98,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.clip();
+
+
+        ctx.strokeStyle =
+            "rgba(15,15,15,0.9)";
+
+        ctx.lineWidth = 1.6;
+
+        ctx.lineCap = "round";
+
+        ctx.lineJoin = "round";
+
+
+        // =================================================
+        // メインヒビ
+        // =================================================
+
+        const cracks = [
+
+            [
+                [0,0],
+                [-7,-12],
+                [-14,-25],
+                [-28,-37],
+                [-32,-53],
+                [-46,-67],
+                [-52,-84]
+            ],
+
+            [
+                [0,0],
+                [10,-8],
+                [21,-17],
+                [35,-28],
+                [42,-44],
+                [58,-57],
+                [67,-76]
+            ],
+
+            [
+                [0,0],
+                [-5,13],
+                [-13,26],
+                [-25,38],
+                [-31,54],
+                [-46,66],
+                [-55,82]
+            ],
+
+            [
+                [0,0],
+                [12,10],
+                [24,20],
+                [38,31],
+                [46,45],
+                [61,55],
+                [73,70]
+            ],
+
+            [
+                [0,0],
+                [-15,3],
+                [-28,9],
+                [-43,7],
+                [-58,16],
+                [-72,12],
+                [-88,22]
+            ],
+
+            [
+                [0,0],
+                [15,2],
+                [29,7],
+                [44,3],
+                [59,10],
+                [76,4],
+                [90,14]
+            ]
+
+        ];
+
+
+        for(let c of cracks){
+
+            const visible =
+                Math.min(
+                    c.length,
+                    Math.floor(
+                        progress * c.length
+                    ) + 1
+                );
+
+
+            if(visible < 2){
+                continue;
+            }
+
+
+            ctx.beginPath();
+
+
+            ctx.moveTo(
+                c[0][0],
+                c[0][1]
+            );
+
+
+            for(
+                let i = 1;
+                i < visible;
+                i++
+            ){
+
+                ctx.lineTo(
+                    c[i][0],
+                    c[i][1]
+                );
+
+            }
+
+
+            ctx.stroke();
+
+        }
+
+
+        // =================================================
+        // 枝ヒビ
+        // =================================================
+
+        if(progress > 0.28){
+
+            const branchProgress =
+                Math.min(
+                    1,
+                    (progress - 0.28) / 0.72
+                );
+
+
+            const branches = [
+
+                [-14,-25,-28,-12],
+                [-28,-37,-48,-28],
+
+                [21,-17,34,-3],
+                [35,-28,56,-20],
+
+                [-13,26,-31,20],
+                [-25,38,-42,49],
+
+                [24,20,42,31],
+                [46,45,67,39],
+
+                [-43,7,-51,-10],
+                [-58,16,-72,29],
+
+                [44,3,57,-10],
+                [59,10,78,25]
+
+            ];
+
+
+            ctx.globalAlpha =
+                branchProgress;
+
+
+            for(let b of branches){
+
+                ctx.beginPath();
+
+                ctx.moveTo(
+                    b[0],
+                    b[1]
+                );
+
+                ctx.lineTo(
+                    b[2],
+                    b[3]
+                );
+
+                ctx.stroke();
+
+            }
+
+        }
+
+
+        // =================================================
+        // 細かいヒビ
+        // =================================================
+
+        if(progress > 0.55){
+
+            const fineProgress =
+                Math.min(
+                    1,
+                    (progress - 0.55) / 0.45
+                );
+
+
+            ctx.globalAlpha =
+                fineProgress;
+
+
+            const fineCracks = [
+
+                [-32,-53,-44,-48],
+                [-46,-67,-58,-62],
+
+                [42,-44,52,-37],
+                [58,-57,72,-51],
+
+                [-31,54,-43,58],
+                [-46,66,-61,62],
+
+                [46,45,56,54],
+                [61,55,78,57],
+
+                [-58,16,-63,3],
+                [-72,12,-83,2],
+
+                [59,10,68,-2],
+                [76,4,87,-7]
+
+            ];
+
+
+            for(let b of fineCracks){
+
+                ctx.beginPath();
+
+                ctx.moveTo(
+                    b[0],
+                    b[1]
+                );
+
+                ctx.lineTo(
+                    b[2],
+                    b[3]
+                );
+
+                ctx.stroke();
+
+            }
+
+        }
+
+
+        ctx.restore();
+
+    }
+
+
+    // =================================================
+    // FINISH用隕石描画
+    // HPバーなし
+    // =================================================
+
+    function drawFinishMeteor(meteor,x,y,r){
+
+        if(!meteor){
+            return;
+        }
+
+
+        ctx.save();
+
+
+        // =================================================
+        // 炎
+        // =================================================
+
+        const fire =
+            ctx.createRadialGradient(
+                x,
+                y,
+                r * 0.5,
+                x,
+                y,
+                r * 1.8
+            );
+
+
+        fire.addColorStop(
+            0,
+            "rgba(255,120,30,0.85)"
+        );
+
+        fire.addColorStop(
+            0.5,
+            "rgba(255,50,0,0.45)"
+        );
+
+        fire.addColorStop(
+            1,
+            "rgba(255,0,0,0)"
+        );
+
+
+        ctx.fillStyle = fire;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            r * 1.8,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        // =================================================
+        // 岩
+        // =================================================
+
+        const points =
+            meteor.randomMeteor
+                ? 8 + Math.floor(Math.random() * 8)
+                : 10;
+
+
+        ctx.beginPath();
+
+
+        for(let i = 0; i < points; i++){
+
+            const angle =
+                Math.PI * 2 * i / points;
+
+
+            const offset =
+                r *
+                (
+                    0.85 +
+                    Math.random() * 0.15
+                );
+
+
+            const px =
+                x +
+                Math.cos(angle) * offset;
+
+
+            const py =
+                y +
+                Math.sin(angle) * offset;
+
+
+            if(i === 0){
+
+                ctx.moveTo(
+                    px,
+                    py
+                );
+
+            }
+            else{
+
+                ctx.lineTo(
+                    px,
+                    py
+                );
+
+            }
+
+        }
+
+
+        ctx.closePath();
+
+
+        // =================================================
+        // 隕石カラー
+        // =================================================
+
+        const rock =
+            ctx.createRadialGradient(
+                x - r * 0.3,
+                y - r * 0.4,
+                5,
+                x,
+                y,
+                r
+            );
+
+
+        if(meteor.type === 0){
+
+            rock.addColorStop(
+                0,
+                "#777"
+            );
+
+            rock.addColorStop(
+                0.5,
+                "#333"
+            );
+
+            rock.addColorStop(
+                1,
+                "#080808"
+            );
+
+        }
+        else if(meteor.type === 1){
+
+            rock.addColorStop(
+                0,
+                "#ff8888"
+            );
+
+            rock.addColorStop(
+                0.5,
+                "#aa2222"
+            );
+
+            rock.addColorStop(
+                1,
+                "#330000"
+            );
+
+        }
+        else if(meteor.type === 2){
+
+            rock.addColorStop(
+                0,
+                "#8888ff"
+            );
+
+            rock.addColorStop(
+                0.5,
+                "#3333aa"
+            );
+
+            rock.addColorStop(
+                1,
+                "#111144"
+            );
+
+        }
+        else if(meteor.type === 3){
+
+            rock.addColorStop(
+                0,
+                "#88ff88"
+            );
+
+            rock.addColorStop(
+                0.5,
+                "#229922"
+            );
+
+            rock.addColorStop(
+                1,
+                "#113311"
+            );
+
+        }
+        else if(meteor.type === 4){
+
+            rock.addColorStop(
+                0,
+                "#ffff88"
+            );
+
+            rock.addColorStop(
+                0.5,
+                "#aa6622"
+            );
+
+            rock.addColorStop(
+                1,
+                "#442200"
+            );
+
+        }
+        else{
+
+            rock.addColorStop(
+                0,
+                "#ff88ff"
+            );
+
+            rock.addColorStop(
+                0.5,
+                "#882288"
+            );
+
+            rock.addColorStop(
+                1,
+                "#220022"
+            );
+
+        }
+
+
+        ctx.fillStyle =
+            rock;
+
+
+        ctx.fill();
+
+
+        // =================================================
+        // 溶岩
+        // =================================================
+
+        ctx.fillStyle =
+            "rgba(255,80,20,0.8)";
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x + r * 0.2,
+            y - r * 0.2,
+            r * 0.15,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.restore();
+
+    }
 
 
     // =================================================
@@ -1906,10 +2481,14 @@ if(Game.state === "SPECIAL_CLEAR"){
     // ↓
     // 隕石高速接近
     // ↓
-    // 月へ直撃
+    // 月直前で消失
     // =================================================
 
     if(Game.specialClearPhase === 0){
+
+        // 次回CLEARに備えてリセット
+        Game.finishLaughPlayed = false;
+
 
         const progress =
             Math.min(
@@ -1937,18 +2516,19 @@ if(Game.state === "SPECIAL_CLEAR"){
 
 
         // =================================================
-        // 月の赤いオーラ
+        // 月オーラ
         // =================================================
 
         const aura =
             ctx.createRadialGradient(
                 moonX,
                 moonY,
-                moonR * 0.35,
+                moonR * 0.3,
                 moonX,
                 moonY,
-                moonR * 2.1
+                moonR * 2.2
             );
+
 
         aura.addColorStop(
             0,
@@ -1957,7 +2537,7 @@ if(Game.state === "SPECIAL_CLEAR"){
 
         aura.addColorStop(
             0.45,
-            "rgba(150,0,0,0.10)"
+            "rgba(150,0,0,0.08)"
         );
 
         aura.addColorStop(
@@ -1965,15 +2545,16 @@ if(Game.state === "SPECIAL_CLEAR"){
             "rgba(0,0,0,0)"
         );
 
-        ctx.fillStyle =
-            aura;
+
+        ctx.fillStyle = aura;
+
 
         ctx.beginPath();
 
         ctx.arc(
             moonX,
             moonY,
-            moonR * 2.1,
+            moonR * 2.2,
             0,
             Math.PI * 2
         );
@@ -1981,15 +2562,63 @@ if(Game.state === "SPECIAL_CLEAR"){
         ctx.fill();
 
 
+        // =================================================
+        // 隕石
+        // =================================================
+
+        if(Game.meteor){
+
+            const meteor =
+                Game.meteor;
+
+
+            const meteorX =
+                400;
+
+
+            const meteorY =
+                700 -
+                progress * 360;
+
+
+            const meteorScale =
+                0.45 +
+                progress * 0.55;
+
+
+            drawFinishMeteor(
+                meteor,
+                meteorX,
+                meteorY,
+                25 * meteorScale
+            );
+
+        }
+
+        // ★ 白い円は完全削除
 
     }
 
 
+    // =================================================
+    // PHASE 1
+    //
+    // 月面に細かいヒビ
+    // ↓
+    // ヒビが全体へ拡大
+    // =================================================
 
     else if(Game.specialClearPhase === 1){
 
-        const centerX = moonX;
-const centerY = moonY;
+        const progress =
+            Math.min(
+                1,
+                Math.max(
+                    0,
+                    1 -
+                    Game.specialClearTimer / 80
+                )
+            );
 
 
         // =================================================
@@ -1998,17 +2627,146 @@ const centerY = moonY;
 
         drawFinishMoon(
             ctx,
-            centerX,
-            centerY,
-            100,
+            moonX,
+            moonY,
+            moonR,
             2,
             false
         );
 
 
-       
+        // =================================================
+        // 赤い内部発光
+        // =================================================
 
-    // =================================================
+        const redGlow =
+            ctx.createRadialGradient(
+                moonX,
+                moonY,
+                20,
+                moonX,
+                moonY,
+                moonR * 1.3
+            );
+
+
+        redGlow.addColorStop(
+            0,
+            `rgba(
+                255,
+                30,
+                20,
+                ${0.08 + progress * 0.30}
+            )`
+        );
+
+
+        redGlow.addColorStop(
+            0.55,
+            `rgba(
+                180,
+                0,
+                0,
+                ${progress * 0.15}
+            )`
+        );
+
+
+        redGlow.addColorStop(
+            1,
+            "rgba(0,0,0,0)"
+        );
+
+
+        ctx.fillStyle =
+            redGlow;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            moonX,
+            moonY,
+            moonR * 1.3,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        // =================================================
+        // ヒビ
+        // =================================================
+
+        drawMoonCracks(
+            progress
+        );
+
+
+        // =================================================
+        // ヒビから赤い光
+        // =================================================
+
+        if(progress > 0.35){
+
+            const glow =
+                (
+                    progress - 0.35
+                ) / 0.65;
+
+
+            ctx.strokeStyle =
+                `rgba(
+                    255,
+                    60,
+                    20,
+                    ${glow * 0.55}
+                )`;
+
+
+            ctx.lineWidth = 4;
+
+            ctx.shadowColor =
+                "#ff2200";
+
+            ctx.shadowBlur = 12;
+
+
+            const glowCracks = [
+
+                [0,0,-32,-53],
+                [0,0,42,-44],
+                [0,0,-31,54],
+                [0,0,46,45],
+                [0,0,-58,16],
+                [0,0,59,10]
+
+            ];
+
+
+            for(let c of glowCracks){
+
+                ctx.beginPath();
+
+                ctx.moveTo(
+                    moonX + c[0],
+                    moonY + c[1]
+                );
+
+                ctx.lineTo(
+                    moonX + c[2],
+                    moonY + c[3]
+                );
+
+                ctx.stroke();
+
+            }
+
+
+            ctx.shadowBlur = 0;
+
+        }
 
     }
 
@@ -2016,13 +2774,11 @@ const centerY = moonY;
     // =================================================
     // PHASE 2
     //
-    // 月消滅
+    // 月崩壊
     // ↓
     // 爆発
     // ↓
     // 破片飛散
-    // ↓
-    // 白フラッシュ
     // =================================================
 
     else if(Game.specialClearPhase === 2){
@@ -2038,29 +2794,49 @@ const centerY = moonY;
             );
 
 
-        const centerX = moonX;
-const centerY = moonY;
+        // =================================================
+        // 笑い声
+        // 月崩壊開始時に一度だけ
+        // =================================================
+
+        if(!Game.finishLaughPlayed){
+
+            Game.finishLaughPlayed = true;
+
+            if(
+                typeof Sound !== "undefined" &&
+                Sound.bossLaugh
+            ){
+
+                Sound.bossLaugh();
+
+            }
+
+        }
 
 
         // =================================================
-        // 強烈な画面揺れ
+        // カメラ振動
         // =================================================
 
         const shakePower =
-            progress * 22;
+            progress * 24;
 
 
         const shakeX =
-            (Math.random() - 0.5) *
-            shakePower;
+            (
+                Math.random() - 0.5
+            ) * shakePower;
 
 
         const shakeY =
-            (Math.random() - 0.5) *
-            shakePower;
+            (
+                Math.random() - 0.5
+            ) * shakePower;
 
 
         ctx.save();
+
 
         ctx.translate(
             shakeX,
@@ -2069,23 +2845,31 @@ const centerY = moonY;
 
 
         // =================================================
-        // 爆発直前の月
+        // 崩壊する月
         // =================================================
 
-        if(progress < 0.16){
+        if(progress < 0.25){
 
             const moonScale =
                 1 -
-                progress * 2.5;
+                progress * 1.5;
 
 
             drawFinishMoon(
                 ctx,
-                centerX,
-                centerY,
-                100 * moonScale,
+                moonX,
+                moonY,
+                moonR * moonScale,
                 2,
                 false
+            );
+
+
+            drawMoonCracks(
+                Math.min(
+                    1,
+                    progress * 5
+                )
             );
 
         }
@@ -2098,7 +2882,7 @@ const centerY = moonY;
         const explosionProgress =
             Math.min(
                 1,
-                progress / 0.72
+                progress / 0.75
             );
 
 
@@ -2106,13 +2890,13 @@ const centerY = moonY;
         // 爆発リング
         // =================================================
 
-        for(let i = 0; i < 10; i++){
+        for(let i = 0; i < 12; i++){
 
             const ringProgress =
                 Math.max(
                     0,
                     explosionProgress -
-                    i * 0.045
+                    i * 0.04
                 );
 
 
@@ -2120,7 +2904,7 @@ const centerY = moonY;
                 ringProgress *
                 (
                     70 +
-                    i * 40
+                    i * 42
                 );
 
 
@@ -2133,19 +2917,24 @@ const centerY = moonY;
 
 
             ctx.strokeStyle =
-                `rgba(255,${50 + i * 18},20,${alpha})`;
+                `rgba(
+                    255,
+                    ${50 + i * 15},
+                    20,
+                    ${alpha}
+                )`;
 
 
             ctx.lineWidth =
                 3 +
-                (1 - ringProgress) * 8;
+                (1 - ringProgress) * 7;
 
 
             ctx.beginPath();
 
             ctx.arc(
-                centerX,
-                centerY,
+                moonX,
+                moonY,
                 radius,
                 0,
                 Math.PI * 2
@@ -2160,21 +2949,21 @@ const centerY = moonY;
         // 中央爆発
         // =================================================
 
-        if(progress > 0.035){
+        if(progress > 0.03){
 
             const explosionRadius =
-                35 +
-                350 *
+                30 +
+                380 *
                 explosionProgress;
 
 
             const explosion =
                 ctx.createRadialGradient(
-                    centerX,
-                    centerY,
+                    moonX,
+                    moonY,
                     0,
-                    centerX,
-                    centerY,
+                    moonX,
+                    moonY,
                     explosionRadius
                 );
 
@@ -2185,23 +2974,23 @@ const centerY = moonY;
             );
 
             explosion.addColorStop(
-                0.07,
-                "rgba(255,245,180,1)"
+                0.06,
+                "rgba(255,245,190,1)"
             );
 
             explosion.addColorStop(
-                0.20,
-                "rgba(255,130,20,0.98)"
+                0.18,
+                "rgba(255,140,20,0.98)"
             );
 
             explosion.addColorStop(
-                0.43,
-                "rgba(230,20,0,0.70)"
+                0.40,
+                "rgba(230,20,0,0.72)"
             );
 
             explosion.addColorStop(
-                0.72,
-                "rgba(100,0,0,0.30)"
+                0.70,
+                "rgba(100,0,0,0.28)"
             );
 
             explosion.addColorStop(
@@ -2217,8 +3006,8 @@ const centerY = moonY;
             ctx.beginPath();
 
             ctx.arc(
-                centerX,
-                centerY,
+                moonX,
+                moonY,
                 explosionRadius,
                 0,
                 Math.PI * 2
@@ -2233,26 +3022,26 @@ const centerY = moonY;
         // 放射状爆発
         // =================================================
 
-        if(progress > 0.06){
+        if(progress > 0.05){
 
-            for(let i = 0; i < 42; i++){
+            for(let i = 0; i < 48; i++){
 
                 const angle =
                     i *
                     Math.PI *
                     2 /
-                    42;
+                    48;
 
 
                 const inner =
-                    45 *
+                    35 *
                     explosionProgress;
 
 
                 const outer =
                     (
                         150 +
-                        (i % 6) * 48
+                        (i % 7) * 55
                     ) *
                     explosionProgress;
 
@@ -2266,7 +3055,12 @@ const centerY = moonY;
 
 
                 ctx.strokeStyle =
-                    `rgba(255,${70 + (i % 5) * 30},20,${alpha})`;
+                    `rgba(
+                        255,
+                        ${70 + (i % 5) * 30},
+                        20,
+                        ${alpha}
+                    )`;
 
 
                 ctx.lineWidth =
@@ -2277,19 +3071,19 @@ const centerY = moonY;
                 ctx.beginPath();
 
                 ctx.moveTo(
-                    centerX +
+                    moonX +
                     Math.cos(angle) * inner,
 
-                    centerY +
+                    moonY +
                     Math.sin(angle) * inner
                 );
 
 
                 ctx.lineTo(
-                    centerX +
+                    moonX +
                     Math.cos(angle) * outer,
 
-                    centerY +
+                    moonY +
                     Math.sin(angle) * outer
                 );
 
@@ -2339,7 +3133,11 @@ const centerY = moonY;
             ];
 
 
-            for(let i = 0; i < fragments.length; i++){
+            for(
+                let i = 0;
+                i < fragments.length;
+                i++
+            ){
 
                 const f =
                     fragments[i];
@@ -2351,18 +3149,19 @@ const centerY = moonY;
 
 
                 const x =
-                    centerX +
+                    moonX +
                     Math.cos(f[0]) *
                     distance;
 
 
                 const y =
-                    centerY +
+                    moonY +
                     Math.sin(f[0]) *
                     distance;
 
 
                 ctx.save();
+
 
                 ctx.translate(
                     x,
@@ -2388,7 +3187,8 @@ const centerY = moonY;
 
                 const fragmentScale =
                     1 -
-                    fragmentProgress * 0.35;
+                    fragmentProgress *
+                    0.35;
 
 
                 ctx.scale(
@@ -2398,32 +3198,38 @@ const centerY = moonY;
 
 
                 ctx.fillStyle =
-                    "#777777";
+                    "#777";
 
 
                 ctx.beginPath();
+
 
                 ctx.moveTo(
                     -f[2],
                     0
                 );
 
+
                 ctx.lineTo(
                     0,
                     -f[2] * 0.75
                 );
+
 
                 ctx.lineTo(
                     f[2],
                     f[2] * 0.25
                 );
 
+
                 ctx.lineTo(
                     f[2] * 0.25,
                     f[2]
                 );
 
+
                 ctx.closePath();
+
 
                 ctx.fill();
 
@@ -2431,7 +3237,9 @@ const centerY = moonY;
                 ctx.strokeStyle =
                     "rgba(255,80,20,0.82)";
 
+
                 ctx.lineWidth = 2;
+
 
                 ctx.stroke();
 
@@ -2460,7 +3268,12 @@ const centerY = moonY;
 
 
             ctx.fillStyle =
-                `rgba(255,255,255,${flash})`;
+                `rgba(
+                    255,
+                    255,
+                    255,
+                    ${flash}
+                )`;
 
 
             ctx.fillRect(
@@ -2475,43 +3288,493 @@ const centerY = moonY;
     }
 
 
-    // =================================================
-    // PHASE 3
-    //
-    // 白フラッシュ
-    // ↓
-    // 徐々に暗転
-    // ↓
-    // METEOR FINISH
-    // =================================================
+// =================================================
+// PHASE 3
+//
+// 爆発終了
+// ↓
+// 白フラッシュ
+// ↓
+// 暗転
+// ↓
+// METEOR FINISH
+// =================================================
 
-    else if(Game.specialClearPhase === 3){
+else if(Game.specialClearPhase === 3){
 
-        const progress =
-            Math.min(
-                1,
-                Math.max(
-                    0,
-                    1 -
-                    Game.specialClearTimer / 100
-                )
-            );
-
-
-        // =================================================
-        // 白から暗転
-        // =================================================
-
-        const alpha =
+    const progress =
+        Math.min(
+            1,
             Math.max(
                 0,
                 1 -
-                progress
-            );
+                Game.specialClearTimer / 100
+            )
+        );
+
+
+    // =================================================
+    // 背景
+    // =================================================
+
+    ctx.fillStyle =
+        "#000005";
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    // =================================================
+    // 爆発直後の白フラッシュ
+    // 少しだけ残す
+    // =================================================
+
+    if(progress < 0.12){
+
+        const flash =
+            1 -
+            progress / 0.12;
 
 
         ctx.fillStyle =
-            `rgba(255,255,255,${alpha})`;
+            `rgba(
+                255,
+                255,
+                255,
+                ${flash * 0.9}
+            )`;
+
+
+        ctx.fillRect(
+            0,
+            0,
+            W,
+            H
+        );
+
+    }
+
+
+    // =================================================
+    // 暗転からタイトル登場
+    // =================================================
+
+    if(progress > 0.18){
+
+        const titleProgress =
+            Math.min(
+                1,
+                (progress - 0.18) / 0.32
+            );
+
+
+        // ---------------------------------------------
+        // なめらかなイージング
+        // ---------------------------------------------
+
+        const ease =
+            1 -
+            Math.pow(
+                1 - titleProgress,
+                3
+            );
+
+
+        // =================================================
+        // 背景の赤い光
+        // =================================================
+
+        const glow =
+            ctx.createRadialGradient(
+                W / 2,
+                350,
+                0,
+                W / 2,
+                350,
+                360
+            );
+
+
+        glow.addColorStop(
+            0,
+            `rgba(
+                180,
+                0,
+                0,
+                ${0.22 * ease}
+            )`
+        );
+
+
+        glow.addColorStop(
+            0.35,
+            `rgba(
+                100,
+                0,
+                0,
+                ${0.10 * ease}
+            )`
+        );
+
+
+        glow.addColorStop(
+            1,
+            "rgba(0,0,0,0)"
+        );
+
+
+        ctx.fillStyle =
+            glow;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            W / 2,
+            350,
+            360,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        // =================================================
+        // タイトル
+        // =================================================
+
+        ctx.save();
+
+
+        ctx.translate(
+            W / 2,
+            350
+        );
+
+
+        // ---------------------------------------------
+        // 登場時に少し大きい
+        // ---------------------------------------------
+
+        const titleScale =
+            1.25 -
+            ease * 0.25;
+
+
+        ctx.scale(
+            titleScale,
+            titleScale
+        );
+
+
+        // ---------------------------------------------
+        // 少しだけ右上がり
+        // ---------------------------------------------
+
+        ctx.rotate(
+            -0.025
+        );
+
+
+        ctx.globalAlpha =
+            ease;
+
+
+        ctx.textAlign =
+            "center";
+
+
+        ctx.textBaseline =
+            "middle";
+
+
+        // =================================================
+        // フォント
+        // =================================================
+
+        ctx.font =
+            "italic 78px Impact, Arial Black, sans-serif";
+
+
+        // =================================================
+        // 外側の黒い太縁
+        // =================================================
+
+        ctx.lineWidth =
+            14;
+
+
+        ctx.lineJoin =
+            "round";
+
+
+        ctx.strokeStyle =
+            "#080808";
+
+
+        ctx.strokeText(
+            "METEOR FINISH",
+            0,
+            0
+        );
+
+
+        // =================================================
+        // 赤い発光
+        // =================================================
+
+        ctx.shadowColor =
+            "#ff1800";
+
+
+        ctx.shadowBlur =
+            35;
+
+
+        ctx.lineWidth =
+            8;
+
+
+        ctx.strokeStyle =
+            "#ff2200";
+
+
+        ctx.strokeText(
+            "METEOR FINISH",
+            0,
+            0
+        );
+
+
+        // =================================================
+        // 白文字
+        // =================================================
+
+        ctx.shadowColor =
+            "#ffffff";
+
+
+        ctx.shadowBlur =
+            12;
+
+
+        ctx.fillStyle =
+            "#ffffff";
+
+
+        ctx.fillText(
+            "METEOR FINISH",
+            0,
+            0
+        );
+
+
+        // =================================================
+        // 上側の白ハイライト
+        // =================================================
+
+        ctx.shadowBlur =
+            0;
+
+
+        ctx.lineWidth =
+            2;
+
+
+        ctx.strokeStyle =
+            "rgba(255,255,255,0.75)";
+
+
+        ctx.strokeText(
+            "METEOR FINISH",
+            0,
+            -1
+        );
+
+
+        ctx.restore();
+
+
+        // =================================================
+        // タイトル横の赤いスピードライン
+        // =================================================
+
+        if(titleProgress > 0.15){
+
+            const lineProgress =
+                Math.min(
+                    1,
+                    (titleProgress - 0.15) / 0.45
+                );
+
+
+            ctx.save();
+
+
+            ctx.globalAlpha =
+                lineProgress * 0.8;
+
+
+            ctx.strokeStyle =
+                "#ff2200";
+
+
+            ctx.lineWidth = 2;
+
+
+            ctx.shadowColor =
+                "#ff2200";
+
+
+            ctx.shadowBlur =
+                10;
+
+
+            // -----------------------------------------
+            // 左
+            // -----------------------------------------
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                80,
+                350
+            );
+
+            ctx.lineTo(
+                260 * lineProgress,
+                350
+            );
+
+            ctx.stroke();
+
+
+            // -----------------------------------------
+            // 右
+            // -----------------------------------------
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                W - 80,
+                350
+            );
+
+            ctx.lineTo(
+                W -
+                260 * lineProgress,
+                350
+            );
+
+            ctx.stroke();
+
+
+            ctx.restore();
+
+        }
+
+
+        // =================================================
+        // 下側の赤いライン
+        // =================================================
+
+        if(titleProgress > 0.35){
+
+            const lineAlpha =
+                Math.min(
+                    1,
+                    (titleProgress - 0.35) / 0.25
+                );
+
+
+            ctx.save();
+
+
+            ctx.globalAlpha =
+                lineAlpha * 0.65;
+
+
+            ctx.strokeStyle =
+                "#ff2200";
+
+
+            ctx.lineWidth = 2;
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                180,
+                405
+            );
+
+
+            ctx.lineTo(
+                W - 180,
+                405
+            );
+
+
+            ctx.stroke();
+
+
+            ctx.restore();
+
+        }
+
+    }
+
+
+    // =================================================
+    // 最後まで残る小さな赤い光
+    // =================================================
+
+    if(progress > 0.55){
+
+        const finalGlow =
+            Math.min(
+                1,
+                (progress - 0.55) / 0.25
+            );
+
+
+        ctx.save();
+
+
+        ctx.globalAlpha =
+            finalGlow * 0.18;
+
+
+        const finalLight =
+            ctx.createRadialGradient(
+                W / 2,
+                350,
+                20,
+                W / 2,
+                350,
+                300
+            );
+
+
+        finalLight.addColorStop(
+            0,
+            "#ff2200"
+        );
+
+
+        finalLight.addColorStop(
+            1,
+            "rgba(0,0,0,0)"
+        );
+
+
+        ctx.fillStyle =
+            finalLight;
 
 
         ctx.fillRect(
@@ -2522,64 +3785,15 @@ const centerY = moonY;
         );
 
 
-        // =================================================
-        // METEOR FINISH
-        // =================================================
-
-        if(progress > 0.35){
-
-            const textAlpha =
-                Math.min(
-                    1,
-                    (progress - 0.35) / 0.25
-                );
-
-
-            ctx.save();
-
-            ctx.globalAlpha =
-                textAlpha;
-
-
-            ctx.textAlign =
-                "center";
-
-            ctx.textBaseline =
-                "middle";
-
-
-            ctx.font =
-                "bold 78px sans-serif";
-
-
-            ctx.shadowColor =
-                "#ff2200";
-
-            ctx.shadowBlur =
-                35;
-
-
-            ctx.fillStyle =
-                "#ffffff";
-
-
-            ctx.fillText(
-                "METEOR FINISH",
-                W / 2,
-                350
-            );
-
-
-            ctx.restore();
-
-        }
+        ctx.restore();
 
     }
 
-
-    ctx.restore();
-
 }
+}
+
+
+
 
 
 

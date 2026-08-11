@@ -2161,6 +2161,533 @@ clearBGM(){
     );
 
 },
+// =====================================================
+// METEOR FINISH
+// 隕石 → 月 激突音
+// 激しい衝撃 + 重低音 + 轟音
+// =====================================================
+
+meteorMoonImpact(){
+
+    if(!this.ctx){
+        return;
+    }
+
+    const now = this.ctx.currentTime;
+
+
+    // =====================
+    // 巨大衝撃ノイズ
+    // =====================
+
+    const bufferSize =
+        this.ctx.sampleRate * 0.35;
+
+    const buffer =
+        this.ctx.createBuffer(
+            1,
+            bufferSize,
+            this.ctx.sampleRate
+        );
+
+    const data =
+        buffer.getChannelData(0);
+
+
+    for(let i = 0; i < bufferSize; i++){
+
+        const t = i / bufferSize;
+
+        const decay =
+            Math.pow(1 - t, 2.5);
+
+        data[i] =
+            (Math.random() * 2 - 1)
+            * decay;
+
+    }
+
+
+    const noise =
+        this.ctx.createBufferSource();
+
+    const noiseGain =
+        this.ctx.createGain();
+
+
+    noise.buffer = buffer;
+
+
+    noiseGain.gain.setValueAtTime(
+        1.5,
+        now
+    );
+
+    noiseGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now + 0.35
+    );
+
+
+    noise.connect(noiseGain);
+    noiseGain.connect(this.master);
+
+    noise.start(now);
+
+
+    // =====================
+    // 超低音「ズドン」
+    // =====================
+
+    const boom =
+        this.ctx.createOscillator();
+
+    const boomGain =
+        this.ctx.createGain();
+
+
+    boom.type = "sine";
+
+
+    boom.frequency.setValueAtTime(
+        75,
+        now
+    );
+
+    boom.frequency.exponentialRampToValueAtTime(
+        18,
+        now + 1.0
+    );
+
+
+    boomGain.gain.setValueAtTime(
+        1.8,
+        now
+    );
+
+    boomGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now + 1.0
+    );
+
+
+    boom.connect(boomGain);
+    boomGain.connect(this.master);
+
+
+    boom.start(now);
+    boom.stop(now + 1.0);
+
+
+    // =====================
+    // 金属・岩石が潰れる音
+    // =====================
+
+    const crush =
+        this.ctx.createOscillator();
+
+    const crushGain =
+        this.ctx.createGain();
+
+
+    crush.type = "sawtooth";
+
+
+    crush.frequency.setValueAtTime(
+        260,
+        now
+    );
+
+    crush.frequency.exponentialRampToValueAtTime(
+        55,
+        now + 0.45
+    );
+
+
+    crushGain.gain.setValueAtTime(
+        0.65,
+        now
+    );
+
+    crushGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now + 0.45
+    );
+
+
+    crush.connect(crushGain);
+    crushGain.connect(this.master);
+
+
+    crush.start(now);
+    crush.stop(now + 0.45);
+
+
+    // =====================
+    // 遅れてくる轟音
+    // =====================
+
+    const rumble =
+        this.ctx.createOscillator();
+
+    const rumbleGain =
+        this.ctx.createGain();
+
+
+    rumble.type = "triangle";
+
+
+    rumble.frequency.setValueAtTime(
+        45,
+        now + 0.08
+    );
+
+    rumble.frequency.exponentialRampToValueAtTime(
+        22,
+        now + 1.4
+    );
+
+
+    rumbleGain.gain.setValueAtTime(
+        0.001,
+        now
+    );
+
+    rumbleGain.gain.exponentialRampToValueAtTime(
+        0.8,
+        now + 0.12
+    );
+
+    rumbleGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now + 1.4
+    );
+
+
+    rumble.connect(rumbleGain);
+    rumbleGain.connect(this.master);
+
+
+    rumble.start(now);
+    rumble.stop(now + 1.4);
+
+},
+
+
+
+// =====================================================
+// METEOR FINISH
+// 月にめり込んだ隕石が砕ける音
+// 重低音の「メキメキメキ……ギギギ……」
+// =====================================================
+
+meteorMoonCrush(){
+
+    if(!this.ctx){
+        return;
+    }
+
+    const now = this.ctx.currentTime;
+
+
+    // =================================================
+    // 超低音の岩盤圧壊
+    // 「ゴゴゴ……」
+    // =================================================
+
+    const rumble =
+        this.ctx.createOscillator();
+
+    const rumbleGain =
+        this.ctx.createGain();
+
+
+    rumble.type = "sawtooth";
+
+
+    rumble.frequency.setValueAtTime(
+        48,
+        now
+    );
+
+    rumble.frequency.exponentialRampToValueAtTime(
+        22,
+        now + 1.8
+    );
+
+
+    rumbleGain.gain.setValueAtTime(
+        0.001,
+        now
+    );
+
+    rumbleGain.gain.exponentialRampToValueAtTime(
+        0.9,
+        now + 0.15
+    );
+
+    rumbleGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now + 1.8
+    );
+
+
+    rumble.connect(rumbleGain);
+    rumbleGain.connect(this.master);
+
+
+    rumble.start(now);
+    rumble.stop(now + 1.8);
+
+
+    // =================================================
+    // 「メキメキメキ」する軋み音
+    // =================================================
+
+    const crack =
+        this.ctx.createOscillator();
+
+    const crackGain =
+        this.ctx.createGain();
+
+
+    crack.type = "sawtooth";
+
+
+    crack.frequency.setValueAtTime(
+        85,
+        now
+    );
+
+
+    // 周波数を細かく変化させて
+    // 岩がねじれて軋む感じを作る
+    crack.frequency.linearRampToValueAtTime(
+        125,
+        now + 0.22
+    );
+
+    crack.frequency.linearRampToValueAtTime(
+        65,
+        now + 0.43
+    );
+
+    crack.frequency.linearRampToValueAtTime(
+        115,
+        now + 0.65
+    );
+
+    crack.frequency.linearRampToValueAtTime(
+        52,
+        now + 0.9
+    );
+
+    crack.frequency.linearRampToValueAtTime(
+        95,
+        now + 1.15
+    );
+
+    crack.frequency.linearRampToValueAtTime(
+        35,
+        now + 1.55
+    );
+
+
+    crackGain.gain.setValueAtTime(
+        0.001,
+        now
+    );
+
+    crackGain.gain.exponentialRampToValueAtTime(
+        0.65,
+        now + 0.12
+    );
+
+    crackGain.gain.exponentialRampToValueAtTime(
+        0.001,
+        now + 1.6
+    );
+
+
+    crack.connect(crackGain);
+    crackGain.connect(this.master);
+
+
+    crack.start(now);
+    crack.stop(now + 1.6);
+
+
+    // =================================================
+    // 低い「ギギギギ」
+    // =================================================
+
+    const grind =
+        this.ctx.createOscillator();
+
+    const grindGain =
+        this.ctx.createGain();
+
+
+    grind.type = "square";
+
+
+    grind.frequency.setValueAtTime(
+        180,
+        now
+    );
+
+    grind.frequency.exponentialRampToValueAtTime(
+        45,
+        now + 1.25
+    );
+
+
+    grindGain.gain.setValueAtTime(
+        0.001,
+        now
+    );
+
+    grindGain.gain.exponentialRampToValueAtTime(
+        0.35,
+        now + 0.08
+    );
+
+    grindGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now + 1.3
+    );
+
+
+    grind.connect(grindGain);
+    grindGain.connect(this.master);
+
+
+    grind.start(now);
+    grind.stop(now + 1.3);
+
+
+    // =================================================
+    // 岩石が割れる瞬間
+    // 「バキッ」
+    // =================================================
+
+    const crackBufferSize =
+        this.ctx.sampleRate * 0.18;
+
+    const crackBuffer =
+        this.ctx.createBuffer(
+            1,
+            crackBufferSize,
+            this.ctx.sampleRate
+        );
+
+    const data =
+        crackBuffer.getChannelData(0);
+
+
+    for(let i = 0; i < crackBufferSize; i++){
+
+        const t =
+            i / crackBufferSize;
+
+        const decay =
+            Math.pow(1 - t, 3);
+
+        data[i] =
+            (Math.random() * 2 - 1)
+            * decay;
+
+    }
+
+
+    const crackNoise =
+        this.ctx.createBufferSource();
+
+    const crackNoiseGain =
+        this.ctx.createGain();
+
+
+    crackNoise.buffer =
+        crackBuffer;
+
+
+    crackNoiseGain.gain.setValueAtTime(
+        0.001,
+        now
+    );
+
+
+    // 少し遅れて「バキッ」
+    crackNoiseGain.gain.exponentialRampToValueAtTime(
+        0.75,
+        now + 0.55
+    );
+
+    crackNoiseGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now + 0.73
+    );
+
+
+    crackNoise.connect(crackNoiseGain);
+    crackNoiseGain.connect(this.master);
+
+
+    crackNoise.start(now);
+
+
+    // =================================================
+    // 最後の重低音
+    // 「ズ……ン」
+    // =================================================
+
+    const finalBoom =
+        this.ctx.createOscillator();
+
+    const finalGain =
+        this.ctx.createGain();
+
+
+    finalBoom.type = "sine";
+
+
+    finalBoom.frequency.setValueAtTime(
+        42,
+        now + 0.5
+    );
+
+    finalBoom.frequency.exponentialRampToValueAtTime(
+        18,
+        now + 1.7
+    );
+
+
+    finalGain.gain.setValueAtTime(
+        0.001,
+        now
+    );
+
+    finalGain.gain.exponentialRampToValueAtTime(
+        0.9,
+        now + 0.58
+    );
+
+    finalGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now + 1.7
+    );
+
+
+    finalBoom.connect(finalGain);
+    finalGain.connect(this.master);
+
+
+    finalBoom.start(now);
+    finalBoom.stop(now + 1.7);
+
+},
+
+
 
 
 };
