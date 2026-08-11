@@ -1159,12 +1159,13 @@ startSpecialClear(){
     // Game.meteor.active=false にはしない
 
     // =========================
-    // BGM停止
-    // =========================
+// BGM完全停止
+// =========================
 
-    Sound.stopBGM();
+Sound.stopBGM();
+Sound.stopBattleBGM();
 
-    Camera.hitShake(10);
+Camera.hitShake(10);
 
 },
 updateSpecialClear(){
