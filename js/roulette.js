@@ -2559,10 +2559,21 @@ else if(value === "★"){
 }
 
 ctx.font =
-    "bold " +
+    "900 " +
     fontSize +
-    "px sans-serif";
+    "px Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif";
 
+// 黒い縁取り
+ctx.lineWidth = 5;
+ctx.strokeStyle = "#000000";
+
+ctx.strokeText(
+    value,
+    symbolX,
+    symbolY
+);
+
+// 本体
 ctx.fillText(
     value,
     symbolX,
