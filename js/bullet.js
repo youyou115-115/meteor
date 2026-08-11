@@ -80,7 +80,7 @@ update(){
 
             const damage =
                 Math.floor(
-                    this.explosionTarget.hp * 0.5
+                    this.explosionTarget.hp * 0.25
                 );
 
             this.explosionTarget.damage(damage);
@@ -101,7 +101,7 @@ update(){
 
             const damage =
                 Math.floor(
-                    Game.boss.hp * 0.25
+                    Game.boss.hp * 0.15
                 );
 
             Game.boss.damage(damage);
