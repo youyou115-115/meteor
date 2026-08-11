@@ -1095,7 +1095,7 @@ if(this.dying){
 
     }
 
-
+ ctx.restore();
     return;
 
 }
